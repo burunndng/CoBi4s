@@ -10,8 +10,6 @@ import {
   Sliders, 
   Menu as MenuIcon, 
   X,
-  ExternalLink,
-  ShieldCheck,
   CheckCircle2,
   GraduationCap
 } from 'lucide-react';
@@ -25,72 +23,12 @@ import StudyPlan from './components/StudyPlan';
 import AppSettings from './components/AppSettings';
 import AIInstructor from './components/AIInstructor';
 
-const ApiKeyGate: React.FC<{ onKeySaved: () => void }> = ({ onKeySaved }) => {
-  const [key, setKey] = useState('');
-  const [error, setError] = useState('');
-
-  const handleSave = () => {
-    if (key.startsWith('sk-or-')) {
-      localStorage.setItem('cognibias-openrouter-key', key);
-      onKeySaved();
-    } else {
-      setError('Invalid key format. Must start with sk-or-');
-    }
-  };
-
-  return (
-    <div className="fixed inset-0 z-[100] bg-[#09090b] flex items-center justify-center p-6">
-      <div className="w-full max-w-sm p-8 surface rounded-xl shadow-2xl">
-        <div className="flex flex-col items-center mb-6 space-y-3">
-          <div className="p-3 bg-white/5 rounded-full border border-white/10">
-            <ShieldCheck size={20} className="text-white" />
-          </div>
-          <div className="text-center">
-            <h2 className="text-lg font-semibold text-white">System Access</h2>
-            <p className="text-xs text-slate-500 mt-1 uppercase tracking-wider">Authentication Required</p>
-          </div>
-        </div>
-
-        <div className="space-y-4">
-          <div>
-            <input 
-              type="password"
-              placeholder="sk-or-..."
-              value={key}
-              onChange={(e) => { setKey(e.target.value); setError(''); }}
-              className="w-full bg-[#09090b] border border-white/10 text-white rounded-lg px-4 py-3 text-sm focus:outline-none focus:border-white/30 transition-colors font-mono placeholder:text-zinc-700"
-            />
-            {error && <p className="text-red-400 text-[10px] mt-2 font-medium uppercase tracking-wide">{error}</p>}
-          </div>
-
-          <button 
-            onClick={handleSave}
-            className="w-full btn-primary py-3 rounded-lg text-sm"
-          >
-            Authenticate
-          </button>
-          
-          <a 
-            href="https://openrouter.ai/keys" 
-            target="_blank" 
-            rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 text-[10px] text-slate-500 hover:text-white transition-colors uppercase tracking-wider"
-          >
-            Get API Key <ExternalLink size={10} />
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('cognibias-storage');
     return saved ? JSON.parse(saved) : INITIAL_STATE;
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [hasKey, setHasKey] = useState<boolean>(!!localStorage.getItem('cognibias-openrouter-key'));
   const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
 
   useEffect(() => {
@@ -140,8 +78,6 @@ const App: React.FC = () => {
     });
     showToast(`Data Updated`, 'success');
   }, [showToast]);
-
-  if (!hasKey) return <ApiKeyGate onKeySaved={() => setHasKey(true)} />;
 
   return (
     <HashRouter>
@@ -208,13 +144,17 @@ const App: React.FC = () => {
                    const isFav = prev.favorites.includes(id);
                    return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
                  });
-                 showToast(state.favorites.includes(id) ? 'Entry Unflagged' : 'Entry Flagged');
               }} />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
-              <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={() => {}} />} />
+              <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
+                setState(prev => {
+                  const isFav = prev.favorites.includes(id);
+                  return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
+                });
+              }} />} />
               <Route path="/quiz" element={<Quiz biases={BIASES} onXpGain={(xp) => setState(prev => ({...prev, totalXp: prev.totalXp + xp}))} />} />
               <Route path="/plan" element={<StudyPlan state={state} />} />
-              <Route path="/settings" element={<AppSettings state={state} setState={setState} onKeyReset={() => setHasKey(false)} />} />
+              <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
             </Routes>
           </div>
         </main>

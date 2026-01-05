@@ -3,7 +3,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { Loader2, ArrowRight, Terminal, Check, X, Play, RotateCcw } from 'lucide-react';
 import { AppState, Bias } from '../types';
 import { BIASES } from '../constants';
-import { generateSimulatorStep } from '../services/geminiService';
+import { generateSimulatorStep } from '../services/apiService';
 
 interface Message {
   role: 'user' | 'assistant' | 'system';

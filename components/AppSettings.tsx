@@ -1,16 +1,15 @@
 
 import React from 'react';
-import { Download, Upload, Trash2, Key } from 'lucide-react';
+import { Download, Upload, Trash2 } from 'lucide-react';
 import { AppState } from '../types';
 import { INITIAL_STATE } from '../constants';
 
 interface SettingsProps {
   state: AppState;
   setState: React.Dispatch<React.SetStateAction<AppState>>;
-  onKeyReset: () => void;
 }
 
-const AppSettings: React.FC<SettingsProps> = ({ state, setState, onKeyReset }) => {
+const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
   const exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -44,13 +43,6 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState, onKeyReset }) =
     }
   };
 
-  const resetKey = () => {
-    if (window.confirm('Disconnect OpenRouter API Key?')) {
-      localStorage.removeItem('cognibias-openrouter-key');
-      onKeyReset();
-    }
-  };
-
   return (
     <div className="max-w-2xl mx-auto space-y-8 animate-fade-in pb-12">
       <header>
@@ -59,13 +51,13 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState, onKeyReset }) =
       </header>
 
       <section className="space-y-4">
-        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Connection</h2>
+        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">System Status</h2>
         <div className="surface rounded-xl p-5 flex items-center justify-between">
           <div>
-             <div className="text-white font-medium text-sm">OpenRouter API</div>
-             <div className="text-xs text-slate-500">Status: Authenticated</div>
+             <div className="text-white font-medium text-sm">Engine Status</div>
+             <div className="text-xs text-slate-500 uppercase tracking-widest">Optimized Flash Model Active</div>
           </div>
-          <button onClick={resetKey} className="text-xs text-red-400 hover:text-red-300">Revoke Key</button>
+          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
         </div>
       </section>
 

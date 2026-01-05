@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
-import { Check, X, ArrowRight, Loader2, Award, ClipboardCheck } from 'lucide-react';
+import { Check, ArrowRight, Loader2, Award, ClipboardCheck, Zap } from 'lucide-react';
 import { Bias, QuizQuestion } from '../types';
-import { generateQuizQuestion } from '../services/geminiService';
+import { generateQuizQuestion } from '../services/apiService';
 
 interface QuizProps {
   biases: Bias[];
@@ -55,19 +55,22 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
       <div className="max-w-xl mx-auto py-12 animate-fade-in">
         <div className="surface p-10 md:p-14 rounded-xl text-center space-y-8">
           <div className="flex justify-center">
-            <div className="p-4 rounded-full border border-zinc-800">
+            <div className="p-4 rounded-full border border-zinc-800 relative">
               <ClipboardCheck size={32} className="text-zinc-500" />
+              <div className="absolute -top-1 -right-1">
+                <Zap size={14} className="text-blue-500 fill-blue-500" />
+              </div>
             </div>
           </div>
           <div className="space-y-2">
             <h2 className="serif text-3xl text-white italic">Assessment</h2>
-            <p className="text-zinc-500 text-sm max-w-sm mx-auto">A randomized 5-part evaluation using rigorously designed scenarios and plausible distractors.</p>
+            <p className="text-zinc-500 text-sm max-w-sm mx-auto">System optimized for low-latency scenario generation.</p>
           </div>
           <button 
             onClick={handleStart}
             className="btn-primary w-full py-4 rounded-md text-xs font-bold uppercase tracking-widest"
           >
-            Start Assessment
+            Initiate Sequence
           </button>
         </div>
       </div>
@@ -83,11 +86,11 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
           </div>
           <div>
             <div className="text-4xl font-serif text-white italic">{Math.round((score/5)*100)}%</div>
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-2">Accuracy Metric</p>
+            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-2">Precision Metric</p>
           </div>
           <div className="grid gap-3 pt-4">
             <button onClick={handleStart} className="btn-primary w-full py-3 rounded-md text-xs font-bold uppercase tracking-widest">
-              Re-Evaluate
+              Restart Protocol
             </button>
             <button onClick={() => setActive(false)} className="text-zinc-500 hover:text-white py-3 text-xs font-bold uppercase tracking-widest transition-colors">
               Exit Simulator
@@ -102,22 +105,25 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
     <div className="max-w-2xl mx-auto py-8 space-y-6">
       <div className="flex justify-between items-end border-b border-zinc-800 pb-4">
         <div>
-          <h2 className="serif text-xl text-white italic">Assessment Sequence</h2>
+          <h2 className="serif text-xl text-white italic">Assessment</h2>
           <p className="text-[10px] text-zinc-500 uppercase font-mono tracking-widest mt-1">Item {count + 1} of 5</p>
         </div>
-        <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Score: {score}</div>
+        <div className="flex items-center gap-2">
+          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
+          <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Score: {score}</div>
+        </div>
       </div>
 
       <div className="min-h-[400px] flex flex-col justify-center">
         {loading ? (
-          <div className="flex flex-col items-center gap-4 text-zinc-600">
+          <div className="flex flex-col items-center gap-4 text-zinc-600 animate-pulse">
             <Loader2 className="animate-spin" size={24} />
-            <span className="text-[10px] font-mono uppercase tracking-widest">Synthesizing MCQ...</span>
+            <span className="text-[10px] font-mono uppercase tracking-widest">Synthesizing...</span>
           </div>
         ) : question && (
           <div className="animate-fade-in space-y-10">
              <div className="surface p-8 border-l-2 border-white">
-                <p className="text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap">{question.content}</p>
+                <p className="text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap italic">"{question.content}"</p>
              </div>
 
              <div className="grid gap-3">

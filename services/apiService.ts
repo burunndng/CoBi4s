@@ -2,10 +2,12 @@
 import { Bias, QuizQuestion } from "../types";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
-const MODEL_NAME = "x-ai/grok-4.1-fast"; // Fast, high reasoning model
+const MODEL_NAME = "x-ai/grok-4.1-fast"; 
+const DEFAULT_TEMP = 0.6;
 
 export const callOpenRouter = async (messages: any[], config: { temperature?: number, response_format?: any } = {}) => {
-  const apiKey = localStorage.getItem('cognibias-openrouter-key');
+  // Try to get from localStorage first, then fallback to environment variable
+  const apiKey = localStorage.getItem('cognibias-openrouter-key') || process.env.API_KEY;
   if (!apiKey) throw new Error("API_KEY_MISSING");
 
   const response = await fetch(OPENROUTER_URL, {
@@ -19,7 +21,7 @@ export const callOpenRouter = async (messages: any[], config: { temperature?: nu
     body: JSON.stringify({
       model: MODEL_NAME,
       messages: messages,
-      temperature: config.temperature ?? 0.5, // Lower temperature for more structured/logical outputs
+      temperature: config.temperature ?? DEFAULT_TEMP,
       response_format: config.response_format
     })
   });
@@ -78,8 +80,8 @@ export const generateQuizQuestion = async (biases: Bias[]): Promise<QuizQuestion
         "scenario": "string",
         "question": "string",
         "options": ["string", "string", "string", "string"],
-        "correctAnswer": "string (must match one option exactly)",
-        "explanation": "string (briefly explain why the answer is correct and why distractors are wrong)"
+        "correctAnswer": "string",
+        "explanation": "string"
       }
     `;
 
@@ -92,19 +94,16 @@ export const generateQuizQuestion = async (biases: Bias[]): Promise<QuizQuestion
 
     const data = JSON.parse(content);
     
-    // Fallback validation
-    if (!data.options || !data.correctAnswer) throw new Error("Invalid format");
-
     return {
       biasId: targetBias.id,
       isScenario: true,
       content: `${data.scenario}\n\n${data.question}`,
       correctAnswer: data.correctAnswer,
-      options: data.options.sort(() => 0.5 - Math.random()), // Shuffle locally to ensure randomness
+      options: data.options.sort(() => 0.5 - Math.random()), 
       explanation: data.explanation
     };
   } catch (error) {
-    console.warn("Falling back to static quiz generation due to error:", error);
+    console.warn("Falling back to static quiz generation:", error);
     return {
       biasId: targetBias.id,
       isScenario: false,
@@ -113,5 +112,45 @@ export const generateQuizQuestion = async (biases: Bias[]): Promise<QuizQuestion
       options: [targetBias.name, ...distractors.map(d => d.name)].sort(() => 0.5 - Math.random()),
       explanation: targetBias.definition
     };
+  }
+};
+
+export const generateSimulatorStep = async (bias: Bias, phase: 'pre' | 'teach' | 'post'): Promise<any> => {
+  let prompt = "";
+  if (phase === 'pre') {
+    prompt = `Create a diagnostic scenario for "${bias.name}" (${bias.definition}). 
+    Provide 2 plausible options. 
+    Output JSON: { "scenario": string, "question": string, "options": [string, string], "correctIndex": number, "explanation": string }.`;
+  } else {
+    prompt = `Create an advanced application scenario for "${bias.name}" (${bias.definition}). 
+    Provide 3 plausible options. 
+    Output JSON: { "scenario": string, "question": string, "options": [string, string, string], "correctIndex": number, "explanation": string }.`;
+  }
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a cognitive bias simulator. JSON only." },
+      { role: "user", content: prompt }
+    ], { 
+      response_format: { type: "json_object" } 
+    });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Simulator step generation failed:", error);
+    throw error;
+  }
+};
+
+export const generateHint = async (biasName: string): Promise<string> => {
+  try {
+    const content = await callOpenRouter([
+      { 
+        role: "user", 
+        content: `Short, 1-sentence cryptic hint for: "${biasName}". No spoilers. Max 10 words.` 
+      }
+    ]);
+    return content.trim();
+  } catch {
+    return "Think about the core concept.";
   }
 };
