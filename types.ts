@@ -96,6 +96,8 @@ export interface ContextScenario {
   }[];
 }
 
+export interface BiasedSnippet {
+  text: string;
   segments: {
     quote: string;
     biasId: string;
