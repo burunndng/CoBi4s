@@ -59,6 +59,7 @@ export interface DecisionLog {
     reasoning: string;
     challengingQuestion: string;
     cues?: string[];
+    severity?: number; // 1-10 User Rating
   }[];
   userReflections: Record<string, string>; // biasId -> user answer
   finalConclusion: string;

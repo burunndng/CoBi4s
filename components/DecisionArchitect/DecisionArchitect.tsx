@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { AppState, DecisionLog } from '../../types';
-import { Plus, History, BrainCircuit } from 'lucide-react';
+import { Plus, History, Scale } from 'lucide-react';
 import { InputForm } from './InputForm';
 import { AuditReport } from './AuditReport';
 import { DecisionHistory } from './DecisionHistory';
@@ -44,33 +44,37 @@ export const DecisionArchitect: React.FC<DecisionArchitectProps> = ({ state, set
   };
 
   return (
-    <div className="max-w-4xl mx-auto space-y-6 pb-24 animate-fade-in">
+    <div className="max-w-5xl mx-auto space-y-8 pb-32 animate-fade-in">
       {/* Header */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 border-b border-zinc-800 pb-6">
+      <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8">
         <div>
-          <h1 className="serif text-3xl text-slate-100 flex items-center gap-3">
-            <BrainCircuit className="w-8 h-8 text-rose-500" />
-            Decision Architect
+          <h1 className="serif text-5xl font-light text-white italic flex items-center gap-4">
+            <Scale className="w-10 h-10 text-rose-500" />
+            Decision Audit
           </h1>
-          <p className="text-slate-500 mt-1">
-            Pre-mortem analysis to identify blind spots before you commit.
+          <p className="text-slate-500 mt-2 text-[10px] uppercase tracking-[0.3em] font-bold">
+            Risk Assessment // Pre-Mortem Protocol
           </p>
         </div>
         
-        <div className="flex gap-2">
+        <div className="flex gap-2 bg-white/[0.03] p-1 rounded-xl border border-white/5">
            <button 
              onClick={() => setView('list')}
-             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'list' ? 'bg-zinc-800 text-white' : 'text-slate-400 hover:text-white'}`}
+             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+               view === 'list' ? 'bg-white/10 text-white shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
+             }`}
            >
-             <History size={18} className="inline mr-2" />
-             History
+             <History size={14} className="inline mr-2 -mt-0.5" />
+             Log
            </button>
            <button 
              onClick={() => { setView('new'); setActiveLogId(null); }}
-             className="px-4 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center"
+             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+               view === 'new' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'text-slate-500 hover:text-white hover:bg-white/5'
+             }`}
            >
-             <Plus size={18} className="mr-2" />
-             New Decision
+             <Plus size={14} className="inline mr-2 -mt-0.5" />
+             New Audit
            </button>
         </div>
       </div>
