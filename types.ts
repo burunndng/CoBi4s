@@ -85,10 +85,13 @@ export interface AlgorithmTest {
 export interface ContextScenario {
   action: string;
   contexts: {
+    id: string;
     type: 'Survival' | 'Social' | 'Neutral';
+    setting: string;
     description: string;
-    verdict: 'Useful Heuristic' | 'Harmful Bias' | 'Neutral';
-    explanation: string;
+    range: { min: number; max: number }; // 0 = Harmful Bias, 100 = Useful Heuristic
+    reasoning: string;
+    cues: string[];
   }[];
 }
 

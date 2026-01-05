@@ -6,8 +6,8 @@ const MODEL_NAME = "x-ai/grok-4.1-fast";
 const DEFAULT_TEMP = 0.6;
 
 export const callOpenRouter = async (messages: any[], config: { temperature?: number, response_format?: any } = {}) => {
-  // Try to get from localStorage first, then fallback to environment variable
-  const apiKey = localStorage.getItem('cognibias-openrouter-key') || process.env.API_KEY;
+  // Try to get from localStorage first (User Override), then fallback to environment variable (Build time)
+  const apiKey = localStorage.getItem('cognibias-openrouter-key') || import.meta.env.VITE_OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("API_KEY_MISSING");
 
   const response = await fetch(OPENROUTER_URL, {
@@ -378,32 +378,46 @@ export const generateContextScenario = async (action: string): Promise<any> => {
   const prompt = `
     Analyze this specific action: "${action}"
     
-    Generate 3 distinct contexts where this action might occur.
-    1. Survival/High-Stakes: Where this action is a USEFUL HEURISTIC (saves time/life).
-    2. Social/Professional: Where this action is a HARMFUL BIAS (damages relationships/decisions).
-    3. Neutral/Low-Stakes: Where it doesn't really matter.
+    Generate 3 distinct contexts where this action might occur:
+    1. Survival/High-Stakes (Where it's useful).
+    2. Social/Professional (Where it's dangerous).
+    3. Neutral/Noise (Where it's mixed).
+    
+    For each, define a "Utility Range" (0 to 100).
+    - 0 = Pure Harmful Bias (Irrational error).
+    - 100 = Pure Useful Heuristic (Smart shortcut).
+    - Example: Running from a lion is 90-100. Judging a book by cover in a library is 40-60.
     
     Output strictly valid JSON:
     {
       "action": "${action}",
       "contexts": [
         {
+          "id": "uuid-1",
           "type": "Survival",
-          "description": "Brief scenario description...",
-          "verdict": "Useful Heuristic",
-          "explanation": "Why it works here"
+          "setting": "Short descriptive title (e.g. Dark Alley)",
+          "description": "Narrative of the situation...",
+          "range": { "min": 80, "max": 100 },
+          "reasoning": "Why this range is correct...",
+          "cues": ["Specific visual/auditory cue 1", "Cue 2"]
         },
         {
+          "id": "uuid-2",
           "type": "Social",
-          "description": "Brief scenario description...",
-          "verdict": "Harmful Bias",
-          "explanation": "Why it fails here"
+          "setting": "Short descriptive title",
+          "description": "...",
+          "range": { "min": 0, "max": 30 },
+          "reasoning": "...",
+          "cues": ["..."]
         },
         {
+          "id": "uuid-3",
           "type": "Neutral",
-          "description": "Brief scenario description...",
-          "verdict": "Neutral",
-          "explanation": "Why it is irrelevant here"
+          "setting": "Short descriptive title",
+          "description": "...",
+          "range": { "min": 40, "max": 60 },
+          "reasoning": "...",
+          "cues": ["..."]
         }
       ]
     }
@@ -411,7 +425,7 @@ export const generateContextScenario = async (action: string): Promise<any> => {
 
   try {
     const content = await callOpenRouter([
-      { role: "system", content: "You are an evolutionary psychologist. JSON only." },
+      { role: "system", content: "You are a Cognitive Calibration Engine. JSON only." },
       { role: "user", content: prompt }
     ], { response_format: { type: "json_object" } });
     return JSON.parse(content);

@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { generateContextScenario } from '../../services/apiService';
 import { ContextScenario } from '../../types';
-import { Loader2, Shuffle, ArrowRight, Shield, Users, Coffee, HelpCircle, Check, X } from 'lucide-react';
+import { CalibrationSlider } from './CalibrationSlider';
+import { Loader2, Shuffle, ArrowRight, Shield, Users, Coffee, HelpCircle, Target } from 'lucide-react';
 
 const ACTIONS = [
   "Interrupting someone immediately",
@@ -18,12 +19,14 @@ export const ContextLab: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [action, setAction] = useState(ACTIONS[0]);
   const [scenario, setScenario] = useState<ContextScenario | null>(null);
-  const [revealed, setRevealed] = useState<boolean[]>([false, false, false]);
+  const [userValues, setUserValues] = useState<number[]>([50, 50, 50]);
+  const [lockedStates, setLockedStates] = useState<boolean[]>([false, false, false]);
 
   const handleGenerate = async () => {
     setLoading(true);
     setScenario(null);
-    setRevealed([false, false, false]);
+    setLockedStates([false, false, false]);
+    setUserValues([50, 50, 50]);
     try {
       const data = await generateContextScenario(action);
       setScenario(data);
@@ -34,10 +37,16 @@ export const ContextLab: React.FC = () => {
     }
   };
 
-  const toggleReveal = (index: number) => {
-    const newRevealed = [...revealed];
-    newRevealed[index] = !newRevealed[index];
-    setRevealed(newRevealed);
+  const handleSliderChange = (index: number, val: number) => {
+    const newValues = [...userValues];
+    newValues[index] = val;
+    setUserValues(newValues);
+  };
+
+  const toggleLock = (index: number) => {
+    const newLocked = [...lockedStates];
+    newLocked[index] = true;
+    setLockedStates(newLocked);
   };
 
   const getIcon = (type: string) => {
@@ -99,52 +108,50 @@ export const ContextLab: React.FC = () => {
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 animate-in slide-in-from-bottom-8 duration-700">
           {scenario.contexts.map((ctx, idx) => (
             <div 
-              key={idx}
-              className={`relative rounded-2xl border transition-all duration-500 overflow-hidden group ${
-                revealed[idx] 
-                  ? (ctx.type === 'Survival' ? 'bg-emerald-950/20 border-emerald-500/50' : 
-                     ctx.type === 'Social' ? 'bg-rose-950/20 border-rose-500/50' : 
-                     'bg-amber-950/20 border-amber-500/50')
-                  : 'surface border-zinc-800 hover:border-zinc-600 cursor-pointer'
-              }`}
-              onClick={() => toggleReveal(idx)}
+              key={ctx.id || idx}
+              className="surface rounded-2xl border border-zinc-800 flex flex-col"
             >
-              <div className="p-6 h-full flex flex-col">
+              <div className="p-6 flex-1">
                 <div className="flex justify-between items-start mb-4">
-                  <div className={`p-3 rounded-full bg-zinc-900 border border-zinc-800 transition-colors duration-500 ${revealed[idx] ? 'opacity-100' : 'opacity-50 grayscale'}`}>
+                  <div className="p-3 rounded-full bg-zinc-900 border border-zinc-800">
                     {getIcon(ctx.type)}
                   </div>
-                  {revealed[idx] && (
-                    <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${
-                        ctx.type === 'Survival' ? 'bg-emerald-500/20 text-emerald-400' : 
-                        ctx.type === 'Social' ? 'bg-rose-500/20 text-rose-400' : 
-                        'bg-amber-500/20 text-amber-400'
-                    }`}>
-                      {ctx.type}
-                    </span>
-                  )}
+                  <span className={`text-[10px] font-bold uppercase tracking-widest px-2 py-1 rounded-full ${
+                      ctx.type === 'Survival' ? 'bg-emerald-500/20 text-emerald-400' : 
+                      ctx.type === 'Social' ? 'bg-rose-500/20 text-rose-400' : 
+                      'bg-amber-500/20 text-amber-400'
+                  }`}>
+                    {ctx.type}
+                  </span>
                 </div>
 
-                <p className="text-slate-300 text-sm leading-relaxed mb-6 flex-1">
+                <h3 className="font-bold text-white mb-2">{ctx.setting}</h3>
+                <p className="text-slate-300 text-sm leading-relaxed mb-6">
                   "{ctx.description}"
                 </p>
 
-                <div className={`pt-4 border-t border-white/5 transition-all duration-500 ${revealed[idx] ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
-                   <p className={`font-bold text-lg mb-1 ${
-                      ctx.verdict.includes('Useful') ? 'text-emerald-400' : 
-                      ctx.verdict.includes('Harmful') ? 'text-rose-400' : 
-                      'text-amber-400'
-                   }`}>
-                     {ctx.verdict}
-                   </p>
-                   <p className="text-xs text-slate-500 leading-snug">
-                     {ctx.explanation}
-                   </p>
+                {/* Slider Component */}
+                <div className="mb-6">
+                   <CalibrationSlider 
+                     userValue={userValues[idx]} 
+                     onChange={(val) => handleSliderChange(idx, val)}
+                     isLocked={lockedStates[idx]}
+                     targetRange={ctx.range}
+                   />
                 </div>
 
-                {!revealed[idx] && (
-                  <div className="absolute inset-0 flex items-center justify-center bg-black/40 backdrop-blur-[2px] opacity-0 group-hover:opacity-100 transition-opacity">
-                    <p className="text-white font-bold text-sm tracking-widest uppercase">Click to Reveal</p>
+                {/* Commit Button / Reveal */}
+                {!lockedStates[idx] ? (
+                  <button 
+                    onClick={() => toggleLock(idx)}
+                    className="w-full py-2 bg-zinc-800 hover:bg-zinc-700 text-slate-300 rounded-lg text-xs font-bold uppercase tracking-widest transition-colors flex items-center justify-center gap-2"
+                  >
+                    <Target size={14} /> Commit Calibration
+                  </button>
+                ) : (
+                  <div className="animate-in fade-in space-y-2 pt-4 border-t border-white/5">
+                     <p className="text-xs font-bold text-yellow-500 uppercase tracking-widest">AI Reasoning</p>
+                     <p className="text-xs text-slate-400 leading-snug">{ctx.reasoning}</p>
                   </div>
                 )}
               </div>
