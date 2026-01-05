@@ -1,9 +1,9 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Loader2 } from 'lucide-react';
+import { Star, Loader2, Shuffle, Type, BookOpen, RotateCw } from 'lucide-react';
 import { BIASES } from '../constants';
 import { AppState } from '../types';
-import { generateHint } from '../services/apiService';
+import { generateHint, generateAIPoweredScenario } from '../services/apiService';
 
 interface FlashcardProps {
   state: AppState;
@@ -17,6 +17,11 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hint, setHint] = useState<string | null>(null);
   const [loadingHint, setLoadingHint] = useState(false);
+  
+  // Contextual Mode State
+  const [cardMode, setCardMode] = useState<'term' | 'scenario'>('term');
+  const [dynamicScenario, setDynamicScenario] = useState<string | null>(null);
+  const [loadingScenario, setLoadingScenario] = useState(false);
 
   useEffect(() => {
     let queue = BIASES.map(b => b.id);
@@ -28,10 +33,16 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   const handleGrade = (quality: number) => {
     const currentId = sessionQueue[currentIndex];
     updateProgress(currentId, quality);
+    
+    // Reset card state for next one
     setFlipped(false);
     setHint(null);
+    setDynamicScenario(null);
+    
     setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
   };
+
+  const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
 
   const handleGenerateHint = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -47,7 +58,19 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
     }
   };
 
-  const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
+  const handleRefreshScenario = async (e: React.MouseEvent) => {
+    e.stopPropagation();
+    if (!bias || loadingScenario) return;
+    setLoadingScenario(true);
+    try {
+      const scenario = await generateAIPoweredScenario(bias);
+      setDynamicScenario(scenario);
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setLoadingScenario(false);
+    }
+  };
 
   if (currentIndex >= sessionQueue.length || !bias) {
     return (
@@ -59,31 +82,100 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
     );
   }
 
+  // Content Logic
+  const frontContent = cardMode === 'term' ? (
+    <>
+      <span className="text-[10px] font-mono text-zinc-500 uppercase mb-8 tracking-[0.2em]">Identify</span>
+      <h3 className="serif text-4xl text-white tracking-tight leading-tight italic">{bias.name}</h3>
+    </>
+  ) : (
+    <>
+       <span className="text-[10px] font-mono text-zinc-500 uppercase mb-6 tracking-[0.2em]">
+         {dynamicScenario ? 'Simulated Context' : 'Example Scenario'}
+       </span>
+       <p className="serif text-xl md:text-2xl text-white italic leading-relaxed max-w-sm">
+         "{dynamicScenario || bias.example}"
+       </p>
+    </>
+  );
+
+  const backContent = cardMode === 'term' ? (
+    <>
+      <span className="text-[10px] font-mono text-zinc-500 uppercase mb-4 tracking-[0.2em]">Definition</span>
+      <p className="text-white text-lg leading-relaxed mb-6 italic">"{bias.definition}"</p>
+      <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
+         <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Example</span>
+         <p className="text-xs text-zinc-300 leading-relaxed font-medium">"{bias.example}"</p>
+      </div>
+    </>
+  ) : (
+    <>
+      <span className="text-[10px] font-mono text-zinc-500 uppercase mb-4 tracking-[0.2em]">Concept</span>
+      <h3 className="serif text-3xl text-white italic mb-2">{bias.name}</h3>
+      <p className="text-zinc-400 text-sm leading-relaxed mb-6">"{bias.definition}"</p>
+      <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
+         <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Mitigation</span>
+         <p className="text-xs text-zinc-300 leading-relaxed font-medium">{bias.counterStrategy}</p>
+      </div>
+    </>
+  );
+
   return (
     <div className="max-w-xl mx-auto py-8 space-y-8 animate-fade-in">
       <div className="flex justify-between items-center px-2">
         <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Protocol {currentIndex + 1} / {sessionQueue.length}</span>
-        <button onClick={() => toggleFavorite(bias.id)} className="text-zinc-500 hover:text-white transition-colors">
-          <Star size={18} fill={state.favorites.includes(bias.id) ? "currentColor" : "none"} />
-        </button>
+        
+        <div className="flex gap-4">
+           {/* Mode Toggle */}
+           <div className="flex bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+              <button 
+                onClick={() => setCardMode('term')}
+                className={`p-1.5 rounded ${cardMode === 'term' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                title="Term Mode"
+              >
+                <Type size={14} />
+              </button>
+              <button 
+                onClick={() => setCardMode('scenario')}
+                className={`p-1.5 rounded ${cardMode === 'scenario' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                title="Scenario Mode"
+              >
+                <BookOpen size={14} />
+              </button>
+           </div>
+
+           <button onClick={() => toggleFavorite(bias.id)} className="text-zinc-500 hover:text-white transition-colors">
+             <Star size={18} fill={state.favorites.includes(bias.id) ? "currentColor" : "none"} />
+           </button>
+        </div>
       </div>
 
-      <div className="relative h-[400px] cursor-pointer" onClick={() => setFlipped(!flipped)}>
+      <div className="relative h-[420px] cursor-pointer group perspective" onClick={() => setFlipped(!flipped)}>
         <div className={`relative w-full h-full transition-transform duration-500 transform-gpu [transform-style:preserve-3d] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}>
           
           {/* Front */}
-          <div className="absolute inset-0 [backface-visibility:hidden] surface rounded-xl p-12 flex flex-col items-center justify-center text-center shadow-2xl">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase mb-8 tracking-[0.2em]">Identify</span>
-            <h3 className="serif text-4xl text-white tracking-tight leading-tight italic">{bias.name}</h3>
+          <div className="absolute inset-0 [backface-visibility:hidden] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl border border-zinc-800/50 group-hover:border-zinc-700/50 transition-colors">
+            {frontContent}
             
-            <div className="mt-12">
+            <div className="mt-12 flex gap-4" onClick={e => e.stopPropagation()}>
+              {cardMode === 'scenario' && (
+                 <button 
+                   onClick={handleRefreshScenario}
+                   disabled={loadingScenario}
+                   className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-indigo-400 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-zinc-900"
+                 >
+                   {loadingScenario ? <Loader2 size={12} className="animate-spin" /> : <Shuffle size={12} />}
+                   New Scenario
+                 </button>
+              )}
+
               {hint ? (
                 <p className="text-xs text-zinc-400 font-medium max-w-xs leading-relaxed animate-fade-in">{hint}</p>
               ) : (
                 <button 
                   onClick={handleGenerateHint} 
                   disabled={loadingHint}
-                  className="text-[10px] font-bold uppercase tracking-widest text-zinc-600 hover:text-white transition-colors flex items-center gap-2"
+                  className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-zinc-900"
                 >
                   {loadingHint ? <Loader2 size={12} className="animate-spin" /> : "Request Hint"}
                 </button>
@@ -92,22 +184,17 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
           </div>
 
           {/* Back */}
-          <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] surface rounded-xl p-10 flex flex-col justify-center shadow-2xl bg-[#0b0b0d]">
-            <span className="text-[10px] font-mono text-zinc-500 uppercase mb-4 tracking-[0.2em]">Definition</span>
-            <p className="text-white text-lg leading-relaxed mb-8 italic">"{bias.definition}"</p>
-            <div className="p-5 bg-zinc-900 border border-zinc-800 rounded-lg">
-               <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-2 tracking-widest">Mitigation</span>
-               <p className="text-xs text-zinc-300 leading-relaxed font-medium">{bias.counterStrategy}</p>
-            </div>
+          <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl bg-[#0b0b0d] border border-zinc-800">
+            {backContent}
           </div>
 
         </div>
       </div>
 
       <div className={`grid grid-cols-3 gap-3 transition-all duration-300 ${flipped ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4 pointer-events-none'}`}>
-        <button onClick={(e) => { e.stopPropagation(); handleGrade(1); }} className="py-4 rounded-md border border-zinc-800 text-red-500/80 hover:bg-red-500/5 text-[10px] font-bold uppercase tracking-widest">Failure</button>
-        <button onClick={(e) => { e.stopPropagation(); handleGrade(3); }} className="py-4 rounded-md border border-zinc-800 text-zinc-400 hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Partial</button>
-        <button onClick={(e) => { e.stopPropagation(); handleGrade(5); }} className="py-4 rounded-md border border-zinc-800 text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest">Acquired</button>
+        <button onClick={(e) => { e.stopPropagation(); handleGrade(1); }} className="py-4 rounded-md border border-zinc-800 text-red-500/80 hover:bg-red-500/5 text-[10px] font-bold uppercase tracking-widest transition-colors">Failure</button>
+        <button onClick={(e) => { e.stopPropagation(); handleGrade(3); }} className="py-4 rounded-md border border-zinc-800 text-zinc-400 hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest transition-colors">Partial</button>
+        <button onClick={(e) => { e.stopPropagation(); handleGrade(5); }} className="py-4 rounded-md border border-zinc-800 text-white hover:bg-white/5 text-[10px] font-bold uppercase tracking-widest transition-colors">Acquired</button>
       </div>
     </div>
   );
