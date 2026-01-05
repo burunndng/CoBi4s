@@ -5,6 +5,8 @@
 
 ### Core Features
 - **AI Simulator (`AIInstructor`)**: Interactive roleplay to diagnose and train specific biases.
+- **Bias Detector (`BiasDetector`)**: Interactive pattern-recognition tool to identify biases in realistic text.
+- **Decision Architect (`DecisionArchitect`)**: Structured "pre-mortem" tool for auditing real-life decisions.
 - **Spaced Repetition (`Flashcards`)**: Flashcard system with mastery tracking (`SM-2` style algorithm).
 - **Assessment (`Quiz`)**: dynamic MCQ generation powered by AI.
 - **Registry (`Catalog`)**: Comprehensive database of cognitive biases.
@@ -57,6 +59,8 @@
 - **Functions**:
   - `generateSimulatorStep`: Creates scenario/question for Pre/Post tests.
   - `generateQuizQuestion`: Creates MCQs with plausible distractors.
+  - `generateBiasScenario`: Writes realistic text with embedded biases.
+  - `auditDecision`: Analyzes user reasoning for blind spots.
   - `generateHint`: Provides cryptic hints for flashcards.
 - **Config**: Temperature set to `0.6` for optimal balance of creativity and structure.
 
@@ -78,6 +82,16 @@
 - **Queue**: Prioritizes overdue items based on `nextReviewDate`.
 - **Algorithm**: Modified SM-2 (SuperMemo) implemented in `App.tsx`'s `updateProgress`.
 - **Interactions**: Flip animation, AI Hint generation.
+
+### `BiasDetector.tsx`
+- **Pattern Recognition**: Generates realistic text via `apiService` with hidden biases.
+- **Interactivity**: Users highlight text to "catch" the bias.
+- **Validation**: Fuzzy-match selection against AI-provided quotes.
+
+### `DecisionArchitect.tsx`
+- **Application**: Audits real-life user decisions.
+- **AI Feedback**: AI identifies top 3 risks and asks "Killer Questions".
+- **Reflection**: Users must record answers to the AI's challenges before finalizing.
 
 ---
 

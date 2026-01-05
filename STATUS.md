@@ -4,6 +4,18 @@
 
 ## 🚀 Recent Changes
 
+### Pattern Recognition & Metacognition Features
+- **Bias Detector (`BiasDetector`)**:
+    - Implemented an interactive pattern-recognition tool.
+    - AI generates realistic text (emails, tweets, ads) with hidden biases.
+    - Users identify biases by highlighting text and tagging them correctly.
+    - Features "fuzzy matching" to validate selections against AI-generated ground truth.
+- **Decision Architect (`DecisionArchitect`)**:
+    - Implemented a "Decision Hygiene" wizard for real-world application.
+    - Uses a "Red Team" AI approach to analyze user-submitted decisions.
+    - Identifies blind spots and generates "Killer Questions" to challenge the user's reasoning.
+    - Supports saving, answering reflections, and finalizing decision logs.
+
 ### AI Architecture Migration
 - **Service Transition**: Migrated all AI logic from Google Gemini (`geminiService.ts`) to OpenRouter (`apiService.ts`).
 - **Model Selection**: Standardized on `x-ai/grok-4.1-fast` for all dynamic content.
