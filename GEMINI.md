@@ -1,5 +1,8 @@
 # CogniBias Project Context
 
+## For Coding AI:
+Do ask questions when you require clarification or lack context. Do not overwhelm users with questions, but do ask in order to improve the quality of your output.
+
 ## 🚀 Project Overview
 **CogniBias** is a personal development platform designed to help users identify, understand, and mitigate cognitive biases. It uses a "Architect Edition" theme with a dark, professional UI.
 
