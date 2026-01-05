@@ -7,6 +7,8 @@ Do ask questions when you require clarification or lack context. Do not overwhel
 **CogniBias** is a personal development platform designed to help users identify, understand, and mitigate cognitive biases. It uses a "Architect Edition" theme with a dark, professional UI.
 
 ### Core Features
+- **Algorithm Trainer (`AlgorithmTrainer`)**: Logic compiler for "programming" biases to test structural understanding.
+- **Context Switcher (`ContextLab`)**: Calibration tool for distinguishing helpful heuristics from harmful biases.
 - **AI Simulator (`AIInstructor`)**: Interactive roleplay to diagnose and train specific biases.
 - **Logic Lab (`LogicLab`)**: Advanced "Argument Repair" workshop for steel-manning and fixing fallacies.
 - **Bias Detector (`BiasDetector`)**: Interactive pattern-recognition tool to identify biases in realistic text.
@@ -68,6 +70,8 @@ Do ask questions when you require clarification or lack context. Do not overwhel
   - `auditDecision`: Analyzes user reasoning for blind spots.
   - `generateLabStatement`: Creates fallacious statements for repair practice.
   - `evaluateRepair`: Grades user's attempt to fix a logical error.
+  - `runAlgorithmTest`: Compiles user pseudo-code and runs adversarial tests.
+  - `generateContextScenario`: Creates multi-context scenarios with utility ranges.
   - `generateHint`: Provides cryptic hints for flashcards.
 - **Config**: Temperature set to `0.6` for optimal balance of creativity and structure.
 
@@ -104,6 +108,16 @@ Do ask questions when you require clarification or lack context. Do not overwhel
 - **Pedagogy**: "Evaluation & Creation" (Bloom's Taxonomy).
 - **Phases**: Setup -> Identify -> Repair -> Result.
 - **AI Role**: "Logic Professor" that grades arguments on a 0-100 scale and provides feedback.
+
+### `AlgorithmTrainer.tsx`
+- **Concept**: Treat biases as software bugs.
+- **Workflow**: Write pseudo-code -> Compile -> Run Unit Tests.
+- **AI Role**: "Adversarial Compiler" that finds edge cases in your logic.
+
+### `ContextLab.tsx`
+- **Concept**: Heuristics are context-dependent.
+- **Interaction**: Calibration Slider (0-100) vs. AI Target Zone.
+- **AI Role**: "Evolutionary Psychologist" determining utility in Survival vs. Social contexts.
 
 ---
 

@@ -4,6 +4,15 @@
 
 ## 🚀 Recent Changes
 
+- **Algorithm Trainer (`AlgorithmTrainer`)**:
+    - **New Feature**: A "Logic Compiler" where users program biases using pseudo-code.
+    - **Adversarial Testing**: The AI runs 3 unit tests (Happy Path, Edge Case, Counter-Example) against the user's logic.
+    - **Integrated IDE**: Includes a code editor, terminal output, and test history.
+- **Context Switcher (`ContextLab`)**:
+    - **New Feature**: A "Range-Vibe Hybrid" tool for calibrating heuristics.
+    - **Workflow**: User inputs an action -> AI generates 3 contexts -> User sets utility sliders -> AI reveals target zones.
+    - **Visual Feedback**: Uses a gradient slider (Rose -> Emerald) with a yellow "Target Zone" overlay.
+
 ### Logic Domain Expansion (Dual-Core Architecture)
 - **Codex (Poly-Registry)**:
     - Updated `Catalog.tsx` to be polymorphic, supporting both **Biases** (Psychology) and **Fallacies** (Logic).
