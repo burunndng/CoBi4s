@@ -5,6 +5,7 @@
 
 ### Core Features
 - **AI Simulator (`AIInstructor`)**: Interactive roleplay to diagnose and train specific biases.
+- **Logic Lab (`LogicLab`)**: Advanced "Argument Repair" workshop for steel-manning and fixing fallacies.
 - **Bias Detector (`BiasDetector`)**: Interactive pattern-recognition tool to identify biases in realistic text.
 - **Decision Architect (`DecisionArchitect`)**: Structured "pre-mortem" tool for auditing real-life decisions.
 - **Spaced Repetition (`Flashcards`)**: Flashcard system with mastery tracking (`SM-2` style algorithm).
@@ -60,7 +61,10 @@
   - `generateSimulatorStep`: Creates scenario/question for Pre/Post tests.
   - `generateQuizQuestion`: Creates MCQs with plausible distractors.
   - `generateBiasScenario`: Writes realistic text with embedded biases.
+  - `generateFallacyScenario`: Writes dialogues with embedded logical fallacies.
   - `auditDecision`: Analyzes user reasoning for blind spots.
+  - `generateLabStatement`: Creates fallacious statements for repair practice.
+  - `evaluateRepair`: Grades user's attempt to fix a logical error.
   - `generateHint`: Provides cryptic hints for flashcards.
 - **Config**: Temperature set to `0.6` for optimal balance of creativity and structure.
 
@@ -92,6 +96,11 @@
 - **Application**: Audits real-life user decisions.
 - **AI Feedback**: AI identifies top 3 risks and asks "Killer Questions".
 - **Reflection**: Users must record answers to the AI's challenges before finalizing.
+
+### `LogicLab.tsx`
+- **Pedagogy**: "Evaluation & Creation" (Bloom's Taxonomy).
+- **Phases**: Setup -> Identify -> Repair -> Result.
+- **AI Role**: "Logic Professor" that grades arguments on a 0-100 scale and provides feedback.
 
 ---
 

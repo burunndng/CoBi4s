@@ -4,6 +4,21 @@
 
 ## 🚀 Recent Changes
 
+### Logic Domain Expansion (Dual-Core Architecture)
+- **Codex (Poly-Registry)**:
+    - Updated `Catalog.tsx` to be polymorphic, supporting both **Biases** (Psychology) and **Fallacies** (Logic).
+    - Visual theming adapts to the active mode (Indigo for Psych, Rose for Logic).
+    - Added comprehensive dataset of top 25 Logical Fallacies (`constants/fallacies.ts`).
+- **Fallacy Finder (`BiasDetector` Upgrade)**:
+    - Enhanced the detector to generate **Dialogues** when in Logic mode.
+    - AI creates realistic debates where users must identify specific fallacious lines.
+    - Added new contexts like "Courtroom" and "Political Talk Show".
+- **Logic Lab (`LogicLab`)**:
+    - **New Feature**: A dedicated module for "Argument Repair".
+    - **Workflow**: Identify -> Repair (Steel Man) -> Evaluate.
+    - **AI Professor**: Grades user repairs on logical soundness and preservation of intent.
+    - Provides constructive feedback and a "Master Repair" example.
+
 ### Pattern Recognition & Metacognition Features
 - **Bias Detector (`BiasDetector`)**:
     - Implemented an interactive pattern-recognition tool.
