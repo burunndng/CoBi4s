@@ -18,7 +18,10 @@
 ### Deployment & CI/CD
 - **GitHub Pages**: Configured the project for hosting on GitHub Pages with `base: '/CoBi4s/'`.
 - **GitHub Actions**: Created a `.github/workflows/deploy.yml` workflow for automated builds and deployments.
-- **Dependency Management**: Added `package-lock.json` to fix CI/CD build issues.
+- **Dependency Management**: Added \`package-lock.json\` to fix CI/CD build issues.
+
+### Agent Customization
+- **CogniBias Expert**: Created a specialized system agent (\`cognibias-expert\`) for repository-specific engineering and feature ideation.
 
 ## 📋 Current State
 - **Status**: Functional & Deployed.
