@@ -36,12 +36,12 @@ export const CodeEditor: React.FC<CodeEditorProps> = ({ value, onChange, disable
           disabled={disabled}
           spellCheck={false}
           className="flex-1 bg-transparent text-indigo-100 font-mono text-sm leading-6 p-4 outline-none resize-none min-h-[360px] placeholder:text-zinc-800"
-          placeholder="// Example: Sunk Cost
+          placeholder={`// Example: Sunk Cost
 IF (investment_exists) AND (future_value < cost_to_continue) THEN
   IF (focus_on_past_loss) THEN
     RETURN "Stay the course"
   END IF
-END IF"
+END IF`}
         />
       </div>
       
