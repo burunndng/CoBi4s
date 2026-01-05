@@ -247,6 +247,20 @@ const App: React.FC = () => {
               }} />} />
               <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
               <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
+              <Route path="/context" element={<ContextLab />} />
+              <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
+              <Route path="/decision" element={<DecisionArchitect state={state} />} />
+              <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
+              <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
+              <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
+                 setState(prev => {
+                   const isFav = prev.favorites.includes(id);
+                   return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
+                 });
+              }} />} />
+              <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
+              <Route path="/plan" element={<StudyPlan state={state} />} />
+              <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
               <Route path="/welcome" element={<LandingPage />} />
             </Routes>
           </div>
