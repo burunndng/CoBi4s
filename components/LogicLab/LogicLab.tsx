@@ -68,15 +68,26 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
   const handleIdentify = () => {
     if (!snippet || !selection || !targetFallacy) return;
 
-    // Check if selection matches quote (fuzzy match)
     const targetSegment = snippet.segments[0];
-    const cleanSelection = selection.text.toLowerCase().replace(/[^a-z0-9]/g, '');
-    const cleanQuote = targetSegment.quote.toLowerCase().replace(/[^a-z0-9]/g, '');
+    const userText = selection.text.toLowerCase().trim();
+    const targetQuote = targetSegment.quote.toLowerCase().trim();
 
-    if (cleanQuote.includes(cleanSelection) || cleanSelection.includes(cleanQuote)) {
+    // Check for significant overlap or containment
+    // 1. Exact or substring match (already handled but repeated for clarity)
+    const isSubstring = targetQuote.includes(userText) || userText.includes(targetQuote);
+    
+    // 2. Word overlap check (for fuzzy matching)
+    const userWords = userText.split(/\s+/).filter(w => w.length > 3);
+    const targetWords = targetQuote.split(/\s+/).filter(w => w.length > 3);
+    const commonWords = userWords.filter(w => targetWords.some(tw => tw.includes(w) || w.includes(tw)));
+    
+    const overlapRatio = commonWords.length / Math.max(targetWords.length, 1);
+    
+    // Allow if user found at least 40% of the significant words
+    if (isSubstring || overlapRatio > 0.4) {
       setPhase('repair');
     } else {
-      setError("Incorrect part selected. Where is the logical error?");
+      setError("Not quite. You're looking for the specific part that contains the logical error.");
     }
   };
 
