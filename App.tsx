@@ -30,7 +30,16 @@ import { DecisionArchitect } from './components/DecisionArchitect/DecisionArchit
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
     const saved = localStorage.getItem('cognibias-storage');
-    return saved ? JSON.parse(saved) : INITIAL_STATE;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Migration: Ensure new fields exist
+      return {
+        ...INITIAL_STATE,
+        ...parsed,
+        decisionLogs: parsed.decisionLogs || []
+      };
+    }
+    return INITIAL_STATE;
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
