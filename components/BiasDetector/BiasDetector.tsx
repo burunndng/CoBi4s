@@ -119,42 +119,42 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
   };
 
   return (
-    <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6 pb-32">
-      <div className="flex flex-col md:flex-row justify-between items-center gap-4">
+    <div className="max-w-5xl mx-auto space-y-8 pb-32 animate-fade-in">
+      <div className="flex flex-col md:flex-row justify-between items-end gap-6 border-b border-white/5 pb-8">
         <div>
-          <h1 className="text-3xl font-serif italic text-slate-100 flex items-center gap-2">
+          <h1 className="serif text-5xl font-light text-white italic flex items-center gap-4">
             {isPsychMode ? (
-              <BrainCircuit className="w-8 h-8 text-indigo-400" />
+              <BrainCircuit className="w-10 h-10 text-indigo-400" />
             ) : (
-              <ShieldAlert className="w-8 h-8 text-rose-400" />
+              <ShieldAlert className="w-10 h-10 text-rose-400" />
             )}
             {isPsychMode ? 'Bias Detector' : 'Fallacy Finder'}
           </h1>
-          <p className="text-slate-400 mt-1">
-            Spot the {isPsychMode ? 'cognitive flaws' : 'logical errors'} in {isPsychMode ? 'scenarios' : 'dialogues'}.
+          <p className="text-slate-500 mt-2 text-[10px] uppercase tracking-[0.3em] font-bold">
+            Pattern Recognition // {isPsychMode ? 'Cognitive Flaws' : 'Logical Errors'}
           </p>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-white/[0.03] p-1 rounded-xl border border-white/5">
           <select 
             value={context} 
             onChange={e => setContext(e.target.value)}
-            className={`bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2 text-sm focus:ring-2 ${isPsychMode ? 'focus:ring-indigo-500' : 'focus:ring-rose-500'}`}
+            className="bg-transparent text-slate-300 text-xs font-bold uppercase tracking-wider px-4 py-2 outline-none cursor-pointer hover:text-white"
           >
-            <option>Workplace Email</option>
-            <option>News Article</option>
-            <option>Twitter Thread</option>
-            <option>Sales Pitch</option>
-            <option>Family Dinner Debate</option>
-            {!isPsychMode && <option>Courtroom Cross-Examination</option>}
-            {!isPsychMode && <option>Political Talk Show</option>}
+            <option className="bg-zinc-950">Workplace Email</option>
+            <option className="bg-zinc-950">News Article</option>
+            <option className="bg-zinc-950">Twitter Thread</option>
+            <option className="bg-zinc-950">Sales Pitch</option>
+            <option className="bg-zinc-950">Family Dinner Debate</option>
+            {!isPsychMode && <option className="bg-zinc-950">Courtroom Cross-Examination</option>}
+            {!isPsychMode && <option className="bg-zinc-950">Political Talk Show</option>}
           </select>
           <button 
             onClick={startGame}
             disabled={loading}
-            className={`p-2 text-white rounded transition-colors disabled:opacity-50 ${isPsychMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-rose-600 hover:bg-rose-700'}`}
+            className={`p-2 rounded-lg transition-all ${loading ? 'bg-white/5' : 'bg-white/10 hover:bg-white/20 text-white'}`}
           >
-            <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
+            <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin' : ''}`} />
           </button>
         </div>
       </div>
@@ -204,36 +204,20 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
         </div>
       ) : null}
 
+import { BiasHUD } from './BiasHUD';
+
+// ... (rest of imports)
+
+// ... (inside BiasDetector component)
+
       {selection && !loading && !showAnswer && (
-        <div className="fixed inset-x-0 bottom-0 p-4 bg-zinc-900 border-t border-zinc-800 shadow-2xl z-50 animate-in slide-in-from-bottom-10">
-           <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-              <div className="flex-1">
-                 <p className="text-sm text-slate-500 mb-1">Selected text:</p>
-                 <p className="text-white font-serif italic truncate max-w-lg">"{selection.text}"</p>
-              </div>
-              
-              <div className="flex items-center gap-3 w-full md:w-auto">
-                 <select 
-                   className={`flex-1 md:w-64 bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2 focus:ring-2 ${isPsychMode ? 'focus:ring-indigo-500' : 'focus:ring-rose-500'}`}
-                   onChange={(e) => {
-                     if (e.target.value) handleGuess(e.target.value);
-                   }}
-                   value=""
-                 >
-                   <option value="" disabled>Identify the {isPsychMode ? 'Bias' : 'Fallacy'}...</option>
-                   {[...SourceList].sort((a,b) => a.name.localeCompare(b.name)).map(b => (
-                     <option key={b.id} value={b.id}>{b.name}</option>
-                   ))}
-                 </select>
-                 <button 
-                   onClick={() => setSelection(null)}
-                   className="px-3 py-2 text-slate-400 hover:text-slate-200"
-                 >
-                   Cancel
-                 </button>
-              </div>
-           </div>
-        </div>
+        <BiasHUD 
+          selection={selection}
+          onCancel={() => setSelection(null)}
+          onSelect={handleGuess}
+          biasList={SourceList as Bias[]}
+          accentColor={accentColor}
+        />
       )}
 
       {feedback && (
