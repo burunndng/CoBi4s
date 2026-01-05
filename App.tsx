@@ -120,39 +120,39 @@ const App: React.FC = () => {
 
   return (
     <HashRouter>
-      <div className="flex h-[100dvh] bg-[#09090b] text-slate-200">
+      <div className="flex h-[100dvh] bg-transparent text-slate-200">
         
         {/* Desktop Sidebar */}
-        <aside className="hidden lg:flex flex-col w-72 border-r border-[#27272a] bg-[#09090b] z-40">
-          <div className="p-6 border-b border-[#27272a]">
-            <h1 className="serif text-2xl font-medium text-white tracking-tight italic">CogniBias</h1>
-            <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Architect Edition</p>
+        <aside className="hidden lg:flex flex-col w-72 border-r border-white/5 bg-white/[0.02] backdrop-blur-xl z-40">
+          <div className="p-8 border-b border-white/5">
+            <h1 className="serif text-3xl font-light text-white tracking-tight italic">CogniBias</h1>
+            <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] mt-1 font-bold">Architect Edition</p>
           </div>
 
-          <div className="px-6 py-4">
-            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-1 flex">
+          <div className="px-6 py-6">
+            <div className="bg-white/[0.03] border border-white/5 rounded-xl p-1 flex shadow-inner">
               <button 
                 onClick={() => setState(prev => ({ ...prev, mode: 'psychology' }))}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                  state.mode === 'psychology' ? 'bg-zinc-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                  state.mode === 'psychology' ? 'bg-white/10 text-white shadow-xl border border-white/10' : 'text-slate-500 hover:text-slate-300'
                 }`}
               >
-                <Brain size={14} />
+                <Brain size={12} />
                 Psychology
               </button>
               <button 
                 onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
-                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                  state.mode === 'logic' ? 'bg-zinc-800 text-rose-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                  state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-xl border border-white/10' : 'text-slate-500 hover:text-slate-300'
                 }`}
               >
-                <ShieldAlert size={14} />
+                <ShieldAlert size={12} />
                 Logic
               </button>
             </div>
           </div>
           
-          <nav className="flex-1 p-4 space-y-1">
+          <nav className="flex-1 p-4 space-y-1 overflow-y-auto no-scrollbar">
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
@@ -167,14 +167,14 @@ const App: React.FC = () => {
             <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" />
           </nav>
 
-          <div className="p-4 border-t border-[#27272a]">
+          <div className="p-4 border-t border-white/5 space-y-1">
             <NavLink to="/welcome" icon={<HelpCircle size={18} />} label="About" />
             <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" />
           </div>
         </aside>
 
         {/* Mobile Header */}
-        <header className="lg:hidden fixed top-0 w-full bg-[#09090b]/90 backdrop-blur-md z-30 border-b border-[#27272a] h-16 flex items-center justify-between px-5">
+        <header className="lg:hidden fixed top-0 w-full bg-black/40 backdrop-blur-xl z-30 border-b border-white/5 h-16 flex items-center justify-between px-5">
           <span className="serif text-xl text-white italic">CogniBias</span>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-slate-400 hover:text-white transition-colors">
             <MenuIcon size={20} />
@@ -185,36 +185,36 @@ const App: React.FC = () => {
         {isMobileMenuOpen && (
           <div className="fixed inset-0 z-50 lg:hidden">
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
-            <div className="absolute right-0 top-0 bottom-0 w-72 bg-[#09090b] border-l border-[#27272a] flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
-              <div className="p-6 border-b border-[#27272a] flex justify-between items-center">
+            <div className="absolute right-0 top-0 bottom-0 w-72 bg-zinc-950/90 backdrop-blur-2xl border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
+              <div className="p-6 border-b border-white/10 flex justify-between items-center">
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Navigation</span>
                 <button onClick={() => setIsMobileMenuOpen(false)}><X size={20} className="text-slate-400 hover:text-white" /></button>
               </div>
 
-              <div className="px-6 py-4 border-b border-[#27272a]">
-                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-1 flex">
+              <div className="px-6 py-6 border-b border-white/10">
+                <div className="bg-white/[0.03] border border-white/5 rounded-xl p-1 flex">
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'psychology' }))}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                      state.mode === 'psychology' ? 'bg-zinc-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                      state.mode === 'psychology' ? 'bg-white/10 text-white shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
-                    <Brain size={14} />
+                    <Brain size={12} />
                     Psychology
                   </button>
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
-                      state.mode === 'logic' ? 'bg-zinc-800 text-rose-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                      state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
-                    <ShieldAlert size={14} />
+                    <ShieldAlert size={12} />
                     Logic
                   </button>
                 </div>
               </div>
 
-              <nav className="flex-1 p-6 space-y-4">
+              <nav className="flex-1 p-6 space-y-4 overflow-y-auto no-scrollbar">
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
@@ -227,6 +227,7 @@ const App: React.FC = () => {
                 <NavLink to="/flashcards" icon={<Zap size={18} />} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/welcome" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" onClick={() => setIsMobileMenuOpen(false)} />
               </nav>
             </div>
@@ -234,7 +235,7 @@ const App: React.FC = () => {
         )}
 
         {/* Main Content */}
-        <main className="flex-1 h-full overflow-y-auto pt-16 lg:pt-0 no-scrollbar bg-[#09090b]">
+        <main className="flex-1 h-full overflow-y-auto pt-16 lg:pt-0 no-scrollbar bg-transparent">
           <div className="max-w-6xl mx-auto p-6 md:p-10 lg:p-12">
             <Routes>
               <Route path="/" element={<Dashboard state={state} />} />
@@ -254,9 +255,9 @@ const App: React.FC = () => {
         {/* Toast Notifications */}
         <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3 pointer-events-none">
           {toasts.map(toast => (
-            <div key={toast.id} className="surface px-5 py-3 rounded-lg flex items-center gap-3 shadow-2xl animate-in slide-in-from-right duration-300 pointer-events-auto border-l-2 border-l-white">
-              {toast.type === 'success' ? <CheckCircle2 size={16} className="text-white" /> : <div className="w-2 h-2 rounded-full bg-red-500" />}
-              <span className="text-xs font-bold uppercase tracking-wider text-white">{toast.message}</span>
+            <div key={toast.id} className="surface px-6 py-4 rounded-xl flex items-center gap-4 shadow-2xl animate-in slide-in-from-right duration-300 pointer-events-auto border-l-4 border-white">
+              {toast.type === 'success' ? <CheckCircle2 size={18} className="text-white" /> : <div className="w-2 h-2 rounded-full bg-red-500" />}
+              <span className="text-xs font-bold uppercase tracking-[0.2em] text-white leading-none">{toast.message}</span>
             </div>
           ))}
         </div>

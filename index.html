@@ -18,58 +18,103 @@
   
   <style>
     :root {
-      --bg-root: #09090b;
-      --bg-surface: #121215;
-      --bg-surface-hover: #1c1c20;
-      --border-subtle: #27272a;
-      --border-active: #3f3f46;
+      --bg-root: #070708;
+      --bg-surface: rgba(18, 18, 21, 0.7);
+      --bg-surface-hover: rgba(28, 28, 32, 0.8);
+      --border-subtle: rgba(255, 255, 255, 0.08);
+      --border-active: rgba(255, 255, 255, 0.15);
       --text-main: #f4f4f5;
-      --text-muted: #a1a1aa;
+      --text-muted: #71717a;
       --accent: #fff;
       --accent-fg: #000;
+      --indigo-accent: rgba(99, 102, 241, 0.2);
+      --rose-accent: rgba(244, 63, 94, 0.2);
     }
 
     body {
       font-family: 'Plus Jakarta Sans', sans-serif;
       background-color: var(--bg-root);
+      background-image: 
+        radial-gradient(circle at 50% -20%, var(--indigo-accent), transparent 60%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 40px 40px, 40px 40px;
       color: var(--text-main);
       min-height: 100vh;
       overflow-x: hidden;
       -webkit-font-smoothing: antialiased;
       -webkit-tap-highlight-color: transparent;
       user-select: none;
+      position: relative;
+    }
+
+    /* Noise Overlay */
+    body::before {
+      content: "";
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 9999;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3True%3Cfilter id='noiseFilter'%3True%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3True%3C/filter%3True%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3True%3C/svg%3True");
     }
 
     .prose { user-select: text; }
-    .serif { font-family: 'Cormorant Garamond', serif; }
-    .mono { font-family: 'JetBrains Mono', monospace; }
+    .serif { font-family: 'Cormorant Garamond', serif; letter-spacing: -0.01em; }
+    .mono { font-family: 'JetBrains Mono', monospace; letter-spacing: -0.02em; }
 
     /* Architect Theme Primitives */
     .surface {
       background-color: var(--bg-surface);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
       border: 1px solid var(--border-subtle);
-      transition: background-color 0.2s ease, border-color 0.2s ease;
+      box-shadow: 0 4px 24px -1px rgba(0, 0, 0, 0.2);
+      transition: all 0.3s cubic-bezier(0.16, 1, 0.3, 1);
     }
     
     .surface-hover:hover {
       background-color: var(--bg-surface-hover);
       border-color: var(--border-active);
+      transform: translateY(-2px);
+      box-shadow: 0 12px 32px -4px rgba(0, 0, 0, 0.3);
     }
 
     .btn-primary {
       background-color: var(--accent);
       color: var(--accent-fg);
-      font-weight: 600;
-      transition: opacity 0.2s;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-size: 0.75rem;
+      transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     }
-    .btn-primary:hover { opacity: 0.9; }
-    .btn-primary:active { opacity: 0.8; transform: translateY(1px); }
+    .btn-primary:hover { 
+      opacity: 0.9; 
+      transform: translateY(-1px);
+      box-shadow: 0 4px 12px rgba(255, 255, 255, 0.15);
+    }
+    .btn-primary:active { opacity: 0.8; transform: translateY(0px); }
 
     .no-scrollbar::-webkit-scrollbar { display: none; }
     .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     
-    @keyframes fade-in { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
-    .animate-fade-in { animation: fade-in 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    @keyframes fade-in { 
+      from { opacity: 0; transform: translateY(10px); } 
+      to { opacity: 1; transform: translateY(0); } 
+    }
+    .animate-fade-in { animation: fade-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+    
+    /* Specialized Layout */
+    .blueprint-grid {
+      background-image: 
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+      background-size: 20px 20px;
+    }
   </style>
 <script type="importmap">
 {
