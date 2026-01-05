@@ -85,7 +85,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
           <NavCard 
             title="Simulator" 
             desc="Decision Sandbox" 
-            icon={<BrainCircuit size={18} />}
+            icon={<BrainCircuit size={20} />}
             onClick={() => navigate('/instructor')} 
           />
           <NavCard 
