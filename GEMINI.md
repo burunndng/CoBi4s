@@ -106,6 +106,21 @@
 
 ## 📏 Development Guidelines
 
+### Engineering Standards & Protocols
+**"The Plan" (Prompt Engineering Discipline)**
+We utilize the frameworks defined in `.gemini/The Plan Prompt Engineering.txt`.
+
+**Core Mental Models:**
+1.  **Prompts are Code**: Treat instructions as software specifications. Version control them.
+2.  **Sandboxing**: Use delimiters (`<xml>`, `"""`) to separate data from instructions.
+3.  **Vibe Coding**: Use "Scaffold → Fill → Refine" for rapid iteration.
+4.  **Role/Context/Constraints**: Structure every major request as a JSON-like object.
+
+**Key Patterns:**
+- **The Architect**: For feature generation (Chain of Thought + Strict Constraints).
+- **The Modernizer**: For refactoring (Before vs. After).
+- **The Sherlock**: For root cause analysis (Context Injection + Hypothesis).
+
 ### Styling
 - **Theme**: Dark mode only (`bg-[#09090b]`, `text-slate-200`).
 - **Components**: Use `surface` class (custom utility likely defined in index.css) for cards/containers.
