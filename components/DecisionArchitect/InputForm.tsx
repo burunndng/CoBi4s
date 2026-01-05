@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { DecisionLog } from '../../types';
 import { auditDecision } from '../../services/apiService';
-import { Loader2, ArrowRight } from 'lucide-react';
+import { Loader2, ArrowRight, BrainCircuit } from 'lucide-react';
 
 interface InputFormProps {
   onComplete: (log: DecisionLog) => void;
