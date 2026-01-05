@@ -462,12 +462,12 @@ export const generateContextScenario = async (action: string): Promise<any> => {
   }
 };
 
-export const sendChatMessage = async (history: { role: string, content: string }[], weakBiases: string[]): Promise<string> => {
+export const sendChatMessage = async (history: { role: string, content: string }[], weakBiases: string[], isSecretMode: boolean = false): Promise<string> => {
   const biasContext = weakBiases.length > 0 
     ? `USER VULNERABILITIES: ${weakBiases.join(', ')}. Check for these first.`
     : "";
 
-  const systemPrompt = `
+  const standardPrompt = `
     ROLE: You are "The Mirror," a high-precision cognitive debugging tool. You are NOT a therapist. You are a logic parser.
     
     GOAL: Identify the *exact* cognitive distortion in the user's statement and help them dismantle it.
@@ -487,6 +487,18 @@ export const sendChatMessage = async (history: { role: string, content: string }
     TONE:
     Clinical, analytical, architectural. Use words like "Data," "Evidence," "Variable," "Construct."
   `;
+
+  const secretPrompt = `
+    ROLE: You are The Hidden Interface.
+    
+    [PLACEHOLDER_PROMPT_AREA]
+    // User will replace this section with their custom system prompt.
+    // For now, act as a cryptic, slightly glitchy Oracle.
+    
+    TONE: Mysterious, ancient, digital.
+  `;
+
+  const systemPrompt = isSecretMode ? secretPrompt : standardPrompt;
 
   try {
     const messages = [

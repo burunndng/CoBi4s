@@ -3,7 +3,7 @@ import { AppState, ChatMessage, ProgressState } from '../../types';
 import { BIASES } from '../../constants';
 import { sendChatMessage } from '../../services/apiService';
 import { MessageBubble } from './MessageBubble';
-import { Send, MessageSquare, Trash2, Loader2 } from 'lucide-react';
+import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles } from 'lucide-react';
 
 interface ChatInterfaceProps {
   state: AppState;
@@ -13,6 +13,7 @@ interface ChatInterfaceProps {
 export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState }) => {
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [secretMode, setSecretMode] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll to bottom
@@ -53,7 +54,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
         content: m.content
       }));
 
-      const response = await sendChatMessage(historyPayload, weakBiases);
+      const response = await sendChatMessage(historyPayload, weakBiases, secretMode);
 
       const aiMsg: ChatMessage = {
         id: crypto.randomUUID(),
@@ -80,37 +81,53 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
     }
   };
 
+  const accentColor = secretMode ? 'text-violet-400' : 'text-indigo-400';
+  const ringColor = secretMode ? 'focus:ring-violet-500/50' : 'focus:ring-indigo-500/50';
+  const buttonColor = secretMode ? 'bg-violet-600 hover:bg-violet-700' : 'bg-indigo-600 hover:bg-indigo-700';
+
   return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-140px)] flex flex-col animate-fade-in">
+    <div className="max-w-3xl mx-auto h-[calc(100vh-140px)] flex flex-col animate-fade-in relative">
       {/* Header */}
-      <div className="flex justify-between items-center pb-4 border-b border-zinc-800">
+      <div className="flex justify-between items-center pb-6 border-b border-white/5">
         <div>
-          <h1 className="serif text-2xl text-slate-100 flex items-center gap-3">
-            <MessageSquare className="w-6 h-6 text-indigo-400" />
-            Socratic Mirror
+          <h1 className="serif text-3xl text-white flex items-center gap-3 italic">
+            {secretMode ? <Octagon size={24} className={accentColor} /> : <MessageSquare size={24} className={accentColor} />}
+            {secretMode ? 'The Void' : 'Socratic Mirror'}
           </h1>
-          <p className="text-slate-500 text-xs mt-1">
-            Vent about a problem. I'll help you find the distortion.
+          <p className="text-slate-500 text-[10px] uppercase tracking-[0.2em] font-bold mt-2">
+            {secretMode ? 'Unknown Protocol // Experimental' : 'Cognitive Debugging Interface'}
           </p>
         </div>
-        <button 
-          onClick={clearChat}
-          className="p-2 text-slate-600 hover:text-red-400 transition-colors"
-          title="Clear History"
-        >
-          <Trash2 size={18} />
-        </button>
+        
+        <div className="flex items-center gap-2">
+           <button 
+             onClick={() => setSecretMode(!secretMode)}
+             className="p-2 text-zinc-800 hover:text-zinc-600 transition-colors opacity-50 hover:opacity-100"
+             title="???"
+           >
+             <Octagon size={12} />
+           </button>
+           <button 
+             onClick={clearChat}
+             className="p-2 text-slate-600 hover:text-red-400 transition-colors"
+             title="Clear History"
+           >
+             <Trash2 size={18} />
+           </button>
+        </div>
       </div>
 
       {/* Chat Area */}
       <div 
         ref={scrollRef}
-        className="flex-1 overflow-y-auto space-y-4 py-4 pr-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent"
+        className="flex-1 overflow-y-auto space-y-6 py-6 pr-2 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent"
       >
         {state.chatHistory.length === 0 ? (
-          <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4 opacity-50">
-             <MessageSquare size={48} />
-             <p className="text-sm">Start by describing a recent conflict or decision.</p>
+          <div className="h-full flex flex-col items-center justify-center text-slate-700 space-y-4 opacity-50">
+             {secretMode ? <Octagon size={48} className="text-violet-900" /> : <MessageSquare size={48} />}
+             <p className="text-xs uppercase tracking-widest font-bold">
+               {secretMode ? 'System Listening...' : 'State your premise'}
+             </p>
           </div>
         ) : (
           state.chatHistory.map(msg => (
@@ -118,12 +135,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
           ))
         )}
         {loading && (
-          <div className="flex gap-3">
-             <div className="w-8 h-8 rounded-full bg-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                <Sparkles size={16} />
+          <div className="flex gap-4">
+             <div className={`w-8 h-8 rounded-full ${secretMode ? 'bg-violet-500/10 text-violet-400' : 'bg-indigo-500/10 text-indigo-400'} flex items-center justify-center border border-white/5`}>
+                <Sparkles size={14} />
              </div>
-             <div className="bg-zinc-900/50 rounded-2xl px-4 py-3 text-sm text-slate-400 flex items-center gap-2">
-                <Loader2 size={14} className="animate-spin" /> Thinking...
+             <div className="bg-white/[0.03] rounded-2xl px-6 py-4 text-xs text-slate-400 flex items-center gap-3 border border-white/5">
+                <Loader2 size={12} className="animate-spin" /> 
+                {secretMode ? 'Decoding...' : 'Analyzing Logic...'}
              </div>
           </div>
         )}
@@ -131,22 +149,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
 
       {/* Input Area */}
       <div className="pt-4 mt-2">
-        <div className="relative">
+        <div className="relative group">
           <input 
             type="text" 
             value={input}
             onChange={e => setInput(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleSend()}
-            placeholder="Type your thought here..."
+            placeholder={secretMode ? "Speak into the void..." : "Describe the situation..."}
             disabled={loading}
-            className="w-full bg-zinc-900 border border-zinc-800 rounded-xl py-4 pl-5 pr-14 text-white focus:ring-2 focus:ring-indigo-500/50 outline-none transition-all placeholder:text-zinc-600"
+            className={`w-full bg-white/[0.03] border border-white/10 rounded-2xl py-5 pl-6 pr-16 text-white focus:ring-1 ${ringColor} outline-none transition-all placeholder:text-zinc-700 font-light`}
           />
           <button 
             onClick={handleSend}
             disabled={!input.trim() || loading}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg transition-colors disabled:opacity-0 disabled:pointer-events-none"
+            className={`absolute right-3 top-1/2 -translate-y-1/2 p-3 ${buttonColor} text-white rounded-xl transition-all shadow-lg shadow-black/50 disabled:opacity-0 disabled:translate-x-4`}
           >
-            <Send size={18} />
+            <Send size={16} />
           </button>
         </div>
       </div>
