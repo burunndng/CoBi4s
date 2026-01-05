@@ -1,33 +1,29 @@
 # CogniBias Project Context
 
-## For Coding AI:
-Do ask questions when you require clarification or lack context. Do not overwhelm users with questions, but do ask in order to improve the quality of your output.
-
 ## 🚀 Project Overview
-**CogniBias** is a personal development platform designed to help users identify, understand, and mitigate cognitive biases. It uses a "Architect Edition" theme with a dark, professional UI.
+**CogniBias** is a "Dual-Core" personal development platform designed to help users identify, understand, and mitigate cognitive biases and logical fallacies. It utilizes a **"Cognitive Brutalism"** aesthetic—a high-fidelity, editorial dark-mode theme designed for the "Cognitive Architect."
 
-### Core Features
-- **Algorithm Trainer (`AlgorithmTrainer`)**: Logic compiler for "programming" biases to test structural understanding.
-- **Context Switcher (`ContextLab`)**: Calibration tool for distinguishing helpful heuristics from harmful biases.
-- **AI Simulator (`AIInstructor`)**: Interactive roleplay to diagnose and train specific biases.
-- **Logic Lab (`LogicLab`)**: Advanced "Argument Repair" workshop for steel-manning and fixing fallacies.
-- **Bias Detector (`BiasDetector`)**: Interactive pattern-recognition tool to identify biases in realistic text.
-- **Decision Architect (`DecisionArchitect`)**: Structured "pre-mortem" tool for auditing real-life decisions.
-- **Spaced Repetition (`Flashcards`)**: Flashcard system with mastery tracking (`SM-2` style algorithm).
-- **Assessment (`Quiz`)**: dynamic MCQ generation powered by AI.
-- **Registry (`Catalog`)**: Comprehensive database of cognitive biases.
-- **Analytics (`Dashboard`)**: Tracking of streaks, XP, and mastery levels.
+### Core Engines (The Toolkit)
+- **The Library (Registry)**: Polymorphic database supporting both **Biases** (Psychology) and **Fallacies** (Logic).
+- **The Drill (Flashcards 2.0)**: Contextual spaced repetition featuring **Scenario Mode** for pattern recognition.
+- **The Sandbox (Simulator)**: Branching "Choose Your Own Adventure" scenarios with real-time consequences.
+- **The Lens (Detector)**: Interactive pattern-recognition tool for spotting flaws in realistic text and dialogues.
+- **The Workshop (Logic Lab)**: Advanced "Argument Repair" module with steel-manning, repair chips, and granular AI metrics.
+- **The Prism (Switcher)**: Nuance calibration tool using a **Range-Vibe Hybrid** slider to distinguish biases from heuristics.
+- **The Coach (Mirror)**: Persistent Socratic chatbot for real-time cognitive debugging and thought auditing.
+- **The Compiler (Trainer)**: Pseudo-code IDE for "programming" concepts to test structural understanding.
+- **The Auditor (Architect)**: Structured "pre-mortem" tool for auditing high-stakes real-life decisions.
 
 ---
 
 ## 🛠 Tech Stack
-- **Framework**: React 19 + TypeScript + Vite 6
-- **Styling**: Tailwind CSS (Dark mode optimized, Zinc/Slate palette)
+- **Framework**: React 19 + TypeScript 5.6 + Vite 6
+- **Styling**: Tailwind CSS + "Cognitive Brutalism" (Blueprint grid, Noise texture, Glassmorphism).
 - **Routing**: `react-router-dom` (HashRouter)
 - **Icons**: `lucide-react`
 - **AI**: 
   - Primary: OpenRouter (`apiService.ts` - `x-ai/grok-4.1-fast`)
-- **Persistence**: `localStorage` (Key: `cognibias-storage`)
+- **Persistence**: `localStorage` (Key: `cognibias-storage`) - Strict "No DB, No Auth" architecture.
 
 ---
 
@@ -37,128 +33,76 @@ Do ask questions when you require clarification or lack context. Do not overwhel
 ```
 /
 ├── components/          # UI Logic & Views
-│   ├── AIInstructor.tsx # Core AI Simulator (Pre-test -> Teach -> Post-test)
-│   ├── Dashboard.tsx    # Main user landing page
-│   ├── Flashcards.tsx   # Spaced repetition logic
-│   ├── Quiz.tsx         # Assessment module
+│   ├── SocraticChat/    # Mirror (Rationality Coach)
+│   ├── LogicLab/        # Workshop (Argument Repair)
+│   ├── ContextLab/      # Switcher (Calibration Slider)
+│   ├── AlgorithmTrainer/# Compiler (Pseudo-code IDE)
+│   ├── shared/          # Unified Interaction Components (TextCanvas, TransferTips)
 │   └── ...
-├── services/            # External Integrations
-│   └── apiService.ts    # OpenRouter/Grok integration (Primary AI Service)
-├── types.ts             # TypeScript Interfaces (AppState, Bias, ProgressState)
-├── constants.ts         # Static Data (BIASES list, INITIAL_STATE)
-├── App.tsx              # Main State Container & Router
-└── vite.config.ts       # Vite configuration
+├── services/            # AI Integration (OpenRouter/Grok)
+├── types.ts             # Strict Schema (AppState, SimulationScenario, BiasedSnippet)
+├── constants.ts         # Logic Core (BIASES, FALLACIES, INITIAL_STATE)
+└── App.tsx              # Main State Container, Routing & Migration
 ```
 
 ### Data Flow
 1. **State Source**: `App.tsx` holds the single source of truth (`AppState`).
 2. **Persistence**: `useEffect` in `App.tsx` syncs state to `localStorage`.
-3. **Prop Drilling**: State and updater functions (`updateProgress`, `toggleFavorite`) are passed down to feature components.
-4. **AI Services**: Components like `AIInstructor` and `Quiz` call `services/apiService.ts` directly for dynamic content.
+3. **Architecture**: **Dual-Core**. Global `mode` state switches the entire app's registry, icons, and accents (Indigo for Psych, Rose for Logic).
+4. **Interactive Primitives**: Shared components like `TextCanvas` (highlighting) and `TransferTips` (cues) ensure cross-module consistency.
 
 ---
 
 ## 🤖 AI Integration
 
 ### OpenRouter Service (`services/apiService.ts`)
-- **Model**: `x-ai/grok-4.1-fast` (High reasoning, fast performance).
-- **Functions**:
-  - `generateSimulatorStep`: Creates scenario/question for Pre/Post tests.
-  - `generateQuizQuestion`: Creates MCQs with plausible distractors.
-  - `generateBiasScenario`: Writes realistic text with embedded biases.
-  - `generateFallacyScenario`: Writes dialogues with embedded logical fallacies.
-  - `auditDecision`: Analyzes user reasoning for blind spots.
-  - `generateLabStatement`: Creates fallacious statements for repair practice.
-  - `evaluateRepair`: Grades user's attempt to fix a logical error.
-  - `runAlgorithmTest`: Compiles user pseudo-code and runs adversarial tests.
-  - `generateContextScenario`: Creates multi-context scenarios with utility ranges.
-  - `generateHint`: Provides cryptic hints for flashcards.
-- **Config**: Temperature set to `0.6` for optimal balance of creativity and structure.
-
+- **Model**: `x-ai/grok-4.1-fast` (High reasoning, low latency).
+- **Key Functions**:
+  - `sendChatMessage`: Socratic coaching with user-context injection (weak biases).
+  - `generateBranchingScenario`: Creates decision trees with narrative consequences.
+  - `evaluateRepair`: Grades argument repairs using granular logic/intent/clarity metrics.
+  - `generateContextScenario`: Creates multi-context utility ranges (0-100).
+  - `runAlgorithmTest`: Runs adversarial unit tests against user pseudo-code.
+  - `generateAIPoweredScenario`: Generates fresh scenarios for contextual flashcards.
 
 ---
 
 ## 🧩 Component Deep Dives
 
-### `AIInstructor.tsx` (Simulator)
-- **Phases**: `idle` -> `pre-test` -> `teaching` -> `post-test` -> `complete`.
-- **Logic**:
-  1. Selects bias with lowest mastery.
-  2. Generates a "Pre-test" scenario.
-  3. If failed, enters "Teaching" phase (Definition + Strategy).
-  4. "Post-test" verifies application of knowledge.
-  5. Updates mastery score (`updateProgress`).
+### `LogicLab.tsx` (The Workshop)
+- **Workflow**: Fuzzy Identify (word-overlap) -> Repair (Strategy Chips) -> Result (Score Breakdown).
+- **Pedagogy**: Active reconstruction of arguments rather than passive selection.
 
-### `Flashcards.tsx`
-- **Queue**: Prioritizes overdue items based on `nextReviewDate`.
-- **Algorithm**: Modified SM-2 (SuperMemo) implemented in `App.tsx`'s `updateProgress`.
-- **Interactions**: Flip animation, AI Hint generation.
+### `AIInstructor.tsx` (The Sandbox)
+- **Concept**: Consequences > Definitions.
+- **Workflow**: Enter Situation -> Choose Action -> See Consequence -> Analyze Bias.
 
-### `BiasDetector.tsx`
-- **Pattern Recognition**: Generates realistic text via `apiService` with hidden biases.
-- **Interactivity**: Users highlight text to "catch" the bias.
-- **Validation**: Fuzzy-match selection against AI-provided quotes.
+### `ContextLab.tsx` (The Prism)
+- **Concept**: Calibration of heuristics.
+- **Workflow**: Action -> 3 Contexts (Survival, Social, Neutral) -> Slider Calibration -> Target Reveal.
 
-### `DecisionArchitect.tsx`
-- **Application**: Audits real-life user decisions.
-- **AI Feedback**: AI identifies top 3 risks and asks "Killer Questions".
-- **Reflection**: Users must record answers to the AI's challenges before finalizing.
-
-### `LogicLab.tsx`
-- **Pedagogy**: "Evaluation & Creation" (Bloom's Taxonomy).
-- **Phases**: Setup -> Identify -> Repair -> Result.
-- **AI Role**: "Logic Professor" that grades arguments on a 0-100 scale and provides feedback.
-
-### `AlgorithmTrainer.tsx`
-- **Concept**: Treat biases as software bugs.
-- **Workflow**: Write pseudo-code -> Compile -> Run Unit Tests.
-- **AI Role**: "Adversarial Compiler" that finds edge cases in your logic.
-
-### `ContextLab.tsx`
-- **Concept**: Heuristics are context-dependent.
-- **Interaction**: Calibration Slider (0-100) vs. AI Target Zone.
-- **AI Role**: "Evolutionary Psychologist" determining utility in Survival vs. Social contexts.
+### `Flashcards.tsx` (The Drill)
+- **Hybrid Modes**: **Term Mode** (Memory) vs **Scenario Mode** (Recognition).
+- **AI Refresh**: Fetch unique AI-generated examples for any card to prevent "memorizing the answer."
 
 ---
 
-## 📏 Development Guidelines
+## 📏 Engineering Standards & Protocols
 
-### Engineering Standards & Protocols
 **"The Plan" (Prompt Engineering Discipline)**
-We utilize the frameworks defined in `.gemini/The Plan Prompt Engineering.txt`.
-
-**Core Mental Models:**
-1.  **Prompts are Code**: Treat instructions as software specifications. Version control them.
-2.  **Sandboxing**: Use delimiters (`<xml>`, `"""`) to separate data from instructions.
-3.  **Vibe Coding**: Use "Scaffold → Fill → Refine" for rapid iteration.
-4.  **Role/Context/Constraints**: Structure every major request as a JSON-like object.
-
-**Key Patterns:**
-- **The Architect**: For feature generation (Chain of Thought + Strict Constraints).
-- **The Modernizer**: For refactoring (Before vs. After).
-- **The Sherlock**: For root cause analysis (Context Injection + Hypothesis).
+Follows the frameworks defined in `.gemini/The Plan Prompt Engineering.txt`.
 
 **Subagents & Personas**
 - **The Cognitive Architect** (`.gemini/The Cognitive Architect.md`): 
-  - **Role**: Chief Learning Architect.
   - **Prime Directive**: "The Transfer Test" (Does this help the user spot patterns in real life?).
-  - **Modes**: Cartographer (Maps data flow), Pedagogue (Designs learning), Weaver (Ensures consistency).
+  - **Philosophy**: Active over Passive. Concrete over Abstract. Friction as a Learning Tool.
 
-### Styling
-- **Theme**: Dark mode only (`bg-[#09090b]`, `text-slate-200`).
-- **Components**: Use `surface` class (custom utility likely defined in index.css) for cards/containers.
-- **Typography**: Serif for headings (`font-serif italic`), Sans for UI text.
-
-### Type Safety
-- **Strict Mode**: Yes.
-- **Conventions**: Interfaces defined in `types.ts`. Avoid `any`.
-- **Enums**: Use `Category` and `Difficulty` enums for Bias properties.
-
-### State Updates
-- Always use functional state updates: `setState(prev => ({ ...prev, ...updates }))`.
-- Ensure `localStorage` logic handles quota errors gracefully (though currently simple `setItem`).
+### Styling System
+- **Theme**: "Cognitive Brutalism" (Dark mode).
+- **Components**: `surface` (Glassmorphism), `serif` (Editorial Type), `mono` (Industrial Instrument).
+- **Texture**: SVG Fractal Noise + Blueprint Grid background.
 
 ---
 
 ## 📜 Project Evolution
-- **STATUS.md**: Refer to this file for a detailed log of all modifications, current status, and next steps.
+- **STATUS.md**: Detailed log of all modifications and upcoming roadmap.
