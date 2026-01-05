@@ -1,240 +1,199 @@
-
-import React, { useState, useEffect, useRef } from 'react';
-import { Loader2, ArrowRight, Terminal, Check, X, Play, RotateCcw } from 'lucide-react';
-import { AppState, Bias } from '../types';
+import React, { useState } from 'react';
+import { AppState, Bias, SimulationScenario } from '../types';
 import { BIASES } from '../constants';
-import { generateSimulatorStep } from '../services/apiService';
-
-interface Message {
-  role: 'user' | 'assistant' | 'system';
-  text: string;
-  type?: 'text' | 'feedback' | 'lesson';
-}
-
-interface StepData {
-  scenario: string;
-  question: string;
-  options: string[];
-  correctIndex: number;
-  explanation: string;
-}
+import { generateBranchingScenario } from '../services/apiService';
+import { TransferTips } from './shared/TransferTips';
+import { BrainCircuit, Loader2, Play, User, ArrowRight, CheckCircle2, XCircle } from 'lucide-react';
 
 interface AIInstructorProps {
   state: AppState;
-  updateProgress: (biasId: string, quality: number) => void;
+  updateProgress: (id: string, quality: number) => void;
 }
 
-const AIInstructor: React.FC<AIInstructorProps> = ({ state, updateProgress }) => {
-  const [phase, setPhase] = useState<'idle' | 'pre-test' | 'teaching' | 'post-test' | 'complete'>('idle');
-  const [messages, setMessages] = useState<Message[]>([]);
-  const [currentBias, setCurrentBias] = useState<Bias | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [activeStep, setActiveStep] = useState<StepData | null>(null);
-  const [score, setScore] = useState({ pre: false, post: false });
-  const scrollRef = useRef<HTMLDivElement>(null);
+export const AIInstructor: React.FC<AIInstructorProps> = ({ state, updateProgress }) => {
+  const [phase, setPhase] = useState<'idle' | 'loading' | 'active' | 'result'>('idle');
+  const [scenario, setScenario] = useState<SimulationScenario | null>(null);
+  const [selectedChoiceId, setSelectedChoiceId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (scrollRef.current) {
-      scrollRef.current.scrollTo({ top: scrollRef.current.scrollHeight, behavior: 'smooth' });
-    }
-  }, [messages, loading, activeStep]);
+  const startSimulation = async () => {
+    setPhase('loading');
+    setScenario(null);
+    setSelectedChoiceId(null);
 
-  const addMessage = (role: Message['role'], text: string, type: Message['type'] = 'text') => {
-    setMessages(prev => [...prev, { role, text, type }]);
-  };
-
-  const initSession = async () => {
-    setPhase('pre-test');
-    setLoading(true);
-    setMessages([]);
-    setScore({ pre: false, post: false });
-    
-    // Select bias with lowest mastery
-    const target = [...BIASES].sort((a, b) => 
-      (state.progress[a.id]?.masteryLevel || 0) - (state.progress[b.id]?.masteryLevel || 0)
-    )[0];
-    
-    setCurrentBias(target);
-    addMessage('system', `Protocol Initiated: ${target.name}`);
+    // Pick a bias (prioritize lowest mastery)
+    const sorted = [...BIASES].sort((a, b) => {
+      const masteryA = state.progress[a.id]?.masteryLevel || 0;
+      const masteryB = state.progress[b.id]?.masteryLevel || 0;
+      return masteryA - masteryB;
+    });
+    const target = sorted[0]; // Simplest selection logic for now
 
     try {
-      const data = await generateSimulatorStep(target, 'pre');
-      setActiveStep(data);
-    } catch (err) {
-      addMessage('system', "Connection error. Protocol aborted.");
+      const data = await generateBranchingScenario(target);
+      setScenario(data);
+      setPhase('active');
+    } catch (e) {
+      console.error(e);
       setPhase('idle');
-    } finally {
-      setLoading(false);
     }
   };
 
-  const handleSelect = async (index: number) => {
-    if (loading || !activeStep) return;
-    setLoading(true);
+  const handleChoice = (choiceId: string) => {
+    setSelectedChoiceId(choiceId);
+    setPhase('result');
+    
+    if (!scenario) return;
+    const choice = scenario.choices.find(c => c.id === choiceId);
+    if (!choice) return;
 
-    const isCorrect = index === activeStep.correctIndex;
-    if (phase === 'pre-test') setScore(s => ({ ...s, pre: isCorrect }));
-    if (phase === 'post-test') setScore(s => ({ ...s, post: isCorrect }));
-
-    addMessage('user', activeStep.options[index]);
-    await new Promise(r => setTimeout(r, 600));
-
-    addMessage('assistant', isCorrect ? "Analysis: Accurate." : "Analysis: Deviation Detected.", 'feedback');
-    addMessage('assistant', activeStep.explanation, 'text');
-
-    if (phase === 'pre-test') {
-      setPhase('teaching');
-      setActiveStep(null);
-      if (currentBias) {
-        setTimeout(() => {
-          addMessage('assistant', `Core Concept: ${currentBias.definition}\n\nMitigation Strategy: ${currentBias.counterStrategy}`, 'lesson');
-          setLoading(false);
-        }, 800);
-      }
-    } else {
-      completeSession(isCorrect);
-    }
+    // Quality: 5 if rational (not trap), 1 if trap
+    const quality = choice.isTrap ? 1 : 5;
+    updateProgress(scenario.biasId, quality);
   };
 
-  const startPostTest = async () => {
-    setPhase('post-test');
-    setLoading(true);
-    addMessage('system', "Application assessment loading...");
-    try {
-      if (currentBias) {
-        const data = await generateSimulatorStep(currentBias, 'post');
-        setActiveStep(data);
-      }
-    } catch (err) {
-      addMessage('system', "Simulation failure.");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const completeSession = (finalCorrect: boolean) => {
-    setPhase('complete');
-    setActiveStep(null);
-    setLoading(false);
-    const quality = (score.pre ? 2 : 0) + (finalCorrect ? 3 : 1);
-    if (currentBias) updateProgress(currentBias.id, quality);
+  const getTargetBiasName = () => {
+    if (!scenario) return '';
+    const b = BIASES.find(x => x.id === scenario.biasId);
+    return b ? b.name : scenario.biasId;
   };
 
   return (
-    <div className="max-w-3xl mx-auto h-[calc(100vh-12rem)] flex flex-col animate-fade-in">
-      <header className="flex justify-between items-end border-b border-zinc-800 pb-4 mb-6">
+    <div className="max-w-4xl mx-auto pb-24 animate-fade-in space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-center border-b border-zinc-800 pb-6">
         <div>
-          <h1 className="serif text-2xl text-white italic">Simulator</h1>
-          <p className="text-[10px] text-zinc-500 uppercase tracking-widest mt-1">Active: {currentBias?.name || "Ready"}</p>
+          <h1 className="serif text-3xl text-slate-100 flex items-center gap-3">
+            <BrainCircuit className="w-8 h-8 text-indigo-400" />
+            Simulation Sandbox
+          </h1>
+          <p className="text-slate-500 mt-1">Live roleplay decisions. Face the consequences.</p>
         </div>
-        <div className="flex gap-1">
-          {['Phase 1', 'Phase 2', 'Phase 3'].map((p, i) => (
-            <div key={p} className={`px-2 py-1 text-[9px] font-bold uppercase tracking-tighter ${
-              (i === 0 && phase === 'pre-test') || (i === 1 && phase === 'teaching') || (i === 2 && phase === 'post-test')
-                ? 'bg-white text-black' : 'bg-zinc-900 text-zinc-600'
-            }`}>
-              {p}
-            </div>
-          ))}
-        </div>
-      </header>
-
-      <div ref={scrollRef} className="flex-1 overflow-y-auto space-y-6 pr-4 no-scrollbar">
-        {phase === 'idle' ? (
-          <div className="h-full flex flex-col items-center justify-center text-center space-y-6">
-            <div className="w-16 h-16 rounded-full border border-zinc-800 flex items-center justify-center">
-              <Terminal size={24} className="text-zinc-600" />
-            </div>
-            <div className="space-y-2">
-              <h3 className="text-white font-medium">Training Sequence Required</h3>
-              <p className="text-xs text-zinc-500 max-w-xs mx-auto">Initialize simulation to assess and refine cognitive heuristics.</p>
-            </div>
-            <button onClick={initSession} className="btn-primary px-8 py-3 rounded-md text-xs uppercase tracking-widest flex items-center gap-2">
-              <Play size={14} /> Start Protocol
-            </button>
-          </div>
-        ) : (
-          <>
-            {messages.map((msg, i) => (
-              <div key={i} className={`flex flex-col ${msg.role === 'user' ? 'items-end' : 'items-start animate-fade-in'}`}>
-                {msg.role === 'system' ? (
-                  <div className="w-full text-center border-b border-zinc-900 leading-[0.1em] my-6">
-                    <span className="bg-[#09090b] px-4 text-[9px] text-zinc-600 uppercase font-mono tracking-widest">{msg.text}</span>
-                  </div>
-                ) : (
-                  <div className={`max-w-[85%] p-4 text-sm leading-relaxed border ${
-                    msg.role === 'user' 
-                      ? 'bg-zinc-100 text-black border-zinc-200 rounded-bl-xl rounded-tl-xl rounded-tr-xl' 
-                      : 'surface border-zinc-800 rounded-br-xl rounded-tr-xl rounded-tl-xl'
-                  }`}>
-                    {msg.type === 'lesson' ? (
-                      <div className="whitespace-pre-wrap font-medium text-zinc-300">
-                        {msg.text.split('\n\n').map((para, pi) => (
-                          <p key={pi} className={pi > 0 ? 'mt-4' : ''}>{para}</p>
-                        ))}
-                      </div>
-                    ) : msg.text}
-                  </div>
-                )}
-              </div>
-            ))}
-
-            {activeStep && (
-              <div className="surface p-6 border-l-2 border-l-white animate-fade-in">
-                <p className="text-xs font-mono text-zinc-500 mb-2 uppercase tracking-tight">Environment Scenario</p>
-                <p className="text-sm text-zinc-200 italic mb-6 leading-relaxed">"{activeStep.scenario}"</p>
-                <p className="text-sm text-white font-semibold mb-6">{activeStep.question}</p>
-                <div className="grid gap-2">
-                  {activeStep.options.map((opt, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => handleSelect(idx)}
-                      disabled={loading}
-                      className="w-full text-left p-4 surface surface-hover text-sm text-zinc-300 flex items-center gap-4 transition-all"
-                    >
-                      <span className="w-6 h-6 flex items-center justify-center border border-zinc-800 rounded font-mono text-[10px] text-zinc-500">
-                        {String.fromCharCode(65 + idx)}
-                      </span>
-                      {opt}
-                    </button>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {phase === 'complete' && (
-              <div className="surface p-12 text-center rounded-xl animate-fade-in space-y-6">
-                <div className="mx-auto w-12 h-12 rounded-full border border-zinc-800 flex items-center justify-center">
-                  <Check size={20} className="text-white" />
-                </div>
-                <div>
-                  <h3 className="text-white font-semibold">Protocol Finalized</h3>
-                  <p className="text-xs text-zinc-500 mt-2">Neural weight adjustments applied to local registry.</p>
-                </div>
-                <button onClick={initSession} className="btn-primary px-8 py-3 rounded-md text-xs uppercase tracking-widest flex items-center gap-2 mx-auto">
-                  <RotateCcw size={14} /> Next Sequence
-                </button>
-              </div>
-            )}
-
-            {loading && !activeStep && (
-              <div className="flex items-center gap-3 text-zinc-600 px-2">
-                <Loader2 className="animate-spin" size={14} />
-                <span className="text-[10px] font-mono uppercase tracking-widest">Processing Data...</span>
-              </div>
-            )}
-          </>
+        {(phase === 'active' || phase === 'result') && (
+           <div className="px-3 py-1 rounded-full border border-indigo-500/30 bg-indigo-500/10 text-indigo-300 text-xs font-bold uppercase tracking-widest">
+             Role: {scenario?.role || '...'}
+           </div>
         )}
       </div>
 
-      {phase === 'teaching' && !loading && (
-        <div className="mt-8 pt-6 border-t border-zinc-800">
-          <button 
-            onClick={startPostTest}
-            className="w-full py-4 bg-white text-black text-xs font-bold uppercase tracking-widest rounded-md hover:opacity-90 flex items-center justify-center gap-2"
-          >
-            Advance to Application <ArrowRight size={14} />
-          </button>
+      {phase === 'idle' && (
+        <div className="h-96 flex flex-col items-center justify-center text-center space-y-6 bg-zinc-900/20 rounded-2xl border border-zinc-800/50">
+           <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center">
+              <User size={40} className="text-indigo-400" />
+           </div>
+           <div>
+              <h2 className="text-xl font-medium text-white">Enter the Simulation</h2>
+              <p className="text-slate-400 text-sm max-w-md mx-auto mt-2">
+                We will generate a high-stakes scenario tailored to your weakest areas.
+                You must make a choice. The system will react.
+              </p>
+           </div>
+           <button 
+             onClick={startSimulation}
+             className="btn-primary bg-indigo-600 hover:bg-indigo-700 px-8 py-3 rounded-xl flex items-center gap-2"
+           >
+             <Play size={18} fill="currentColor" /> Start Scenario
+           </button>
+        </div>
+      )}
+
+      {phase === 'loading' && (
+        <div className="h-96 flex flex-col items-center justify-center text-slate-500 gap-4">
+          <Loader2 className="w-8 h-8 animate-spin text-indigo-500" />
+          <p className="animate-pulse">Constructing reality...</p>
+        </div>
+      )}
+
+      {(phase === 'active' || phase === 'result') && scenario && (
+        <div className="space-y-8 animate-in slide-in-from-bottom-4 duration-500">
+           {/* Narrative Card */}
+           <div className="surface p-8 rounded-2xl border border-zinc-800 relative overflow-hidden">
+              <div className="absolute top-0 left-0 w-1 h-full bg-indigo-500"></div>
+              <h3 className="text-xs font-bold text-indigo-400 uppercase tracking-widest mb-4">The Situation</h3>
+              <p className="text-xl md:text-2xl font-serif text-slate-200 leading-relaxed">
+                "{scenario.situation}"
+              </p>
+           </div>
+
+           {/* Choices */}
+           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {scenario.choices.map((choice) => {
+                const isSelected = selectedChoiceId === choice.id;
+                const isRevealed = phase === 'result';
+                
+                let borderClass = 'border-zinc-800 hover:border-zinc-600';
+                if (isRevealed && isSelected) {
+                   borderClass = choice.isTrap ? 'border-rose-500 bg-rose-500/10' : 'border-emerald-500 bg-emerald-500/10';
+                }
+
+                return (
+                  <button
+                    key={choice.id}
+                    onClick={() => !isRevealed && handleChoice(choice.id)}
+                    disabled={isRevealed}
+                    className={`text-left p-6 rounded-xl border transition-all duration-300 flex flex-col h-full ${borderClass} ${
+                      !isRevealed ? 'bg-zinc-900 hover:bg-zinc-800' : 'cursor-default'
+                    } ${isRevealed && !isSelected ? 'opacity-50' : 'opacity-100'}`}
+                  >
+                    <div className="flex-1">
+                       <span className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2 block">Option {choice.id}</span>
+                       <p className="text-sm font-medium text-white">{choice.text}</p>
+                    </div>
+                    {isRevealed && isSelected && (
+                       <div className="mt-4 pt-4 border-t border-white/10 animate-in fade-in">
+                          <p className={`text-xs font-bold uppercase tracking-widest mb-1 flex items-center gap-2 ${choice.isTrap ? 'text-rose-400' : 'text-emerald-400'}`}>
+                             {choice.isTrap ? <XCircle size={14} /> : <CheckCircle2 size={14} />}
+                             {choice.isTrap ? 'Trap Triggered' : 'Crisis Averted'}
+                          </p>
+                       </div>
+                    )}
+                  </button>
+                );
+              })}
+           </div>
+
+           {/* Outcome Reveal */}
+           {phase === 'result' && selectedChoiceId && (
+             <div className="bg-zinc-950 border border-zinc-800 rounded-2xl p-8 animate-in zoom-in-95 duration-500">
+                <div className="flex flex-col md:flex-row gap-8">
+                   <div className="flex-1 space-y-4">
+                      <h3 className="text-lg font-serif text-white">Consequence</h3>
+                      <p className="text-slate-300 leading-relaxed italic">
+                        "{scenario.choices.find(c => c.id === selectedChoiceId)?.outcome}"
+                      </p>
+                      
+                      <div className="pt-4">
+                         <h4 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Analysis</h4>
+                         <p className="text-sm text-slate-400">
+                           {scenario.choices.find(c => c.id === selectedChoiceId)?.explanation}
+                         </p>
+                         <p className="text-xs text-indigo-400 mt-2">
+                           Target Concept: <strong>{getTargetBiasName()}</strong>
+                         </p>
+                      </div>
+                   </div>
+                   
+                   <div className="w-full md:w-1/3 border-l border-zinc-800 pl-8 md:block hidden">
+                      <div className="h-full flex flex-col justify-center text-center space-y-4">
+                         <p className="text-slate-500 text-xs">Did you learn from this timeline?</p>
+                         <button 
+                           onClick={startSimulation}
+                           className="w-full py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-colors"
+                         >
+                           Next Scenario <ArrowRight size={16} />
+                         </button>
+                      </div>
+                   </div>
+                </div>
+                
+                {/* Mobile Button */}
+                <button 
+                   onClick={startSimulation}
+                   className="w-full mt-6 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg font-bold flex items-center justify-center gap-2 transition-colors md:hidden"
+                 >
+                   Next Scenario <ArrowRight size={16} />
+                 </button>
+             </div>
+           )}
         </div>
       )}
     </div>

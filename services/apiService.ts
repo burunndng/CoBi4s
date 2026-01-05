@@ -505,3 +505,47 @@ export const sendChatMessage = async (history: { role: string, content: string }
     throw error;
   }
 };
+
+export const generateBranchingScenario = async (bias: Bias): Promise<any> => {
+  const prompt = `
+    Create a "Choose Your Own Adventure" decision point to test the user's resistance to: "${bias.name}" (${bias.definition}).
+    
+    1. ROLE: Assign the user a specific role (e.g. CEO, Doctor, Parent).
+    2. SITUATION: Describe a high-stakes moment where the bias temptation is strong.
+    3. CHOICES: Provide 3 distinct actions the user can take.
+       - One must be the "Trap" (succumbing to the bias).
+       - One must be the "Rational" choice (mitigating the bias).
+       - One can be a "Neutral/Distractor" choice.
+    
+    For each choice, describe the IMMEDIATE CONSEQUENCE (outcome).
+    
+    Output strictly valid JSON:
+    {
+      "biasId": "${bias.id}",
+      "role": "string",
+      "situation": "string",
+      "choices": [
+        {
+          "id": "A",
+          "text": "Action description...",
+          "isTrap": boolean,
+          "outcome": "What happens next? (Narrative consequence)",
+          "explanation": "Why this was/wasn't the bias"
+        },
+        { "id": "B", ... },
+        { "id": "C", ... }
+      ]
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a simulation designer for cognitive training. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Simulation generation failed:", error);
+    throw error;
+  }
+};

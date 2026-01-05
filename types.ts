@@ -114,6 +114,20 @@ export interface ChatMessage {
   relatedBiasId?: string; // If the AI detects a specific bias
 }
 
+export interface SimulationScenario {
+  id: string;
+  biasId: string;
+  role: string; // "Project Manager", "Parent", etc.
+  situation: string; // The opening context
+  choices: {
+    id: string;
+    text: string;
+    isTrap: boolean; // True if this choice succumbs to the bias
+    outcome: string; // The consequence of this choice
+    explanation: string; // Why it was/wasn't the bias
+  }[];
+}
+
 export interface AppState {
   mode: LearningMode;
   progress: Record<string, ProgressState>;
