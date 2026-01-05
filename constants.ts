@@ -35,6 +35,7 @@ export const INITIAL_STATE: AppState = {
   totalXp: 0,
   favorites: [],
   decisionLogs: [],
+  algorithmTests: [],
   preferences: {
     flashcardsOnlyFavorites: false,
     learnTab: 'all'

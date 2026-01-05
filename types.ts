@@ -66,6 +66,22 @@ export interface DecisionLog {
 
 export type LearningMode = 'psychology' | 'logic';
 
+export interface AlgorithmTest {
+  id: string;
+  timestamp: number;
+  biasId: string;
+  pseudoCode: string;
+  results: {
+    testCase: string;
+    scenario: string;
+    isPass: boolean;
+    error?: string;
+    suggestion?: string;
+  }[];
+  overallAssessment: string;
+  status: 'compiled' | 'buggy' | 'critical_failure';
+}
+
 export interface AppState {
   mode: LearningMode;
   progress: Record<string, ProgressState>;
@@ -75,6 +91,7 @@ export interface AppState {
   totalXp: number;
   favorites: string[];
   decisionLogs: DecisionLog[];
+  algorithmTests: AlgorithmTest[];
   preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;

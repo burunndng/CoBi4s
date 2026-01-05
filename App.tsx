@@ -16,7 +16,8 @@ import {
   Scale,
   ShieldAlert,
   Brain,
-  FlaskConical
+  FlaskConical,
+  Binary
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
@@ -30,6 +31,7 @@ import AIInstructor from './components/AIInstructor';
 import { BiasDetector } from './components/BiasDetector/BiasDetector';
 import { DecisionArchitect } from './components/DecisionArchitect/DecisionArchitect';
 import { LogicLab } from './components/LogicLab/LogicLab';
+import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -42,7 +44,8 @@ const App: React.FC = () => {
         ...parsed,
         mode: parsed.mode || 'psychology',
         fallacyProgress: parsed.fallacyProgress || {},
-        decisionLogs: parsed.decisionLogs || []
+        decisionLogs: parsed.decisionLogs || [],
+        algorithmTests: parsed.algorithmTests || []
       };
     }
     return INITIAL_STATE;
@@ -142,6 +145,7 @@ const App: React.FC = () => {
           <nav className="flex-1 p-4 space-y-1">
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
+            <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
             <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
             <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
             <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" />
@@ -200,6 +204,7 @@ const App: React.FC = () => {
               <nav className="flex-1 p-6 space-y-4">
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" onClick={() => setIsMobileMenuOpen(false)} />
@@ -224,6 +229,7 @@ const App: React.FC = () => {
                    return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
                  });
               }} />} />
+              <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
               <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
               <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />

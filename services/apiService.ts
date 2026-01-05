@@ -325,3 +325,51 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
     throw error;
   }
 };
+
+export const runAlgorithmTest = async (biasName: string, definition: string, pseudoCode: string): Promise<any> => {
+  const prompt = `
+    Act as a "Logic Compiler" and Adversarial Unit Tester for cognitive psychology concepts.
+    
+    TARGET CONCEPT: "${biasName}"
+    DEFINITION: "${definition}"
+    USER'S PSEUDO-CODE LOGIC:
+    \`\`\`
+    ${pseudoCode}
+    \`\`\`
+    
+    TASK:
+    Run exactly 3 "Unit Tests" against the user's pseudo-code.
+    1. Test Case 1: A standard scenario (Happy Path).
+    2. Test Case 2: A subtle edge case where the logic might be too simple.
+    3. Test Case 3: A counter-example where the logic shouldn't trigger, or triggers incorrectly.
+    
+    For each test case, determine if the logic "Passes" or "Throws an Error".
+    Do not explain the bias itself. Be a literal-minded compiler.
+    
+    Output strictly valid JSON:
+    {
+      "results": [
+        {
+          "testCase": "string (name of test)",
+          "scenario": "string (brief scenario description)",
+          "isPass": boolean,
+          "error": "string (Logic Error message if isPass is false)",
+          "suggestion": "string (how to refine the code if isPass is false)"
+        }
+      ],
+      "overallAssessment": "string (Brief conclusion on the logic's robustness)",
+      "status": "compiled | buggy | critical_failure"
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a literal-minded logic compiler. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Algorithm test failed:", error);
+    throw error;
+  }
+};
