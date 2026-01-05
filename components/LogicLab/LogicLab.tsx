@@ -126,6 +126,21 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
     }
   };
 
+  const getStrategies = () => {
+    if (!targetFallacy) return [];
+    // Generic strategies based on fallacy type could be expanded
+    return [
+      { label: "Steel Man", text: "If I understand correctly, your strongest point is..." },
+      { label: "Focus on Logic", text: "Setting aside the emotional content, the logical claim is..." },
+      { label: "Grant Premise", text: "Even if we accept that premise, it doesn't follow that..." },
+      { label: "Ask for Evidence", text: "What specific evidence supports the claim that..." }
+    ];
+  };
+
+  const addStrategy = (text: string) => {
+    setUserRepair(prev => prev ? prev + " " + text : text);
+  };
+
   return (
     <div className="max-w-3xl mx-auto space-y-8 animate-fade-in pb-24">
       {/* Header */}
@@ -252,6 +267,17 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
                  </div>
                  
                  <div className="p-6">
+                    <div className="flex flex-wrap gap-2 mb-3">
+                       {getStrategies().map((strat, i) => (
+                         <button 
+                           key={i}
+                           onClick={() => addStrategy(strat.text)}
+                           className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-indigo-300 hover:bg-indigo-900/30 hover:border-indigo-500/50 transition-colors"
+                         >
+                           {strat.label}
+                         </button>
+                       ))}
+                    </div>
                     <p className="text-slate-500 text-xs uppercase font-bold tracking-widest mb-3">Steel Man Version</p>
                     <textarea 
                       className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-rose-500 outline-none h-32 resize-none"
