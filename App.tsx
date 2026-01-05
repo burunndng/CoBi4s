@@ -19,7 +19,8 @@ import {
   FlaskConical,
   Binary,
   Shuffle,
-  MessageSquare
+  MessageSquare,
+  HelpCircle
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
@@ -36,6 +37,10 @@ import { LogicLab } from './components/LogicLab/LogicLab';
 import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer';
 import { ContextLab } from './components/ContextLab/ContextLab';
 import { ChatInterface } from './components/SocraticChat/ChatInterface';
+import { LandingPage } from './components/LandingPage';
+
+// --- Types & Constants ---
+// (Moved to separate files: types.ts and constants.ts)
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -163,6 +168,7 @@ const App: React.FC = () => {
           </nav>
 
           <div className="p-4 border-t border-[#27272a]">
+            <NavLink to="/welcome" icon={<HelpCircle size={18} />} label="About" />
             <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" />
           </div>
         </aside>
@@ -240,20 +246,7 @@ const App: React.FC = () => {
               }} />} />
               <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
               <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
-              <Route path="/context" element={<ContextLab />} />
-              <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
-              <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
-              <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
-              <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
-              <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
-                setState(prev => {
-                  const isFav = prev.favorites.includes(id);
-                  return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
-                });
-              }} />} />
-              <Route path="/quiz" element={<Quiz biases={BIASES} onXpGain={(xp) => setState(prev => ({...prev, totalXp: prev.totalXp + xp}))} />} />
-              <Route path="/plan" element={<StudyPlan state={state} />} />
-              <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
+              <Route path="/welcome" element={<LandingPage />} />
             </Routes>
           </div>
         </main>
