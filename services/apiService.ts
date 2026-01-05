@@ -267,3 +267,61 @@ export const generateFallacyScenario = async (targetFallacies: Fallacy[], contex
     throw error;
   }
 };
+
+export const generateLabStatement = async (targetFallacy: Fallacy): Promise<{ statement: string }> => {
+  const prompt = `
+    Generate a single, realistic fallacious statement that clearly demonstrates the "${targetFallacy.name}" fallacy.
+    Definition: ${targetFallacy.definition}
+    
+    The topic should be a common debate (technology, work, lifestyle).
+    Make it sound like a real comment one might find online or in a meeting.
+    
+    Output strictly valid JSON:
+    { "statement": "string" }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a logic instructor. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Lab statement generation failed:", error);
+    return { statement: targetFallacy.example };
+  }
+};
+
+export const evaluateRepair = async (original: string, fallacy: string, repair: string): Promise<any> => {
+  const prompt = `
+    Evaluate this 'Argument Repair'. 
+    
+    Original Statement (Fallacious): "${original}"
+    Fallacy used: "${fallacy}"
+    User's Attempt to Repair: "${repair}"
+    
+    CRITERIA:
+    1. Did they successfully remove the fallacy?
+    2. Did they preserve the core point or concern of the original statement? (The "Steel Man" approach)
+    3. Is the resulting argument logically sound?
+    
+    Output strictly valid JSON:
+    {
+      "isSuccess": boolean,
+      "score": number (0 to 100),
+      "feedback": "Constructive critique of their repair",
+      "improvedVersion": "An even better, more rigorous version of the repair"
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a rigorous logic professor and debate coach. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Repair evaluation failed:", error);
+    throw error;
+  }
+};
