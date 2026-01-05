@@ -58,11 +58,15 @@ const App: React.FC = () => {
     setTimeout(() => setToasts(prev => prev.filter(t => t.id !== id)), 3000);
   }, []);
 
-  const updateProgress = useCallback((biasId: string, quality: number) => {
+  const updateProgress = useCallback((id: string, quality: number) => {
     setState(prev => {
-      const current = prev.progress[biasId] || {
-        biasId, interval: 1, repetition: 0, easeFactor: 2.5, nextReviewDate: Date.now(), masteryLevel: 0
+      const isLogic = prev.mode === 'logic';
+      const progressMap = isLogic ? prev.fallacyProgress : prev.progress;
+      
+      const current = progressMap[id] || {
+        biasId: id, interval: 1, repetition: 0, easeFactor: 2.5, nextReviewDate: Date.now(), masteryLevel: 0
       };
+      
       let { interval, repetition, easeFactor } = current;
       if (quality >= 3) {
         if (repetition === 0) interval = 1;
@@ -90,7 +94,10 @@ const App: React.FC = () => {
         totalXp: prev.totalXp + 15,
         dailyStreak: newStreak,
         lastStudyDate: today,
-        progress: { ...prev.progress, [biasId]: { biasId, interval, repetition, easeFactor, nextReviewDate, masteryLevel } }
+        [isLogic ? 'fallacyProgress' : 'progress']: { 
+          ...progressMap, 
+          [id]: { biasId: id, interval, repetition, easeFactor, nextReviewDate, masteryLevel } 
+        }
       };
     });
     showToast(`Data Updated`, 'success');
@@ -215,7 +222,7 @@ const App: React.FC = () => {
               }} />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
               <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
-              <Route path="/detector" element={<BiasDetector />} />
+              <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
               <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
                 setState(prev => {
                   const isFav = prev.favorites.includes(id);

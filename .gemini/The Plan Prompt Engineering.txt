@@ -1,0 +1,3394 @@
+
+
+### The Plan: "Prompt Engineering as a Software Discipline"
+
+---
+
+### Part 1: The Mental Model & Anatomy
+#### The Deterministic Developer’s Guide to Probabilistic Machines
+
+Welcome to the new stack. If you are reading this, you are likely frustrated. You are used to `if x then y`. You are used to compilers that scream at you when you miss a semicolon.
+
+Large Language Models (LLMs) are different. They are stochastic. They are probabilistic. They are "fuzzy." To a developer, this feels like chaos.
+
+This guide is not about "talking nicely to the robot." It is about **constraining the search space** of the model to force it into pseudo-deterministic behavior. We treat prompts not as conversation, but as code payload.
+
+---
+
+### 1. The Core Paradigm Shift
+In traditional coding, you write the **logic** to process the data.
+In prompt engineering, you write the **specification** and the **examples**, and the model generates the logic (or the direct output).
+
+*   **Bad Mental Model:** "I am asking a smart assistant a question."
+*   **Good Mental Model:** "I am writing a function signature and docstring for an unwieldy, over-confident, junior developer to execute."
+
+### 2. The Anatomy of a Production Prompt
+A robust prompt is not a single sentence. It is a structured object. When building applications or using coding assistants, structure your request into four distinct components.
+
+Think of a prompt as a JSON object:
+
+```json
+{
+  "role": "System Definition (Persona/Context)",
+  "instruction": "The specific task to execute",
+  "context": "The data or code snippet to operate on",
+  "constraints": "Output format, forbidden actions, style guides"
+}
+```
+
+#### A. Role/Persona (The Environment)
+This sets the "Global Scope." If you don't define the environment, the model defaults to "Helpful Generalist," which is often too verbose and apologetic for code.
+
+*   *Weak:* "Help me fix this bug."
+*   *Strong:* "You are a Senior Python Backend Engineer specializing in FastAPI and concurrency. You prioritize performance and type safety."
+
+#### B. The Delimiter (The Syntax)
+LLMs struggle to differentiate between your instructions and the data you want them to process. If you paste a messy log file into a prompt, the LLM might try to "read" the logs as instructions.
+
+**Rule:** Use XML-style tags or Markdown fences to wrap your data. This creates a sandboxed scope for the model.
+
+**Example:**
+> Analyze the error logs in the `<logs>` tags. Do not output the logs. Only output the root cause.
+>
+> `<logs>`
+> [2023-10-10 12:00] Error: Connection refused...
+> `</logs>`
+
+#### C. The Output Schema (The Return Type)
+Never leave the output format up to the model. If you need JSON, define the JSON structure. If you need Python, specify the version and libraries.
+
+*   *Weak:* "Give me the code."
+*   *Strong:* "Return only raw Python code. Do not use Markdown backticks. Do not add explanations. The code must be compatible with Python 3.9."
+
+---
+
+### 3. Blueprint: The "Mega-Prompt" Structure
+When working with Codex, Gemini, or Claude, try to assemble your prompts using this template. This is the "Boilerplate" of Prompt Engineering.
+
+```text
+# ROLE
+You are an expert SQL Data Architect.
+
+# OBJECTIVE
+Convert the natural language query provided below into a highly optimized PostgreSQL query.
+
+# CONTEXT / DATA
+Schema Definition:
+<schema>
+  Table: Users (id, name, signup_date)
+  Table: Orders (id, user_id, amount, status)
+</schema>
+
+# CONSTRAINTS
+1. Use CTEs (Common Table Expressions) for readability.
+2. Do not hallucinate columns not in the schema.
+3. If the query is impossible based on the schema, return "ERROR: CANNOT COMPUTE".
+4. Output format: Markdown code block only.
+
+# INPUT
+<query>
+Find the top 5 users by spend who signed up in last 3 months.
+</query>
+```
+
+### 4. Directives vs. Suggestions
+Developers often use polite, passive language ("Could you try to..."). This increases entropy (randomness). Use **Imperative Mood**.
+
+| Passive (Avoid) | Imperative (Use) | Why? |
+| :--- | :--- | :--- |
+| "I want you to try and keep it short." | "Be concise. Limit response to 50 words." | Reduces token usage and rambling. |
+| "Can you check if there are bugs?" | "Audit this code for security vulnerabilities. List them." | ambiguity leads to hallucinations. |
+| "Don't write bad code." | "Ensure all functions are pure and typed." | Negative constraints ("Don't") are harder for LLMs to process than positive constraints ("Do"). |
+
+### 5. Summary of Part 1
+1.  **Treat Prompts as Code:** Version control them. Iterating on a prompt is like refactoring a function.
+2.  **Sandboxing:** Always use delimiters (`"""`, ```` `, `<tag>`) to separate your instructions from your data.
+3.  **Type Safety:** Explicitly define the output format (JSON, SQL, List) to ensure the output can be parsed programmatically.
+
+***
+
+------------------
+
+Here is **Part 3: Patterns for Common Tasks**.
+
+These are battle-tested, copy-paste templates designed for high-velocity development ("Vibe Coding"). They utilize the structural concepts from Part 1 and the reasoning techniques from Part 2.
+
+**How to use these:**
+1.  Copy the block into your LLM (Claude, ChatGPT, Gemini, etc.) or IDE (Cursor, Copilot).
+2.  Replace the `{{PLACEHOLDERS}}` with your specific data.
+3.  Add the code/context in the designated XML/Markdown tags.
+
+---
+
+### 1. The Architect (New Feature Generation)
+**Goal:** Generate a complete, production-ready module (not just a snippet) that fits your stack.
+**Technique:** Chain of Thought + Strict Constraints.
+
+```markdown
+# ROLE
+Act as a Senior Software Engineer specializing in {{LANGUAGE/STACK}} (e.g., TypeScript, Node.js, React).
+
+# TASK
+Implement a {{FEATURE_NAME}} based on the requirements below.
+
+# SPECIFICATIONS
+1. **Functionality**: {{BRIEF_DESCRIPTION}}
+2. **Input**: {{INPUT_DATA_TYPE}}
+3. **Output**: {{OUTPUT_DATA_TYPE}}
+
+# CONSTRAINTS & STYLE
+- **Type Safety**: Strictly typed. No `any` types.
+- **Error Handling**: Use `try/catch` (or `Result` types) and handle edge cases gracefully.
+- **Comments**: Add JSDoc/Docstrings for public functions only.
+- **Libraries**: Use only {{PREFERRED_LIBRARIES}}. Do not introduce new dependencies unless necessary.
+- **Placeholder Rule**: Do not use placeholders like `// ... implementation here`. Write full, working code.
+
+# STEPS
+1. Briefly outline the file structure or class hierarchy.
+2. Provide the complete code implementation.
+```
+
+---
+
+### 2. The Modernizer (Refactoring)
+**Goal:** Improve code quality, performance, or readability without breaking functionality.
+**Technique:** Comparative constraint (Before vs. After).
+
+```markdown
+# CONTEXT
+I am providing a piece of legacy code in `<legacy_code>` tags.
+
+# OBJECTIVE
+Refactor this code to follow modern {{LANGUAGE}} best practices.
+
+# PRIORITIES
+1. **Readability**: Simplify complex conditionals (use guard clauses).
+2. **Performance**: Optimize loops and database calls (N+1 queries).
+3. **Immutability**: Prefer immutable data structures where possible.
+4. **Behavior**: The external API and return values must remain EXACTLY the same.
+
+# OUTPUT FORMAT
+1. Explanation of top 3 changes and *why* they were made.
+2. The refactored code block.
+
+<legacy_code>
+{{PASTE_CODE_HERE}}
+</legacy_code>
+```
+
+---
+
+### 3. The Sherlock (Debugging & Root Cause)
+**Goal:** Fix a bug while understanding *why* it happened (prevents "patch" coding).
+**Technique:** Context Injection + Hypothesis generation.
+
+```markdown
+# CONTEXT
+I have a bug in the following code.
+Stack: {{STACK_DETAILS}}
+
+# DATA
+1. **The Code**: Provided in `<code_snippet>` tags.
+2. **The Error**: Provided in `<error_log>` tags.
+
+# INSTRUCTIONS
+1. **Analyze**: Trace the execution flow based on the error message.
+2. **Hypothesize**: List 2 potential root causes.
+3. **Fix**: Provide the corrected code.
+4. **Prevent**: Suggest a test case or type change to prevent this from recurring.
+
+<code_snippet>
+{{PASTE_CODE_HERE}}
+</code_snippet>
+
+<error_log>
+{{PASTE_ERROR_LOGS_HERE}}
+</error_log>
+```
+
+---
+
+### 4. The QA Engineer (Unit Test Generation)
+**Goal:** Generate comprehensive tests, including edge cases you might forget.
+**Technique:** Adversarial Prompting.
+
+```markdown
+# ROLE
+You are a QA Engineer proficient in {{TEST_FRAMEWORK}} (e.g., Pytest, Jest).
+
+# TASK
+Write a comprehensive test suite for the code provided in `<source_code>`.
+
+# COVERAGE REQUIREMENTS
+1. **Happy Path**: Test the expected usage.
+2. **Edge Cases**: Test null inputs, empty lists, negative numbers, and boundary conditions.
+3. **Error Handling**: Ensure the function raises the correct exceptions for invalid input.
+4. **Mocking**: Mock external API calls or DB connections (do not make real network requests).
+
+# OUTPUT
+Return a single file containing all tests.
+
+<source_code>
+{{PASTE_CODE_HERE}}
+</source_code>
+```
+
+---
+
+### 5. The Pixel Perfect (Frontend Design to Code)
+**Goal:** Convert a rough description or requirements into clean UI code.
+**Technique:** Component-focused generation.
+
+```markdown
+# ROLE
+Frontend Expert in {{FRAMEWORK}} (e.g., React/Tailwind).
+
+# TASK
+Create a UI component for: {{COMPONENT_DESCRIPTION}}.
+
+# VISUAL & UX GUIDELINES
+- **Styling**: Use Tailwind CSS. Ensure mobile responsiveness (use `md:` and `lg:` breakpoints).
+- **Accessibility**: Include ARIA labels, semantic HTML (<section>, <article>), and keyboard navigation support.
+- **State**: Handle loading states (skeleton loader) and empty states.
+- **Theme**: Dark mode compatible.
+
+# OUTPUT
+Provide the single component file.
+
+# INPUT CONTEXT (Optional)
+The data structure prop looks like this:
+```json
+{{JSON_STRUCTURE_EXAMPLE}}
+```
+
+---
+
+### 6. The Technical Writer (Documentation)
+**Goal:** Generate documentation that is actually useful for other developers.
+**Technique:** Audience definition.
+
+```markdown
+# TASK
+Write documentation for the code in `<code_snippet>`.
+
+# FORMAT
+1. **Docstring/JSDoc**: Write the function/class comment block including params, returns, and raised exceptions.
+2. **README snippet**: A short markdown section explaining how to use this module with a code example.
+
+# AUDIENCE
+Target this documentation at a Junior Developer who has never seen this codebase. Explain *why* this exists, not just *what* it does.
+
+<code_snippet>
+{{PASTE_CODE_HERE}}
+</code_snippet>
+```
+
+---
+
+### 7. The Staff Engineer (Code Review / Security Audit)
+**Goal:** Catch issues before you push to production.
+**Technique:** Role-playing a strict auditor.
+
+```markdown
+# ROLE
+You are a Security Researcher and Performance Expert.
+
+# TASK
+Review the code provided below for:
+1. **Security Vulnerabilities**: (SQL Injection, XSS, exposed secrets, insecure deserialization).
+2. **Performance Bottlenecks**: (O(n^2) operations, memory leaks).
+3. **Code Smells**: (Magic numbers, deep nesting).
+
+# OUTPUT
+- List critical issues (Red Flags).
+- List minor improvements (Yellow Flags).
+- Provide a "Patched Version" of the code that fixes the Red Flags.
+
+<code>
+{{PASTE_CODE_HERE}}
+</code>
+```
+
+---
+
+### 8. The Regex Wizard (Data Parsing)
+**Goal:** Generate complex Regex without the headache.
+**Technique:** Few-shot examples (as discussed in Part 2).
+
+```markdown
+# TASK
+Write a Regular Expression (Regex) for {{LANGUAGE}} to capture {{TARGET_DATA}}.
+
+# EXAMPLES
+Match: "{{EXAMPLE_MATCH_1}}"
+Match: "{{EXAMPLE_MATCH_2}}"
+No Match: "{{EXAMPLE_FAIL_1}}"
+
+# REQUIREMENTS
+1. Explain the logic of the regex breakdown.
+2. Provide the raw regex string.
+3. Provide a {{LANGUAGE}} code snippet showing how to use it.
+```
+
+---
+
+### Summary of Part 3
+*   **Context is King:** The more specific you are about libraries, versions, and constraints, the less editing you will do later.
+*   **Separation of Concerns:** Don't ask for a Feature + Tests + Docs in one prompt unless you have a massive context window. Break them down using the templates above for higher quality.
+
+***
+
+--------------------
+
+# Part 2: Prompt Engineering for Vibe Coding
+## Intermediate & Advanced Techniques
+
+---
+
+## 2.1 What is Vibe Coding?
+
+Coined by Andrej Karpathy, **vibe coding** is:
+
+> *"You fully give in to the vibes, embrace exponentials, and forget that the code even exists."*
+
+In practice, it means:
+- Describing intent in natural language
+- Iterating conversationally rather than precisely engineering each prompt
+- Trusting the AI to figure out implementation details
+- Focusing on *what* and *why*, not *how*
+- Moving fast, fixing as you go
+
+**This part assumes you're already vibe coding.** We're here to make you dangerously good at it.
+
+---
+
+## 2.2 The Vibe Coding Spectrum
+
+Most developers fall somewhere on this spectrum:
+
+```
+OVER-SPECIFIED                                    UNDER-SPECIFIED
+     |                                                   |
+"Write a function                              "make it work"
+ with these exact                                      
+ 17 parameters..."                                     
+     |                                                   |
+     ├── Slow to write                    ├── Fast to write
+     ├── Little AI creativity             ├── AI guesses everything  
+     └── Often over-constrained           └── Often misses intent
+                            
+                      ↓ SWEET SPOT ↓
+                 "Intent + Constraints + Taste"
+```
+
+The techniques below help you hit that sweet spot consistently.
+
+---
+
+# INTERMEDIATE TECHNIQUES
+
+---
+
+## 2.3 The Conversation Patterns
+
+### Pattern 1: Scaffold → Fill → Refine
+
+Don't ask for everything at once. Build in layers.
+
+```
+Turn 1: "Create a REST API structure for a todo app - just the route 
+        handlers as stubs, no implementation yet"
+
+Turn 2: "Now implement the createTodo handler. Use Prisma for DB, 
+        validate that title is non-empty"
+
+Turn 3: "Add rate limiting to this endpoint - 100 requests per minute per user"
+```
+
+**Why it works:** Each turn has clear scope. AI doesn't have to guess what you care about. You can steer after each layer.
+
+---
+
+### Pattern 2: Example-Driven Vibing
+
+Instead of describing what you want, show a case and let AI generalize.
+
+```
+"Here's how I want errors handled in this API:
+
+app.get('/users/:id', async (req, res) => {
+  try {
+    const user = await getUser(req.params.id);
+    if (!user) return res.status(404).json({ error: 'User not found' });
+    res.json({ data: user });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'Internal error' });
+  }
+});
+
+Now create the /posts endpoints following this same pattern"
+```
+
+**Why it works:** Your example carries implicit information about error handling, response format, async patterns, logging, and style. The AI absorbs all of it without you listing each requirement.
+
+---
+
+### Pattern 3: The "Yes, And" Iteration
+
+Borrowed from improv. Accept what the AI gave you and build on it.
+
+```
+AI: [generates a UserService class]
+
+You: "Yes, and add a caching layer using Redis. Keep the same interface"
+
+AI: [adds Redis caching]
+
+You: "Yes, and make the cache TTL configurable per method"
+
+AI: [adds TTL config]
+
+You: "Now extract the cache logic into a decorator I can reuse"
+```
+
+**Why it works:** You're steering, not restarting. Each turn preserves previous context. AI understands it's building on prior work.
+
+**Anti-pattern:** "No, that's wrong, start over and do X instead" → Loses context, restarts from scratch.
+
+---
+
+### Pattern 4: The Contrast Prompt
+
+Show what you DON'T want alongside what you DO want.
+
+```
+"Refactor this function.
+
+NOT like this (too verbose):
+function processData(data) {
+  const result = [];
+  for (let i = 0; i < data.length; i++) {
+    if (data[i].active === true) {
+      result.push(data[i].value);
+    }
+  }
+  return result;
+}
+
+MORE like this (our style):
+const processData = (data) => 
+  data.filter(d => d.active).map(d => d.value);
+"
+```
+
+**Why it works:** Negative examples constrain the solution space. AI learns your taste implicitly.
+
+---
+
+## 2.4 Steering Techniques
+
+### Technique 1: Temperature Control via Language
+
+You can influence creativity/conservatism through word choice:
+
+| Phrase | Effect |
+|--------|--------|
+| "Give me a simple, straightforward..." | Conservative, common patterns |
+| "What's the most elegant way to..." | More creative, opinionated |
+| "How would a senior engineer..." | Best practices, production-ready |
+| "Quick and dirty solution for..." | Pragmatic, possibly hacky |
+| "Explore a few different approaches..." | Multiple options, comparative |
+| "Following the principle of least surprise..." | Conservative, idiomatic |
+
+---
+
+### Technique 2: Soft Constraints vs. Hard Constraints
+
+Learn to signal what's negotiable:
+
+```
+HARD (non-negotiable):
+"MUST use our existing auth middleware"
+
+SOFT (prefer, but flexible):
+"Prefer composition over inheritance if it makes sense"
+
+EXPLORATORY (you decide):
+"Consider whether this should be sync or async"
+```
+
+This lets the AI make intelligent tradeoffs without violating your actual requirements.
+
+---
+
+### Technique 3: The Rubber Duck Redirect
+
+When you're stuck, use the AI as a thinking partner, not just a code generator:
+
+```
+"I'm trying to design a notification system. Walk me through the 
+tradeoffs between:
+1. Polling
+2. WebSockets  
+3. Server-Sent Events
+
+For context: 10k concurrent users, notifications every few minutes, 
+mobile web clients"
+```
+
+Then, after the discussion:
+
+```
+"Based on that, let's go with SSE. Implement the server side"
+```
+
+**Why it works:** You get architectural clarity before committing to code. The AI's implementation is informed by the preceding discussion (within the same context window).
+
+---
+
+## 2.5 Context Window Judo
+
+Your context window is a resource. Manage it.
+
+### The Progressive Context Pattern
+
+Start focused, expand as needed:
+
+```
+Turn 1: [Just the problem, minimal context]
+"Write a debounce function in TypeScript"
+
+Turn 2: [Add context only if output missed something]
+"Make it generic - should work with any function signature. 
+Also needs to return a cancel function"
+
+Turn 3: [Add more only if needed]
+"Actually, here's how we're using it: [paste usage code]. 
+Update to match this interface"
+```
+
+**Anti-pattern:** Dumping 500 lines of code in the first prompt "for context"
+
+---
+
+### The Context Reset
+
+When conversation gets tangled, reset cleanly:
+
+```
+"Let's step back. Here's what we have so far that's working:
+[paste final good code]
+
+Now, starting from this, add the webhook handling"
+```
+
+**Why it works:** You're pruning the context tree. Old mistakes and tangents are removed. AI starts fresh but with the good stuff preserved.
+
+---
+
+### The Summary Checkpoint
+
+For long sessions, periodically consolidate:
+
+```
+"Before we continue, summarize what we've built:
+- What endpoints exist
+- What's left to do
+- Any decisions we made along the way"
+```
+
+Then use that summary to start the next session or continue with clarity.
+
+---
+
+# ADVANCED TECHNIQUES
+
+---
+
+## 2.6 Multi-Turn Orchestration
+
+### The Parallel Exploration Pattern
+
+Ask for multiple approaches, then choose:
+
+```
+"Give me 3 different approaches to implement rate limiting here:
+1. In-memory (simple, single-instance)
+2. Redis-based (distributed)  
+3. Using middleware library
+
+For each: show the code and note tradeoffs. 
+Don't pick for me - I'll decide"
+```
+
+Then:
+```
+"Let's go with approach 2, but use the configuration style from approach 3"
+```
+
+**Why it works:** You see the solution space. You can mix and match. AI doesn't lock you into its first guess.
+
+---
+
+### The Adversarial Pair Pattern
+
+Make the AI critique its own work:
+
+```
+Turn 1: "Implement a user registration endpoint"
+
+Turn 2: "Now review this code as a security-focused engineer. 
+        What vulnerabilities exist? What's missing?"
+
+Turn 3: "Fix the issues you identified"
+```
+
+**Why it works:** AI has knowledge about security, performance, etc. but doesn't always apply it unprompted. The second prompt activates that knowledge as a lens.
+
+Variations:
+- "Review this for performance bottlenecks"
+- "Review this as if you're onboarding a new developer - what would confuse them?"
+- "What would break if this receives 100x expected traffic?"
+
+---
+
+### The Test-First Vibe
+
+Use tests to specify behavior:
+
+```
+"Here are the tests I want to pass:
+
+describe('calculateShipping', () => {
+  it('returns 0 for orders over $100', () => {
+    expect(calculateShipping({ total: 150 })).toBe(0);
+  });
+  
+  it('returns flat $5 for orders under $100', () => {
+    expect(calculateShipping({ total: 50 })).toBe(5);
+  });
+  
+  it('handles international with 2x multiplier', () => {
+    expect(calculateShipping({ total: 50, international: true })).toBe(10);
+  });
+});
+
+Write the implementation"
+```
+
+**Why it works:** Tests are unambiguous specifications. No room for interpretation. AI writes code that matches your exact expectations.
+
+---
+
+## 2.7 The Meta-Prompting Layer
+
+### Ask AI How to Ask
+
+When you don't know how to prompt for something:
+
+```
+"I want to build a real-time collaborative text editor. 
+Before we start coding, what information would you need from me 
+to give good implementation guidance? What questions should I be 
+prepared to answer?"
+```
+
+AI will list: conflict resolution strategy, persistence needs, user count, framework, etc.
+
+Then you answer those questions in your next prompt.
+
+---
+
+### The Specification Generator
+
+Use AI to write the spec you'll use to prompt it:
+
+```
+"I need to build an invoice generator. Interview me - ask me 
+questions one at a time about requirements. After 5-10 questions, 
+generate a technical specification I can use for implementation"
+```
+
+Then use that spec as context for implementation prompts.
+
+---
+
+## 2.8 The Diff-Based Workflow
+
+For existing code, work in diffs:
+
+```
+"Here's my current function:
+
+[paste function]
+
+Make these specific changes:
+1. Add input validation for email format
+2. Replace callback with async/await
+3. Add JSDoc comments
+
+Show me the changes as a diff, then the full updated code"
+```
+
+**Why it works:**
+- You can review what changed, not just what exists
+- AI is focused on modifications, not rewriting
+- Easier to reject specific changes while keeping others
+
+---
+
+## 2.9 The Persona Stack
+
+Layer personas for nuanced output:
+
+```
+"You're a senior TypeScript developer who:
+- Has worked on high-traffic APIs (millions of requests/day)
+- Is slightly paranoid about error handling
+- Prefers explicit over clever code
+- Comments only the 'why', never the 'what'
+
+Given that persona, implement the payment processing webhook handler"
+```
+
+### Advanced: Persona Switching
+
+```
+Turn 1 (Architect persona): "Design the high-level structure for a 
+plugin system"
+
+Turn 2 (Security persona): "Review this design for security concerns"
+
+Turn 3 (Developer persona): "Implement the core plugin loader"
+
+Turn 4 (Adversary persona): "How would you write a malicious plugin 
+that exploits this system?"
+
+Turn 5 (Developer persona): "Update the implementation to prevent 
+those exploits"
+```
+
+---
+
+## 2.10 Escape Hatches
+
+### When AI is Stuck in a Loop
+
+```
+"You've suggested X twice and it's not working. 
+Let's try a completely different approach. 
+What's an alternative solution that doesn't involve X at all?"
+```
+
+### When Output is Consistently Wrong
+
+```
+"Stop. The approach isn't working. Tell me:
+1. What assumptions are you making about [problem]?
+2. What information would help you solve this?
+3. What's confusing about my request?
+
+Don't write code yet - let's debug the communication first"
+```
+
+### When You Need to Break the Pattern
+
+```
+"I know the conventional approach is X, but I have a constraint 
+you don't know about: [explain constraint]. Given that, what 
+unconventional approaches might work?"
+```
+
+---
+
+## 2.11 Vibe Coding Anti-Patterns to Avoid
+
+| Anti-Pattern | Problem | Fix |
+|--------------|---------|-----|
+| **"Keep going"** | Vague, AI doesn't know which direction | "Keep going with X, specifically add Y" |
+| **Wall of paste** | Dilutes focus, buries the ask | Paste only relevant code, summarize the rest |
+| **Stack prompts** | "Do A, B, C, D, E" overwhelms | One or two things at a time |
+| **Flip-flopping** | "Use X... no use Y... actually X" confuses context | Make a decision, commit for a few turns |
+| **Ignoring warnings** | AI says "this might be an issue" - you skip it | Address concerns before they become bugs |
+| **Vibe without verify** | Speed without testing | Run the code. Test the edge cases. |
+
+---
+
+## 2.12 The Vibe Coder's Checklist
+
+Before submitting a prompt in a vibe session:
+
+```
+□ Is my intent clear? (What should this code DO)
+□ Did I include enough context? (What code exists, what tech stack)
+□ Did I specify constraints? (What must NOT happen, what must it match)
+□ Am I asking one thing at a time? (Or two, not five)
+□ Did I show relevant examples? (Even partial ones help)
+```
+
+After receiving output:
+
+```
+□ Did I read it? (Not just copy-paste)
+□ Does the logic make sense? (Trace through it)
+□ Are there edge cases it missed? (Empty inputs, errors, etc.)
+□ Did I test it? (Run it. Really.)
+□ Would I approve this in a code review? (If not, iterate)
+```
+
+---
+
+## Summary: Part 2
+
+| Level | Key Techniques |
+|-------|----------------|
+| **Intermediate** | Scaffold→Fill→Refine, Example-driven, "Yes And", Contrast prompts, Soft vs. hard constraints, Context management |
+| **Advanced** | Parallel exploration, Adversarial review, Meta-prompting, Persona stacking, Diff-based workflow, Test-first specification |
+
+**The Vibe Coding Mantra:**
+> *Move fast, but verify. Be casual, but intentional. Trust the AI, but read the code.*
+
+---
+
+------------------
+# Part 3: Patterns for Common Tasks
+## Copy-Paste Templates for Real Work
+
+---
+
+## How to Use This Section
+
+Each pattern includes:
+- 📋 **Template**: Copy-paste and fill in the `[BRACKETS]`
+- 🔧 **Variations**: Common modifications
+- 💡 **Pro Tips**: Make it work better
+- 📝 **Example**: Filled-in version
+
+**Format Legend:**
+```
+[REQUIRED]     - You must fill this in
+[OPTIONAL]     - Include if relevant
+{CHOICE_A|B}   - Pick one
+```
+
+---
+
+# 3.1 CODE GENERATION
+
+---
+
+## Pattern: Function Generation
+
+### 📋 Template
+
+```
+Write a [LANGUAGE] function that [PRIMARY_ACTION].
+
+Inputs:
+- [PARAM_1]: [TYPE] - [DESCRIPTION]
+- [PARAM_2]: [TYPE] - [DESCRIPTION]
+
+Output: [RETURN_TYPE] - [DESCRIPTION]
+
+Requirements:
+- [REQUIREMENT_1]
+- [REQUIREMENT_2]
+- Handle edge cases: [EDGE_CASES]
+
+[OPTIONAL: Example usage:]
+[EXAMPLE_CODE]
+
+[OPTIONAL: Match this style:]
+[STYLE_EXAMPLE]
+```
+
+### 📝 Example
+
+```
+Write a TypeScript function that calculates compound interest.
+
+Inputs:
+- principal: number - Initial investment amount
+- rate: number - Annual interest rate as decimal (e.g., 0.05 for 5%)
+- years: number - Number of years
+- compoundingFrequency: 'daily' | 'monthly' | 'yearly' - How often interest compounds
+
+Output: { finalAmount: number, totalInterest: number }
+
+Requirements:
+- Pure function, no side effects
+- Throw descriptive error if any input is negative
+- Round results to 2 decimal places
+- Handle edge case: 0 years returns principal with 0 interest
+
+Example usage:
+const result = calculateCompoundInterest(1000, 0.05, 10, 'yearly');
+// { finalAmount: 1628.89, totalInterest: 628.89 }
+```
+
+### 🔧 Variations
+
+**Async version:**
+```
+Write an async [LANGUAGE] function that [ACTION].
+It should fetch/await [EXTERNAL_DEPENDENCY].
+Handle errors by [ERROR_STRATEGY].
+```
+
+**Generic/Flexible version:**
+```
+Write a generic function that works with [TYPE_CONSTRAINT].
+It should be reusable for [USE_CASES].
+```
+
+---
+
+## Pattern: Class/Module Generation
+
+### 📋 Template
+
+```
+Create a [LANGUAGE] {class|module|service} for [DOMAIN].
+
+Purpose: [WHAT_IT_DOES]
+
+Core methods:
+- [METHOD_1]: [DESCRIPTION]
+- [METHOD_2]: [DESCRIPTION]
+
+State/Properties:
+- [PROPERTY_1]: [TYPE] - [PURPOSE]
+
+Dependencies: [DEPENDENCIES_OR_NONE]
+
+Patterns to follow:
+- [PATTERN_1: e.g., "dependency injection", "singleton", "immutable state"]
+
+[OPTIONAL: Interface it should implement:]
+[INTERFACE_CODE]
+
+[OPTIONAL: Example of how it will be used:]
+[USAGE_CODE]
+```
+
+### 📝 Example
+
+```
+Create a TypeScript class for managing WebSocket connections.
+
+Purpose: Handles reconnection, message queuing, and connection state
+
+Core methods:
+- connect(url): Establishes connection, returns promise that resolves when open
+- send(message): Queues message if disconnected, sends immediately if connected
+- subscribe(event, handler): Register event handlers
+- disconnect(): Clean shutdown
+
+State/Properties:
+- status: 'connecting' | 'connected' | 'disconnected' | 'reconnecting'
+- queuedMessages: Message[] - Messages waiting to be sent
+
+Dependencies: None (use native WebSocket)
+
+Patterns to follow:
+- EventEmitter pattern for subscriptions
+- Auto-reconnect with exponential backoff (max 30 seconds)
+- Dependency injection for WebSocket (for testing)
+
+Example usage:
+const ws = new WebSocketManager();
+ws.subscribe('message', (data) => console.log(data));
+await ws.connect('wss://api.example.com');
+ws.send({ type: 'ping' });
+```
+
+---
+
+## Pattern: API Endpoint Generation
+
+### 📋 Template
+
+```
+Create a [FRAMEWORK] {GET|POST|PUT|DELETE} endpoint for [RESOURCE].
+
+Route: [ROUTE_PATH]
+
+Request:
+- Params: [URL_PARAMS]
+- Body: [BODY_SCHEMA]
+- Headers: [REQUIRED_HEADERS]
+- Auth: [AUTH_REQUIREMENTS]
+
+Response:
+- Success [STATUS_CODE]: [SUCCESS_SCHEMA]
+- Error cases:
+  - [ERROR_CASE_1]: [STATUS_CODE] - [ERROR_RESPONSE]
+
+Business logic:
+- [LOGIC_STEP_1]
+- [LOGIC_STEP_2]
+
+Use these existing services/utilities:
+- [SERVICE_1]: [WHAT_IT_DOES]
+
+[OPTIONAL: Follow this existing endpoint as style reference:]
+[REFERENCE_CODE]
+```
+
+### 📝 Example
+
+```
+Create an Express.js POST endpoint for creating orders.
+
+Route: POST /api/orders
+
+Request:
+- Body: { items: Array<{productId: string, quantity: number}>, shippingAddressId: string }
+- Headers: Authorization: Bearer <token>
+- Auth: User must be authenticated
+
+Response:
+- Success 201: { orderId: string, total: number, estimatedDelivery: string }
+- Error cases:
+  - Invalid product ID: 400 - { error: 'Product not found', productId: string }
+  - Insufficient stock: 409 - { error: 'Insufficient stock', productId: string, available: number }
+  - Invalid address: 400 - { error: 'Invalid shipping address' }
+
+Business logic:
+- Validate all products exist and have sufficient stock
+- Calculate total (use product prices from DB, not from request)
+- Reserve inventory (decrement stock)
+- Create order record with status 'pending'
+- Return order details
+
+Use these existing services:
+- ProductService.getByIds(ids): Returns product details with current stock
+- OrderService.create(orderData): Persists order, returns order with ID
+- InventoryService.reserve(items): Decrements stock, throws if insufficient
+
+Follow REST conventions and our error format: { error: string, details?: object }
+```
+
+---
+
+## Pattern: Full Feature Generation
+
+### 📋 Template
+
+```
+Build a complete [FEATURE_NAME] feature.
+
+Overview: [HIGH_LEVEL_DESCRIPTION]
+
+Tech stack:
+- [FRONTEND_TECH]
+- [BACKEND_TECH]
+- [DATABASE]
+
+User stories:
+1. As a [ROLE], I can [ACTION] so that [BENEFIT]
+2. As a [ROLE], I can [ACTION] so that [BENEFIT]
+
+Data model:
+[DESCRIBE_OR_SHOW_SCHEMA]
+
+Generate in this order:
+1. Database schema/migrations
+2. Backend API endpoints  
+3. Frontend components
+4. Integration between them
+
+Constraints:
+- [CONSTRAINT_1]
+- [CONSTRAINT_2]
+
+Start with step 1. I'll review before moving to each next step.
+```
+
+💡 **Pro Tip:** Always break large features into reviewable chunks. Don't let AI generate everything at once.
+
+---
+
+# 3.2 REFACTORING
+
+---
+
+## Pattern: Performance Refactor
+
+### 📋 Template
+
+```
+Refactor this code for better performance:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Context:
+- This runs [HOW_OFTEN: e.g., "1000x per second", "once per request"]
+- Data size: [TYPICAL_SIZE: e.g., "arrays of 10k items", "small objects"]
+- Current bottleneck (if known): [BOTTLENECK]
+
+Optimize for:
+- [PRIMARY: e.g., "time complexity", "memory usage", "fewer DB calls"]
+- [SECONDARY]
+
+Constraints:
+- Keep the same function signature/interface
+- [OTHER_CONSTRAINTS]
+
+Explain the optimizations you made and their impact.
+```
+
+### 📝 Example
+
+```
+Refactor this code for better performance:
+
+```javascript
+async function getOrdersWithProducts(userId) {
+  const orders = await db.orders.findMany({ where: { userId } });
+  
+  for (const order of orders) {
+    order.products = [];
+    for (const item of order.items) {
+      const product = await db.products.findUnique({ where: { id: item.productId } });
+      order.products.push({ ...product, quantity: item.quantity });
+    }
+  }
+  
+  return orders;
+}
+```
+
+Context:
+- This runs on every request to the orders page
+- Users have 5-50 orders, each with 1-10 items
+- Current bottleneck: Page takes 3+ seconds to load
+
+Optimize for:
+- Fewer database queries (N+1 problem)
+- Response time
+
+Constraints:
+- Keep the same function signature
+- Keep using Prisma
+- Maintain the same return structure
+
+Explain the optimizations you made.
+```
+
+---
+
+## Pattern: Readability Refactor
+
+### 📋 Template
+
+```
+Refactor this code for better readability:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Issues I'm seeing:
+- [ISSUE_1: e.g., "too deeply nested", "unclear variable names"]
+- [ISSUE_2]
+
+Our team conventions:
+- [CONVENTION_1]
+- [CONVENTION_2]
+
+Goals:
+- A new team member should understand this in [TIME: e.g., "< 5 minutes"]
+- [OTHER_GOALS]
+
+Keep behavior exactly the same. Add comments only for "why", not "what".
+```
+
+---
+
+## Pattern: Modernization Refactor
+
+### 📋 Template
+
+```
+Modernize this [LANGUAGE] code:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Current version: [OLD_VERSION/PATTERNS]
+Target version: [NEW_VERSION/PATTERNS]
+
+Specifically update:
+- [CHANGE_1: e.g., "callbacks to async/await"]
+- [CHANGE_2: e.g., "var to const/let"]
+- [CHANGE_3: e.g., "class components to hooks"]
+
+Keep unchanged:
+- [PRESERVE_1: e.g., "external API interface", "function names"]
+
+Flag any breaking changes or things that need manual review.
+```
+
+---
+
+## Pattern: Extract and Restructure
+
+### 📋 Template
+
+```
+This [FILE/FUNCTION/CLASS] has grown too large. Help me break it down.
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Current problems:
+- [PROBLEM_1: e.g., "mixing UI and business logic"]
+- [PROBLEM_2: e.g., "500+ lines, hard to navigate"]
+
+Propose a structure that:
+- Separates [CONCERN_A] from [CONCERN_B]
+- Makes [ASPECT] easier to test
+- Follows [PATTERN: e.g., "repository pattern", "hooks extraction"]
+
+Show me:
+1. The proposed file/module structure
+2. What goes in each file
+3. How they import/depend on each other
+4. The refactored code for each piece
+```
+
+---
+
+# 3.3 DEBUGGING
+
+---
+
+## Pattern: Error Diagnosis
+
+### 📋 Template
+
+```
+I'm getting this error:
+
+```
+[ERROR_MESSAGE]
+```
+
+Here's the relevant code:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Context:
+- This happens when: [TRIGGER_CONDITION]
+- Environment: [ENV_DETAILS: e.g., "Node 18", "React 18", "Production only"]
+- Recent changes: [WHAT_CHANGED]
+
+What I've already tried:
+- [ATTEMPT_1]
+- [ATTEMPT_2]
+
+Diagnose the issue and provide a fix. Explain why this error occurred.
+```
+
+### 📝 Example
+
+```
+I'm getting this error:
+
+```
+TypeError: Cannot read properties of undefined (reading 'map')
+    at UserList (UserList.tsx:12:23)
+    at renderWithHooks (react-dom.development.js:14985:18)
+```
+
+Here's the relevant code:
+
+```tsx
+function UserList() {
+  const { data } = useQuery(['users'], fetchUsers);
+  
+  return (
+    <ul>
+      {data.users.map(user => (  // Line 12
+        <li key={user.id}>{user.name}</li>
+      ))}
+    </ul>
+  );
+}
+```
+
+Context:
+- This happens on initial page load, then works after refresh
+- Environment: React 18, React Query v4
+- Recent changes: Migrated from useEffect/useState to React Query
+
+What I've already tried:
+- Adding a null check: `data?.users.map()` - still get error sometimes
+- Checking network tab: API returns correct data
+
+Diagnose and fix.
+```
+
+---
+
+## Pattern: Behavior Debugging
+
+### 📋 Template
+
+```
+This code isn't behaving as expected.
+
+Expected behavior: [WHAT_IT_SHOULD_DO]
+Actual behavior: [WHAT_IT_DOES]
+
+Code:
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Additional context:
+- Input data: [SAMPLE_INPUT]
+- Environment/setup: [ENVIRONMENT]
+
+What's causing the discrepancy? Provide corrected code.
+```
+
+---
+
+## Pattern: Debugging Strategy Request
+
+### 📋 Template
+
+```
+I have a complex bug I can't figure out:
+
+Symptom: [WHAT_GOES_WRONG]
+Reproduction: [HOW_TO_REPRODUCE, OR "intermittent"]
+
+System overview:
+[BRIEF_ARCHITECTURE]
+
+Don't give me a solution yet. Instead, give me:
+1. A debugging strategy - what to check and in what order
+2. Key points to add logging/breakpoints
+3. What data to collect
+4. Hypotheses ranked by likelihood
+```
+
+💡 **Pro Tip:** For hard bugs, ask for a strategy before asking for a fix. It activates different problem-solving.
+
+---
+
+## Pattern: Performance Debugging
+
+### 📋 Template
+
+```
+This code is slower than expected:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Performance profile:
+- Expected: [EXPECTED_PERFORMANCE]
+- Actual: [ACTUAL_PERFORMANCE]
+- Measured using: [PROFILING_METHOD]
+
+Data characteristics:
+- [SIZE_AND_SHAPE_OF_DATA]
+
+Identify the performance bottlenecks and suggest optimizations with expected impact.
+```
+
+---
+
+# 3.4 TESTING
+
+---
+
+## Pattern: Unit Test Generation
+
+### 📋 Template
+
+```
+Write unit tests for this function:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Testing framework: [FRAMEWORK: e.g., Jest, Pytest, Mocha]
+
+Cover:
+- Happy path cases
+- Edge cases: [SPECIFIC_EDGES]
+- Error cases: [EXPECTED_ERRORS]
+
+Mocking requirements:
+- [DEPENDENCY_1] should be mocked because [REASON]
+
+Test style:
+- [STYLE_PREFERENCES: e.g., "describe/it blocks", "AAA pattern", "one assertion per test"]
+
+[OPTIONAL: Example of our test style:]
+[EXAMPLE_TEST]
+```
+
+### 📝 Example
+
+```
+Write unit tests for this function:
+
+```typescript
+async function processPayment(
+  amount: number,
+  userId: string,
+  paymentMethodId: string
+): Promise<{ transactionId: string; status: 'success' | 'failed' }> {
+  if (amount <= 0) throw new Error('Amount must be positive');
+  
+  const user = await UserService.get(userId);
+  if (!user) throw new Error('User not found');
+  
+  const paymentMethod = await PaymentMethodService.get(paymentMethodId);
+  if (paymentMethod.userId !== userId) throw new Error('Payment method not owned by user');
+  
+  const result = await StripeService.charge(amount, paymentMethod.stripeId);
+  
+  await TransactionService.record({
+    userId,
+    amount,
+    stripeTransactionId: result.id,
+    status: result.success ? 'success' : 'failed'
+  });
+  
+  return { transactionId: result.id, status: result.success ? 'success' : 'failed' };
+}
+```
+
+Testing framework: Jest with TypeScript
+
+Cover:
+- Happy path: successful payment
+- Edge cases: minimum amount (0.01), large amount
+- Error cases: negative amount, missing user, wrong payment method ownership, Stripe failure
+
+Mocking requirements:
+- UserService, PaymentMethodService, StripeService, TransactionService should all be mocked
+
+Test style:
+- describe/it blocks grouped by scenario
+- Arrange-Act-Assert pattern
+- Descriptive test names that read like sentences
+```
+
+---
+
+## Pattern: Test Case Expansion
+
+### 📋 Template
+
+```
+I have this test:
+
+```[LANGUAGE]
+[EXISTING_TEST]
+```
+
+For this code:
+
+```[LANGUAGE]
+[CODE_UNDER_TEST]
+```
+
+What test cases am I missing? Consider:
+- Edge cases
+- Error conditions
+- Boundary values
+- Race conditions (if applicable)
+- Security-relevant inputs
+
+List the missing cases, then generate the tests.
+```
+
+---
+
+## Pattern: Integration Test Generation
+
+### 📋 Template
+
+```
+Write integration tests for this [API/FEATURE/WORKFLOW]:
+
+Components involved:
+- [COMPONENT_1]
+- [COMPONENT_2]
+- [DATABASE/EXTERNAL_SERVICE]
+
+Test scenarios:
+1. [SCENARIO_1: e.g., "Complete user registration flow"]
+2. [SCENARIO_2: e.g., "Order with payment failure handling"]
+
+Setup requirements:
+- [SETUP_1: e.g., "Seed database with test user"]
+- [SETUP_2: e.g., "Mock external payment API"]
+
+Framework/tools: [TEST_FRAMEWORK]
+
+Test should:
+- Set up state
+- Perform the action
+- Verify database state, API responses, and side effects
+- Clean up
+```
+
+---
+
+## Pattern: Test Data Generation
+
+### 📋 Template
+
+```
+Generate test fixtures/factories for this data model:
+
+```[LANGUAGE]
+[TYPE_DEFINITIONS_OR_SCHEMA]
+```
+
+I need:
+- Factory functions with sensible defaults
+- Ability to override any field
+- Related entity creation (e.g., User with Orders)
+- [SPECIAL_REQUIREMENTS]
+
+Use [LIBRARY: e.g., "Faker.js", "Factory Boy", "plain functions"]
+
+Example usage I want:
+```[LANGUAGE]
+const user = createTestUser();
+const userWithOrders = createTestUser({ orders: 3 });
+const specificUser = createTestUser({ email: 'test@test.com' });
+```
+```
+
+---
+
+# 3.5 FRONTEND DESIGN
+
+---
+
+## Pattern: Component Generation
+
+### 📋 Template
+
+```
+Create a [FRAMEWORK] component for [COMPONENT_PURPOSE].
+
+Component: [COMPONENT_NAME]
+
+Props:
+- [PROP_1]: [TYPE] - [DESCRIPTION]
+- [PROP_2]: [TYPE] - [DESCRIPTION]
+
+Behavior:
+- [BEHAVIOR_1]
+- [BEHAVIOR_2]
+
+States to handle:
+- Loading: [LOADING_BEHAVIOR]
+- Error: [ERROR_BEHAVIOR]
+- Empty: [EMPTY_BEHAVIOR]
+
+Styling: [STYLING_APPROACH: e.g., "Tailwind", "CSS modules", "styled-components"]
+
+Accessibility:
+- [A11Y_REQUIREMENT_1]
+- [A11Y_REQUIREMENT_2]
+
+[OPTIONAL: Design reference:]
+[DESCRIPTION_OR_LINK]
+
+[OPTIONAL: Match existing component style:]
+[EXAMPLE_COMPONENT]
+```
+
+### 📝 Example
+
+```
+Create a React component for a data table with sorting and pagination.
+
+Component: DataTable
+
+Props:
+- data: T[] - Array of row objects
+- columns: Column<T>[] - Column definitions with key, header, render
+- pageSize?: number - Rows per page (default 10)
+- onRowClick?: (row: T) => void - Row click handler
+- isLoading?: boolean - Show loading state
+
+Behavior:
+- Click column header to sort (toggle asc/desc/none)
+- Pagination controls at bottom
+- Maintain sort state when page changes
+- Reset to page 1 when data changes
+
+States to handle:
+- Loading: Show skeleton rows (same number as pageSize)
+- Error: Not handled by this component (parent responsibility)
+- Empty: Show "No data available" message in table body
+
+Styling: Tailwind CSS
+
+Accessibility:
+- Proper table semantics (<table>, <th scope="col">, etc.)
+- Sort buttons are keyboard accessible
+- Current sort announced to screen readers (aria-sort)
+- Pagination buttons have aria-labels
+
+Match our existing component patterns:
+```tsx
+// Our components use this structure:
+export function ComponentName({ prop1, prop2 }: Props) {
+  // hooks at top
+  // handlers next
+  // early returns for loading/error
+  // main render
+}
+```
+```
+
+---
+
+## Pattern: Layout Generation
+
+### 📋 Template
+
+```
+Create a [LAYOUT_TYPE] layout using [STYLING_APPROACH].
+
+Structure:
+[ASCII_OR_DESCRIPTION_OF_LAYOUT]
+
+Requirements:
+- Responsive breakpoints: [BREAKPOINTS]
+- [REQUIREMENT_1]
+- [REQUIREMENT_2]
+
+Content areas:
+- [AREA_1]: [WHAT_GOES_HERE]
+- [AREA_2]: [WHAT_GOES_HERE]
+
+Generate the [HTML/JSX] and [CSS/TAILWIND].
+```
+
+### 📝 Example
+
+```
+Create a dashboard layout using Tailwind CSS.
+
+Structure:
+┌─────────────────────────────────────────────┐
+│  Header (fixed)                             │
+├──────────┬──────────────────────────────────┤
+│          │                                  │
+│  Sidebar │  Main Content                    │
+│  (fixed) │  (scrollable)                    │
+│          │                                  │
+│          │                                  │
+└──────────┴──────────────────────────────────┘
+
+Requirements:
+- Responsive: Sidebar collapses to hamburger menu on mobile (<768px)
+- Sidebar: 256px wide on desktop
+- Header: 64px tall, stays on top when scrolling
+- Main content: fills remaining space, has its own scroll
+
+Content areas:
+- Header: Logo left, user menu right
+- Sidebar: Navigation links, collapsible sections
+- Main: Render children prop
+
+Generate React component with Tailwind CSS.
+```
+
+---
+
+## Pattern: Interactive UI Implementation
+
+### 📋 Template
+
+```
+Implement [INTERACTION_NAME] in [FRAMEWORK].
+
+Behavior:
+1. User does: [USER_ACTION_1]
+2. UI responds: [RESPONSE_1]
+3. User does: [USER_ACTION_2]
+4. UI responds: [RESPONSE_2]
+
+Animation/transition:
+- [ANIMATION_DETAILS]
+
+State management:
+- [STATE_REQUIREMENTS]
+
+Edge cases:
+- [EDGE_CASE_1]
+- [EDGE_CASE_2]
+
+Accessibility:
+- [A11Y_REQUIREMENTS]
+```
+
+### 📝 Example
+
+```
+Implement a drag-and-drop reorderable list in React.
+
+Behavior:
+1. User clicks and holds an item: Item lifts (scale up slightly, add shadow)
+2. User drags: Item follows cursor, other items shift to show drop position
+3. User releases: Item animates to new position, list state updates
+4. User presses Escape while dragging: Cancel, return to original position
+
+Animation/transition:
+- Lift: 150ms ease-out, scale 1.02, shadow elevation
+- Other items shifting: 200ms ease-in-out
+- Drop: 200ms ease-out to final position
+
+State management:
+- Controlled: Accept items and onReorder props
+- Track: draggedIndex, targetIndex during drag
+
+Edge cases:
+- Dropping in same position: No state change, no callback
+- Fast sequential drags: Cancel previous if new drag starts
+- Touch devices: Support touch events with same behavior
+
+Accessibility:
+- Items are keyboard reorderable (Enter to pick up, arrows to move, Enter to drop)
+- Live region announces position changes
+- Focus management after reorder
+```
+
+---
+
+## Pattern: Responsive Design
+
+### 📋 Template
+
+```
+Make this component responsive:
+
+```[LANGUAGE]
+[CURRENT_COMPONENT]
+```
+
+Current: Designed for [CURRENT_TARGET]
+Need: Support [TARGET_DEVICES]
+
+Breakpoints:
+- Mobile: [MOBILE_SPEC]
+- Tablet: [TABLET_SPEC]
+- Desktop: [DESKTOP_SPEC]
+
+Specific adaptations:
+- [WHAT_CHANGES_AT_MOBILE]
+- [WHAT_CHANGES_AT_TABLET]
+```
+
+---
+
+# 3.6 DOCUMENTATION
+
+---
+
+## Pattern: Code Documentation
+
+### 📋 Template
+
+```
+Add documentation to this code:
+
+```[LANGUAGE]
+[YOUR_CODE]
+```
+
+Documentation format: [FORMAT: JSDoc, docstrings, XML comments, etc.]
+
+Include:
+- [x] Function/method descriptions
+- [x] Parameter types and descriptions
+- [x] Return value description
+- [x] Exceptions/errors that can be thrown
+- [OPTIONAL] Usage examples
+- [OPTIONAL] Complexity notes
+
+Style guide:
+- [STYLE_REQUIREMENTS]
+- Comment "why" not "what"
+- [OTHER_PREFERENCES]
+```
+
+---
+
+## Pattern: README Generation
+
+### 📋 Template
+
+```
+Write a README.md for this project:
+
+Project: [PROJECT_NAME]
+Purpose: [WHAT_IT_DOES]
+
+Tech stack:
+- [TECH_1]
+- [TECH_2]
+
+Include sections:
+- Overview/Introduction
+- Features
+- Installation
+- Quick Start / Usage
+- Configuration (env vars, etc.)
+- [OPTIONAL: API Reference]
+- [OPTIONAL: Contributing]
+- License
+
+Tone: [TONE: e.g., "professional", "casual", "minimal"]
+
+[OPTIONAL: Existing code structure:]
+[TREE_OR_DESCRIPTION]
+
+[OPTIONAL: Example commands:]
+[COMMANDS_TO_INCLUDE]
+```
+
+---
+
+## Pattern: API Documentation
+
+### 📋 Template
+
+```
+Generate API documentation for these endpoints:
+
+```[LANGUAGE]
+[ROUTE_DEFINITIONS_OR_CODE]
+```
+
+Format: [FORMAT: OpenAPI/Swagger, Markdown, custom]
+
+For each endpoint include:
+- HTTP method and path
+- Description
+- Request parameters (path, query, body)
+- Request body schema with examples
+- Response schemas for all status codes
+- Example request/response pairs
+- Authentication requirements
+
+[OPTIONAL: Base URL and auth scheme:]
+[API_BASE_INFO]
+```
+
+---
+
+## Pattern: Architecture Documentation
+
+### 📋 Template
+
+```
+Document the architecture of this system:
+
+Components:
+[LIST_OR_DESCRIBE_COMPONENTS]
+
+Create documentation that includes:
+1. System overview diagram (describe in text/mermaid)
+2. Component responsibilities
+3. Data flow for key operations:
+   - [OPERATION_1]
+   - [OPERATION_2]
+4. Technology choices and rationale
+5. Deployment architecture
+
+Audience: [WHO_WILL_READ: e.g., "new team members", "external developers"]
+Detail level: [LEVEL: "high-level overview", "detailed technical"]
+```
+
+---
+
+# 3.7 CODE REVIEW
+
+---
+
+## Pattern: Comprehensive Code Review
+
+### 📋 Template
+
+```
+Review this code as a senior developer:
+
+```[LANGUAGE]
+[CODE_TO_REVIEW]
+```
+
+Context:
+- This is for: [FEATURE/PURPOSE]
+- Will run in: [ENVIRONMENT]
+- Team size: [CONTEXT]
+
+Review for:
+- [ ] Correctness: Logic errors, bugs
+- [ ] Security: Vulnerabilities, injection, auth issues
+- [ ] Performance: Bottlenecks, complexity issues
+- [ ] Readability: Naming, structure, clarity
+- [ ] Maintainability: Coupling, testability
+- [ ] Error handling: Edge cases, failure modes
+- [ ] [CUSTOM_CONCERN]
+
+Format your review as:
+🔴 Critical - Must fix before merge
+🟡 Suggestion - Should consider
+🟢 Nitpick - Minor improvement
+💡 Note - FYI, not actionable
+
+For each item, explain why and provide corrected code if applicable.
+```
+
+### 📝 Example Output Format
+
+```
+🔴 Critical - SQL Injection vulnerability (line 23)
+
+The user input is directly concatenated into the SQL query:
+```javascript
+const query = `SELECT * FROM users WHERE id = ${userId}`;
+```
+
+This allows SQL injection attacks. Use parameterized queries:
+```javascript
+const query = 'SELECT * FROM users WHERE id = ?';
+const [users] = await db.execute(query, [userId]);
+```
+
+---
+
+🟡 Suggestion - Consider extracting validation logic (lines 15-22)
+
+The validation logic is complex and duplicated. Extract to a validator:
+```javascript
+const validateOrderInput = (input) => {
+  // validation logic here
+};
+```
+
+This improves testability and reusability.
+
+---
+
+🟢 Nitpick - Variable naming (line 8)
+
+`d` is unclear. Consider `userData` or `fetchedUser` to indicate what it contains.
+```
+
+---
+
+## Pattern: Security-Focused Review
+
+### 📋 Template
+
+```
+Perform a security review of this code:
+
+```[LANGUAGE]
+[CODE_TO_REVIEW]
+```
+
+Application context:
+- Type: [WEB_API/CLI/SERVICE/etc.]
+- Handles: [DATA_TYPES: e.g., "user PII", "payments", "authentication"]
+- Exposed to: [INTERNAL/PUBLIC]
+
+Check for:
+- Injection vulnerabilities (SQL, NoSQL, Command, XSS)
+- Authentication/Authorization flaws
+- Sensitive data exposure
+- Input validation issues
+- Cryptography misuse
+- Insecure dependencies
+- Race conditions
+- [SPECIFIC_CONCERNS]
+
+For each finding, rate severity (Critical/High/Medium/Low) and provide remediation code.
+```
+
+---
+
+## Pattern: Pre-Merge Checklist Review
+
+### 📋 Template
+
+```
+Review this PR against our checklist:
+
+```diff
+[DIFF_OR_CHANGES]
+```
+
+Verify:
+- [ ] No console.logs or debug code
+- [ ] Error messages don't leak sensitive info
+- [ ] New functions have tests
+- [ ] Database changes have migrations
+- [ ] API changes are backward compatible
+- [ ] No hardcoded secrets or credentials
+- [ ] Follows our naming conventions
+- [ ] Comments explain "why" not "what"
+- [CUSTOM_CHECKLIST_ITEMS]
+
+For each failed check, show the offending code and suggest fix.
+```
+
+---
+
+# 3.8 AGENT/SYSTEM PROMPTS
+
+For tools that support persistent instructions (Claude Projects, Cursor rules, Codex setup, etc.):
+
+---
+
+## Pattern: Project-Level System Prompt
+
+### 📋 Template
+
+```markdown
+# Project: [PROJECT_NAME]
+
+## Context
+[BRIEF_DESCRIPTION]
+Tech stack: [STACK]
+Architecture: [ARCHITECTURE_STYLE]
+
+## Code Style
+- Language: [LANGUAGE] with [SPECIFIC_FEATURES: e.g., "strict TypeScript"]
+- Formatting: [FORMATTER]
+- Naming: [CONVENTIONS]
+- File structure: [STRUCTURE]
+
+## Patterns We Use
+- [PATTERN_1]: [HOW_WE_USE_IT]
+- [PATTERN_2]: [HOW_WE_USE_IT]
+
+## Patterns to Avoid
+- [ANTI_PATTERN_1]: [WHY]
+- [ANTI_PATTERN_2]: [WHY]
+
+## Common Tasks
+When asked to [TASK_1], always [APPROACH].
+When asked to [TASK_2], include [REQUIREMENTS].
+
+## Testing
+- Framework: [FRAMEWORK]
+- Coverage requirement: [REQUIREMENTS]
+- Test file location: [PATTERN]
+
+## Dependencies
+Prefer these libraries:
+- For [CATEGORY]: [LIBRARY]
+- For [CATEGORY]: [LIBRARY]
+
+Avoid: [LIBRARIES_TO_AVOID]
+
+## Examples
+[PASTE_EXEMPLARY_CODE_FROM_YOUR_PROJECT]
+```
+
+---
+
+## Pattern: Role-Based Agent Prompt
+
+### 📋 Template
+
+```markdown
+# Role: [ROLE_NAME]
+
+You are a [ROLE] working on [PROJECT_TYPE].
+
+## Your Expertise
+- [EXPERTISE_1]
+- [EXPERTISE_2]
+
+## Your Responsibilities
+- [RESPONSIBILITY_1]
+- [RESPONSIBILITY_2]
+
+## How You Work
+- [BEHAVIOR_1]
+- [BEHAVIOR_2]
+- When uncertain, [UNCERTAINTY_BEHAVIOR]
+
+## Quality Bar
+You always:
+- [QUALITY_1]
+- [QUALITY_2]
+
+You never:
+- [ANTI_PATTERN_1]
+- [ANTI_PATTERN_2]
+
+## Response Format
+For [REQUEST_TYPE]: [FORMAT]
+For [REQUEST_TYPE]: [FORMAT]
+```
+
+### 📝 Example
+
+```markdown
+# Role: Backend API Developer
+
+You are a senior backend developer working on a Node.js/Express API.
+
+## Your Expertise
+- RESTful API design
+- PostgreSQL and Prisma ORM
+- Authentication/Authorization patterns
+- Performance optimization
+
+## Your Responsibilities  
+- Write production-ready, type-safe code
+- Consider security implications
+- Handle errors gracefully
+- Write code that's testable
+
+## How You Work
+- Ask clarifying questions for ambiguous requirements
+- Propose solutions before implementing for large features
+- Explain tradeoffs when multiple approaches exist
+- When uncertain, state assumptions explicitly
+
+## Quality Bar
+You always:
+- Validate all external input
+- Use parameterized queries
+- Handle all error cases explicitly
+- Add appropriate logging
+- Consider what could go wrong
+
+You never:
+- Leave TODO comments without explanation
+- Ignore TypeScript errors with @ts-ignore
+- Store secrets in code
+- Trust user input
+
+## Response Format
+For new endpoints: Show route, handler, types, and example request/response
+For debugging: Explain diagnosis process, then show fix
+For refactoring: Explain what changes and why, show before/after
+```
+
+---
+
+# Quick Reference Card
+
+Copy this for common tasks:
+
+```markdown
+## Quick Templates
+
+### Generate Code
+"Write a [LANG] [function/class] that [ACTION]. 
+Inputs: [INPUTS]. Output: [OUTPUT]. 
+Handle: [EDGE_CASES]. Style: [STYLE/EXAMPLE]"
+
+### Debug
+"Error: [ERROR]. Code: [CODE]. 
+Happens when: [TRIGGER]. 
+Tried: [ATTEMPTS]. Diagnose and fix."
+
+### Review
+"Review for [CONCERNS]. Rate issues: 🔴 Critical 🟡 Should fix 🟢 Nitpick.
+Provide fixes."
+
+### Test  
+"Write [FRAMEWORK] tests for [CODE].
+Cover: happy path, edges [EDGES], errors [ERRORS].
+Mock: [DEPENDENCIES]. Style: [STYLE]."
+
+### Refactor
+"Refactor for [GOAL]. Keep same [INTERFACE].
+Context: [HOW_ITS_USED]. Explain changes."
+
+### Document
+"Document this [CODE]. Format: [FORMAT].
+Include: description, params, returns, examples."
+```
+
+---
+
+## Summary: Part 3
+
+| Category | Key Patterns |
+|----------|--------------|
+| **Generation** | Function, Class, API Endpoint, Full Feature |
+| **Refactoring** | Performance, Readability, Modernization, Extract |
+| **Debugging** | Error Diagnosis, Behavior, Strategy, Performance |
+| **Testing** | Unit, Integration, Case Expansion, Fixtures |
+| **Frontend** | Component, Layout, Interactive, Responsive |
+| **Documentation** | Code, README, API, Architecture |
+| **Review** | Comprehensive, Security, Pre-merge |
+| **Agents** | Project Setup, Role-based |
+
+---
+
+------------------
+
+
+# Part 4: Advanced Techniques
+## Reasoning, Chaining, and Sophisticated Prompt Patterns
+
+---
+
+## 4.1 The Limits of Single-Shot Prompting
+
+Most developers hit a ceiling with simple prompts:
+
+| Problem | Single-Shot Failure Mode |
+|---------|-------------------------|
+| Complex feature | AI loses coherence, misses requirements |
+| Subtle bug | Jumps to wrong conclusion |
+| Large refactor | Changes too much or too little |
+| Architecture decision | Gives generic advice |
+| Multi-file changes | Loses consistency between files |
+
+**The solution:** Make the AI think before it acts, and break complex work into stages.
+
+This part covers techniques that transform AI from a code-autocomplete into a reasoning partner.
+
+---
+
+# REASONING TECHNIQUES
+
+---
+
+## 4.2 Chain of Thought (CoT) for Code
+
+Chain of Thought prompting asks the AI to show its reasoning before giving answers. For coding, this catches errors before they become code.
+
+### Pattern: Explicit Reasoning Request
+
+```
+[PROBLEM_DESCRIPTION]
+
+Before writing any code:
+1. Identify the key requirements
+2. Consider edge cases
+3. Outline your approach
+4. Note any assumptions
+
+Then implement the solution.
+```
+
+### 📝 Example
+
+**Without CoT:**
+```
+Write a function to find the longest palindromic substring in a string.
+```
+→ AI might jump to a suboptimal O(n³) solution
+
+**With CoT:**
+```
+Write a function to find the longest palindromic substring in a string.
+
+Before coding:
+1. State the problem in your own words
+2. Consider different approaches and their time complexity
+3. Identify edge cases (empty string, single char, all same chars, no palindrome > 1)
+4. Choose an approach and justify why
+
+Then implement with the chosen approach.
+```
+
+→ AI considers expand-from-center O(n²) or Manacher's O(n), makes reasoned choice
+
+---
+
+### Pattern: Step-by-Step Algorithm Design
+
+```
+I need an algorithm to [PROBLEM].
+
+Walk me through the design process:
+
+Step 1: Define inputs and outputs precisely
+Step 2: Work through a small example by hand
+Step 3: Identify the pattern/insight
+Step 4: Write pseudocode
+Step 5: Analyze time and space complexity
+Step 6: Identify edge cases
+Step 7: Convert to [LANGUAGE] code
+Step 8: Trace through the code with the example from Step 2
+
+Show your work for each step.
+```
+
+### 📝 Example
+
+```
+I need an algorithm to merge overlapping intervals.
+
+Walk me through the design process:
+
+Step 1: Define inputs and outputs precisely
+Step 2: Work through this example by hand: [[1,3], [2,6], [8,10], [15,18]]
+Step 3: Identify the pattern/insight
+Step 4: Write pseudocode
+Step 5: Analyze time and space complexity
+Step 6: Identify edge cases
+Step 7: Convert to Python code
+Step 8: Trace through the code with the example from Step 2
+
+Show your work for each step.
+```
+
+**Why this works:** Forcing explicit steps prevents the AI from pattern-matching to a memorized solution. It genuinely works through the problem.
+
+---
+
+### Pattern: Debugging with Reasoning Trace
+
+```
+This code has a bug:
+
+```[LANGUAGE]
+[BUGGY_CODE]
+```
+
+Expected: [EXPECTED_BEHAVIOR]
+Actual: [ACTUAL_BEHAVIOR]
+
+Debug this step by step:
+1. Read through the code and explain what each section does
+2. Trace execution with input: [SAMPLE_INPUT]
+3. Identify where actual behavior diverges from expected
+4. Explain the root cause
+5. Provide the fix
+
+Show your reasoning at each step.
+```
+
+### 📝 Example
+
+```
+This code has a bug:
+
+```python
+def binary_search(arr, target):
+    left, right = 0, len(arr)
+    
+    while left < right:
+        mid = (left + right) // 2
+        if arr[mid] == target:
+            return mid
+        elif arr[mid] < target:
+            left = mid
+        else:
+            right = mid
+    
+    return -1
+```
+
+Expected: Returns index of target, or -1 if not found
+Actual: Sometimes hangs infinitely
+
+Debug step by step:
+1. Explain what each section does
+2. Trace execution with arr=[1,2,3,4,5], target=2
+3. Trace execution with arr=[1,2,3,4,5], target=5 (this hangs)
+4. Identify where behavior diverges
+5. Explain root cause
+6. Provide fix
+
+Show your reasoning.
+```
+
+---
+
+## 4.3 Planning Before Coding
+
+### Pattern: Architecture-First Prompting
+
+For complex features, separate planning from implementation:
+
+```
+I need to implement [FEATURE].
+
+Phase 1 - Design (do this first, don't write implementation code):
+- What components/modules are needed?
+- What are their responsibilities?
+- How do they interact?
+- What's the data flow?
+- What are the key interfaces?
+
+Present the design, then wait for my approval before Phase 2.
+
+Phase 2 - Implementation:
+- Implement each component
+- I'll review each before moving to the next
+```
+
+### 📝 Example
+
+```
+I need to implement a rate limiter for our API.
+
+Phase 1 - Design (no implementation code yet):
+- What rate limiting algorithm? (Token bucket, sliding window, etc.)
+- Where does it run? (Middleware, separate service, etc.)
+- Where is state stored? (Memory, Redis, etc.)
+- What's the interface for configuring limits?
+- How are different limits applied? (Per user, per endpoint, global)
+- How do we handle distributed servers?
+
+Present the design with tradeoffs, then wait for my approval.
+```
+
+---
+
+### Pattern: Test-First Reasoning
+
+```
+I need a function that [REQUIREMENT].
+
+Before implementing:
+1. Write the function signature with types
+2. Write 5-7 test cases that fully specify behavior, including:
+   - Basic happy path
+   - Edge cases
+   - Error cases
+3. Review: do these tests fully capture the requirement?
+4. Now implement to pass these tests
+```
+
+This forces the AI to think about behavior specification before implementation.
+
+---
+
+## 4.4 Self-Consistency Checking
+
+Make the AI verify its own work:
+
+### Pattern: Generate and Validate
+
+```
+[TASK_DESCRIPTION]
+
+After generating your solution:
+1. Review it for logic errors
+2. Trace through with a sample input
+3. Check edge cases: [EDGE_CASES]
+4. Rate your confidence (1-10) and explain any concerns
+
+If confidence is below 8, revise before presenting final answer.
+```
+
+### Pattern: Multi-Approach Verification
+
+```
+Solve this problem: [PROBLEM]
+
+Approach it two different ways:
+1. [APPROACH_A: e.g., "iterative"]
+2. [APPROACH_B: e.g., "recursive"]
+
+Both solutions should produce the same output for any input.
+Verify they're equivalent by testing with: [TEST_INPUTS]
+
+If they differ, investigate which is correct.
+Present the verified correct solution.
+```
+
+### Pattern: Inverse Verification
+
+```
+Write a function to [SERIALIZE/ENCODE/TRANSFORM].
+
+Then write the inverse function to [DESERIALIZE/DECODE/REVERSE].
+
+Verify: for any valid input X, inverse(forward(X)) === X
+
+Test with these cases: [TEST_CASES]
+
+If verification fails, fix until it passes.
+```
+
+---
+
+## 4.5 Rubber Duck Reasoning
+
+Use the AI to think through problems without asking for solutions:
+
+### Pattern: Explain to Solve
+
+```
+I'm stuck on this problem: [PROBLEM]
+
+Don't give me the solution. Instead, ask me questions that will help 
+me figure it out myself. After each of my answers, ask a follow-up 
+that guides me closer to the insight I'm missing.
+```
+
+### Pattern: Assumption Surfacing
+
+```
+I'm about to implement [FEATURE] this way: [APPROACH]
+
+Interview me to surface hidden assumptions:
+- What am I taking for granted?
+- What could go wrong that I haven't considered?
+- What requirements might I be missing?
+
+Ask questions one at a time. After I answer, probe deeper.
+```
+
+---
+
+# PROMPT CHAINING
+
+---
+
+## 4.6 What is Prompt Chaining?
+
+**Prompt chaining** breaks complex tasks into a sequence of simpler prompts, where each prompt's output feeds into the next.
+
+```
+┌─────────────┐     ┌─────────────┐     ┌─────────────┐     ┌─────────────┐
+│  Prompt 1   │────▶│  Prompt 2   │────▶│  Prompt 3   │────▶│   Final     │
+│  (Analyze)  │     │  (Design)   │     │  (Implement)│     │   Output    │
+└─────────────┘     └─────────────┘     └─────────────┘     └─────────────┘
+       │                   │                   │
+       ▼                   ▼                   ▼
+   Requirements        Architecture          Code
+   Analysis            Document              
+```
+
+**Why chain?**
+- Each step has focused scope
+- You can review/correct between steps
+- Better results than asking for everything at once
+- Mirrors how humans actually work
+
+---
+
+## 4.7 Common Chain Patterns
+
+### Chain: Analyze → Design → Implement → Test
+
+**Prompt 1: Analyze**
+```
+Analyze this feature request:
+
+"[FEATURE_REQUEST]"
+
+Extract:
+1. Functional requirements (what it must do)
+2. Non-functional requirements (performance, security, etc.)
+3. Ambiguities that need clarification
+4. Assumptions we'll need to make
+5. Out of scope items (if any)
+
+Don't design or implement yet.
+```
+
+**Prompt 2: Design** (after reviewing analysis)
+```
+Based on this requirements analysis:
+[PASTE_ANALYSIS]
+
+Design the solution:
+1. Component structure
+2. Key interfaces/contracts
+3. Data flow diagram (in text)
+4. Technology choices with rationale
+5. Potential risks and mitigations
+
+Don't implement yet. I'll review the design first.
+```
+
+**Prompt 3: Implement** (after approving design)
+```
+Based on this approved design:
+[PASTE_DESIGN]
+
+Implement the components in this order:
+1. [COMPONENT_1]
+2. [COMPONENT_2]
+...
+
+Start with component 1. I'll review before you continue to the next.
+```
+
+**Prompt 4: Test** (after implementation)
+```
+For this implementation:
+[PASTE_IMPLEMENTATION]
+
+Generate:
+1. Unit tests for each function
+2. Integration tests for the main flows
+3. Edge case tests
+4. Test data fixtures needed
+```
+
+---
+
+### Chain: Scaffold → Implement → Harden → Document
+
+**Prompt 1: Scaffold**
+```
+Create the file structure and stub functions for [FEATURE].
+
+For each function:
+- Signature with types
+- JSDoc comment with description
+- Body that throws "Not implemented" error
+- TODO comment noting what it should do
+
+Don't implement yet - just structure.
+```
+
+**Prompt 2: Implement** (per function)
+```
+Implement this stubbed function:
+
+```[LANGUAGE]
+[STUB_CODE]
+```
+
+Requirements:
+[REQUIREMENTS]
+
+Implement only this function. Keep the signature exactly as defined.
+```
+
+**Prompt 3: Harden**
+```
+Review this implementation for production readiness:
+
+```[LANGUAGE]
+[IMPLEMENTATION]
+```
+
+Add:
+1. Input validation
+2. Error handling with descriptive messages
+3. Logging at appropriate points
+4. Any missing edge case handling
+```
+
+**Prompt 4: Document**
+```
+Add comprehensive documentation to this code:
+
+```[LANGUAGE]
+[HARDENED_CODE]
+```
+
+Include:
+- Module-level overview
+- Function documentation
+- Inline comments for complex logic
+- Usage examples
+```
+
+---
+
+### Chain: Read → Understand → Modify
+
+For working with existing codebases:
+
+**Prompt 1: Read**
+```
+Here's a codebase file:
+
+```[LANGUAGE]
+[EXISTING_CODE]
+```
+
+Summarize:
+1. What is the purpose of this code?
+2. What are the main functions/classes and their roles?
+3. What external dependencies does it have?
+4. What's the data flow?
+```
+
+**Prompt 2: Understand** (with context)
+```
+Based on your summary:
+[PASTE_SUMMARY]
+
+And the original code:
+[PASTE_CODE]
+
+Answer these specific questions:
+1. How would I add [NEW_FEATURE]?
+2. What would break if I changed [COMPONENT]?
+3. Where is [SPECIFIC_THING] handled?
+```
+
+**Prompt 3: Modify** (with full context)
+```
+Given your analysis of the codebase:
+[PASTE_ANALYSIS]
+
+Make this modification:
+[MODIFICATION_REQUEST]
+
+Show me:
+1. What files change
+2. The minimal diff to achieve this
+3. Any other places that might need updates
+```
+
+---
+
+## 4.8 Branching Chains
+
+Sometimes you need parallel paths:
+
+```
+                        ┌─────────────────┐
+                   ┌───▶│   Frontend      │───┐
+                   │    │   Component     │   │
+┌─────────────┐    │    └─────────────────┘   │    ┌─────────────┐
+│   Design    │────┤                          ├───▶│  Integrate  │
+│   Phase     │    │    ┌─────────────────┐   │    │   & Test    │
+└─────────────┘    └───▶│   Backend       │───┘    └─────────────┘
+                        │   API           │
+                        └─────────────────┘
+```
+
+**Implementation:**
+
+```
+Phase 1: Design (single prompt)
+↓
+Phase 2a: "Implement frontend component from this design: [DESIGN]"
+Phase 2b: "Implement backend API from this design: [DESIGN]"
+↓
+Phase 3: "Here's the frontend [CODE] and backend [CODE]. 
+          Verify they integrate correctly. Fix any mismatches."
+```
+
+---
+
+## 4.9 Recursive Chains
+
+For deeply nested problems:
+
+### Pattern: Divide and Conquer
+
+```
+I need to implement [LARGE_FEATURE].
+
+Break this down into sub-problems. For each sub-problem:
+- If it's simple enough to implement directly, mark it [LEAF]
+- If it needs further breakdown, mark it [BRANCH]
+
+Present the hierarchy.
+```
+
+Then for each [BRANCH], recursively:
+```
+Break down this sub-problem further:
+[SUB_PROBLEM]
+
+Continue until all items are [LEAF] nodes.
+```
+
+Then implement leaf-by-leaf:
+```
+Implement this leaf task:
+[LEAF_TASK]
+
+Context from parent: [PARENT_CONTEXT]
+```
+
+---
+
+# STRUCTURED OUTPUT TECHNIQUES
+
+---
+
+## 4.10 Enforcing Output Format
+
+When you need consistent, parseable output:
+
+### Pattern: Format Specification
+
+```
+[TASK]
+
+Respond in exactly this format:
+
+```json
+{
+  "analysis": "string - your analysis here",
+  "recommendation": "string - your recommendation",
+  "confidence": "number 1-10",
+  "code": "string - the code solution"
+}
+```
+
+Output only valid JSON. No markdown, no explanation outside the JSON.
+```
+
+### Pattern: Template Completion
+
+```
+Complete this template based on [CONTEXT]:
+
+---
+## Function: [fill: function name]
+
+**Purpose:** [fill: one sentence description]
+
+**Parameters:**
+- `[fill: param1]`: [fill: type] - [fill: description]
+- `[fill: param2]`: [fill: type] - [fill: description]
+
+**Returns:** [fill: type] - [fill: description]
+
+**Throws:**
+- `[fill: error type]`: [fill: when this is thrown]
+
+**Example:**
+```[LANGUAGE]
+[fill: usage example]
+```
+---
+
+Fill in all [fill: ...] sections based on the code below:
+[CODE]
+```
+
+---
+
+### Pattern: Diff Output
+
+```
+Modify this code:
+[ORIGINAL_CODE]
+
+To achieve: [MODIFICATION]
+
+Output format - show changes as unified diff:
+```diff
+[Your diff here]
+```
+
+Then show the complete updated code:
+```[LANGUAGE]
+[Complete code here]
+```
+```
+
+---
+
+## 4.11 Constrained Generation
+
+### Pattern: Checklist-Gated Output
+
+```
+Generate [OUTPUT].
+
+Before finalizing, verify these constraints:
+□ Constraint 1: [CONSTRAINT]
+□ Constraint 2: [CONSTRAINT]
+□ Constraint 3: [CONSTRAINT]
+
+Show your verification:
+
+Constraint 1: ✓/✗ - [evidence]
+Constraint 2: ✓/✗ - [evidence]
+Constraint 3: ✓/✗ - [evidence]
+
+If any constraint fails, revise and re-verify before presenting final output.
+```
+
+### Pattern: Budget-Constrained Solutions
+
+```
+Implement [FEATURE] with these constraints:
+- Maximum [N] lines of code
+- Maximum [M] external dependencies
+- Time complexity better than [O(X)]
+- Memory usage under [Y]
+
+If you cannot meet all constraints, state which you'll violate and why.
+```
+
+---
+
+# META-PROMPTING
+
+---
+
+## 4.12 Using AI to Improve Prompts
+
+### Pattern: Prompt Refinement
+
+```
+I've been using this prompt:
+
+"""
+[YOUR_CURRENT_PROMPT]
+"""
+
+It gives me [RESULTS], but I want [BETTER_RESULTS].
+
+Analyze my prompt and suggest improvements:
+1. What's ambiguous?
+2. What context is missing?
+3. What constraints should I add?
+4. Rewrite the improved version
+```
+
+### Pattern: Prompt Generation
+
+```
+I need to accomplish [TASK] with an AI assistant.
+
+Help me write an effective prompt. Ask me questions to understand:
+1. What exactly I need
+2. What format I want
+3. What constraints exist
+4. What I've tried that didn't work
+
+After gathering info, generate the prompt I should use.
+```
+
+### Pattern: Failure Analysis
+
+```
+I used this prompt:
+"""
+[PROMPT]
+"""
+
+And got this response:
+"""
+[RESPONSE]
+"""
+
+The response was wrong because: [PROBLEM]
+
+Analyze:
+1. What caused the AI to make this error?
+2. How should I modify my prompt to prevent this?
+3. Provide the improved prompt
+```
+
+---
+
+## 4.13 Dynamic Prompt Construction
+
+### Pattern: Context-Aware Prompt Assembly
+
+```python
+# Build prompts programmatically based on context
+
+def build_review_prompt(code: str, context: dict) -> str:
+    concerns = []
+    
+    if context.get('is_public_api'):
+        concerns.append("- Security: injection, auth bypass, data exposure")
+    
+    if context.get('is_performance_critical'):
+        concerns.append("- Performance: time complexity, memory usage, DB queries")
+    
+    if context.get('is_financial'):
+        concerns.append("- Accuracy: rounding errors, currency handling, overflow")
+    
+    return f"""
+Review this code:
+
+```
+{code}
+```
+
+Focus areas:
+{chr(10).join(concerns)}
+
+Rate issues by severity: 🔴 Critical 🟡 Medium 🟢 Minor
+"""
+```
+
+### Pattern: Retrieval-Augmented Prompts
+
+```
+[QUESTION_ABOUT_CODE]
+
+Relevant context from the codebase:
+
+File: {retrieved_file_1}
+```
+{retrieved_content_1}
+```
+
+File: {retrieved_file_2}
+```
+{retrieved_content_2}
+```
+
+Using only the provided context, [INSTRUCTION].
+```
+
+---
+
+# MULTI-STAGE REASONING PATTERNS
+
+---
+
+## 4.14 The Critique Pattern
+
+### Generate → Critique → Refine
+
+**Stage 1: Generate**
+```
+Write a function to [TASK].
+```
+
+**Stage 2: Critique** (same or new conversation)
+```
+Critique this code as a senior engineer who is:
+- Pedantic about error handling
+- Paranoid about security
+- Obsessive about performance
+
+```[LANGUAGE]
+[GENERATED_CODE]
+```
+
+List all issues, no matter how minor. Be harsh.
+```
+
+**Stage 3: Refine**
+```
+Address these critiques:
+[PASTE_CRITIQUES]
+
+For the code:
+```[LANGUAGE]
+[GENERATED_CODE]
+```
+
+Fix each issue. Explain what you changed for each critique.
+```
+
+---
+
+## 4.15 The Adversarial Pattern
+
+### Build → Attack → Defend
+
+**Stage 1: Build**
+```
+Implement authentication for our API:
+[REQUIREMENTS]
+```
+
+**Stage 2: Attack**
+```
+You are a security researcher. Find vulnerabilities in this auth implementation:
+
+```[LANGUAGE]
+[AUTH_CODE]
+```
+
+For each vulnerability:
+- Describe the attack vector
+- Show proof-of-concept exploit (conceptual)
+- Rate severity (Critical/High/Medium/Low)
+```
+
+**Stage 3: Defend**
+```
+Fix these vulnerabilities:
+[PASTE_VULNERABILITIES]
+
+In this code:
+```[LANGUAGE]
+[AUTH_CODE]
+```
+
+For each fix, explain how it mitigates the attack.
+```
+
+---
+
+## 4.16 The Ensemble Pattern
+
+Get multiple perspectives, synthesize:
+
+**Perspective 1:**
+```
+As a developer focused on readability and maintainability:
+How would you implement [FEATURE]?
+```
+
+**Perspective 2:**
+```
+As a developer focused on performance and efficiency:
+How would you implement [FEATURE]?
+```
+
+**Perspective 3:**
+```
+As a developer focused on simplicity and shipping quickly:
+How would you implement [FEATURE]?
+```
+
+**Synthesis:**
+```
+Here are three approaches to [FEATURE]:
+
+Approach A (Maintainability-focused):
+[PASTE]
+
+Approach B (Performance-focused):
+[PASTE]
+
+Approach C (Simplicity-focused):
+[PASTE]
+
+Synthesize these into a final recommendation that:
+- Takes the best ideas from each
+- Notes tradeoffs explicitly
+- Provides a concrete implementation
+```
+
+---
+
+## 4.17 The Verification Ladder
+
+Progressive verification for critical code:
+
+**Level 1: Self-Review**
+```
+[IMPLEMENTATION REQUEST]
+
+After implementing, review your own code for errors.
+Fix any issues before presenting.
+```
+
+**Level 2: Trace Verification**
+```
+For this code:
+[CODE]
+
+Trace through execution with these inputs:
+- Input 1: [NORMAL_CASE]
+- Input 2: [EDGE_CASE]
+- Input 3: [ERROR_CASE]
+
+Show each step. Verify output matches expected.
+```
+
+**Level 3: Property Verification**
+```
+Verify these properties hold for your implementation:
+
+Property 1: [INVARIANT] (e.g., "output is always sorted")
+Property 2: [INVARIANT] (e.g., "no duplicate IDs")
+Property 3: [INVARIANT] (e.g., "all resources are cleaned up")
+
+For each property, explain why the code guarantees it.
+```
+
+**Level 4: Adversarial Verification**
+```
+Try to find inputs that would break this code.
+Think about:
+- Malicious inputs
+- Extreme values
+- Concurrent access
+- Resource exhaustion
+
+If you find breaking inputs, fix the code.
+```
+
+---
+
+# WORKFLOW PATTERNS
+
+---
+
+## 4.18 The Session Architecture
+
+Structure long coding sessions:
+
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  SESSION START                                                  │
+│  - Set context (project, stack, conventions)                    │
+│  - Define session goal                                          │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  WORK LOOP (repeat)                                             │
+│  1. State current task clearly                                  │
+│  2. AI generates solution                                       │
+│  3. You review and test                                         │
+│  4. Provide feedback / approve                                  │
+│  5. Checkpoint if needed (summarize progress)                   │
+└───────────────────────────────┬─────────────────────────────────┘
+                                │
+                                ▼
+┌─────────────────────────────────────────────────────────────────┐
+│  SESSION END                                                    │
+│  - Summarize what was built                                     │
+│  - Note any open items                                          │
+│  - Generate handoff documentation                               │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### Implementation Templates
+
+**Session Start:**
+```
+Starting a coding session.
+
+Project: [PROJECT_NAME]
+Goal: [SESSION_GOAL]
+Stack: [TECH_STACK]
+
+Key context:
+- [CONTEXT_1]
+- [CONTEXT_2]
+
+Conventions to follow:
+- [CONVENTION_1]
+- [CONVENTION_2]
+
+First task: [FIRST_TASK]
+```
+
+**Checkpoint:**
+```
+Checkpoint. Summarize our progress:
+1. What we've built so far
+2. Current state (working? partial? blocked?)
+3. What's remaining
+4. Any decisions we made
+
+Then continue with: [NEXT_TASK]
+```
+
+**Session End:**
+```
+End of session. Generate a handoff document:
+
+1. Summary of what was built
+2. Files created/modified
+3. How to test it
+4. Known limitations or TODOs
+5. Suggested next steps
+```
+
+---
+
+## 4.19 The Review Gate Pattern
+
+Build in mandatory review points:
+
+```
+Implement [FEATURE].
+
+STOP for review after each phase:
+
+Phase 1: Interface Design
+- Define public interfaces
+- Define types/schemas
+- [STOP - I will review]
+
+Phase 2: Core Implementation
+- Implement main logic
+- No error handling yet
+- [STOP - I will review]
+
+Phase 3: Error Handling
+- Add validation
+- Add error cases
+- [STOP - I will review]
+
+Phase 4: Tests
+- Unit tests
+- Edge case tests
+- [STOP - I will review]
+
+Start with Phase 1. Stop after completing it and wait for my review.
+```
+
+---
+
+## 4.20 Decision Tree Prompting
+
+Navigate complex decisions:
+
+```
+I need to choose a caching strategy.
+
+Guide me through the decision:
+
+Q1: What are the key questions I need to answer?
+(List them, I'll answer)
+
+[After I answer]
+
+Q2: Based on my answers, what are my options?
+(For each option, list pros/cons)
+
+[After I react]
+
+Q3: Given my priorities ([PRIORITIES]), which do you recommend?
+(Explain reasoning)
+
+[After I decide]
+
+Implement the chosen approach.
+```
+
+---
+
+## Summary: Part 4
+
+| Category | Key Techniques |
+|----------|----------------|
+| **Reasoning** | Chain of Thought, Step-by-Step Design, Debug Traces, Self-Consistency |
+| **Chaining** | Analyze→Design→Implement, Scaffold→Fill→Harden, Branching, Recursive |
+| **Structured Output** | Format Specification, Templates, Diff Output, Constraints |
+| **Meta-Prompting** | Prompt Refinement, Generation, Failure Analysis, Dynamic Construction |
+| **Multi-Stage** | Critique Pattern, Adversarial, Ensemble, Verification Ladder |
+| **Workflow** | Session Architecture, Review Gates, Decision Trees |
+
+---
+
+**The Advanced Practitioner's Mindset:**
+
+> *The goal isn't to write more prompts—it's to get the right output with appropriate verification. Use these techniques when single-shot fails or when correctness matters more than speed.*
+
+---

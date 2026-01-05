@@ -1,11 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { BIASES } from '../../constants';
-import { generateBiasScenario } from '../../services/apiService';
-import { BiasedSnippet, Bias } from '../../types';
+import { BIASES, FALLACIES } from '../../constants';
+import { generateBiasScenario, generateFallacyScenario } from '../../services/apiService';
+import { BiasedSnippet, Bias, Fallacy, AppState } from '../../types';
 import { TextCanvas, Highlight } from './TextCanvas';
-import { Loader2, AlertCircle, CheckCircle, BrainCircuit, RefreshCw, Eye } from 'lucide-react';
+import { Loader2, AlertCircle, CheckCircle, BrainCircuit, RefreshCw, Eye, ShieldAlert } from 'lucide-react';
 
-export const BiasDetector: React.FC = () => {
+interface BiasDetectorProps {
+  state: AppState;
+  updateProgress: (id: string, quality: number) => void;
+}
+
+export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgress }) => {
   const [loading, setLoading] = useState(false);
   const [snippet, setSnippet] = useState<BiasedSnippet | null>(null);
   const [foundIds, setFoundIds] = useState<string[]>([]);
@@ -13,6 +18,10 @@ export const BiasDetector: React.FC = () => {
   const [feedback, setFeedback] = useState<{type: 'success' | 'error', msg: string} | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [context, setContext] = useState("Workplace Email");
+
+  const isPsychMode = state.mode === 'psychology';
+  const accentColor = isPsychMode ? 'indigo' : 'rose';
+  const SourceList = isPsychMode ? BIASES : FALLACIES;
 
   const startGame = async () => {
     setLoading(true);
@@ -22,25 +31,25 @@ export const BiasDetector: React.FC = () => {
     setFeedback(null);
     setSnippet(null);
     
-    // Pick 3 random biases that are distinct
-    const shuffled = [...BIASES].sort(() => 0.5 - Math.random());
+    const shuffled = [...SourceList].sort(() => 0.5 - Math.random());
     const targets = shuffled.slice(0, 3);
     
     try {
-      const data = await generateBiasScenario(targets, context);
+      const data = isPsychMode 
+        ? await generateBiasScenario(targets as Bias[], context)
+        : await generateFallacyScenario(targets as Fallacy[], context);
       setSnippet(data);
     } catch (e) {
       console.error(e);
-      setFeedback({ type: 'error', msg: "Failed to generate scenario. Try again." });
+      setFeedback({ type: 'error', msg: `Failed to generate ${isPsychMode ? 'bias' : 'fallacy'} scenario. Try again.` });
     } finally {
       setLoading(false);
     }
   };
 
   useEffect(() => {
-    // Initial load
     startGame();
-  }, []);
+  }, [state.mode]); // Restart when mode changes
 
   const handleSelection = (text: string, rect: DOMRect | null) => {
     setFeedback(null);
@@ -51,50 +60,44 @@ export const BiasDetector: React.FC = () => {
     setSelection({ text, rect });
   };
 
-  const handleGuess = (biasId: string) => {
+  const handleGuess = (id: string) => {
     if (!snippet || !selection) return;
 
-    const targetSegment = snippet.segments.find(s => s.biasId === biasId);
+    const targetSegment = snippet.segments.find(s => s.biasId === id);
     
-    // 1. Check if bias exists in scenario
     if (!targetSegment) {
-       setFeedback({ type: 'error', msg: "That bias isn't hidden in this text!" });
+       setFeedback({ type: 'error', msg: `That ${isPsychMode ? 'bias' : 'fallacy'} isn't hidden in this text!` });
        return;
     }
 
-    // 2. Check if selection matches quote (fuzzy match)
     const cleanSelection = selection.text.toLowerCase().replace(/[^a-z0-9]/g, '');
     const cleanQuote = targetSegment.quote.toLowerCase().replace(/[^a-z0-9]/g, '');
 
-    // Allow user to select a substring or superstring, as long as there is significant overlap
     if (!cleanQuote.includes(cleanSelection) && !cleanSelection.includes(cleanQuote)) {
-       setFeedback({ type: 'error', msg: "Right bias, but wrong text selected!" });
+       setFeedback({ type: 'error', msg: "Right identification, but wrong text selected!" });
        return;
     }
 
-    // 3. Check if already found
-    if (foundIds.includes(biasId)) {
+    if (foundIds.includes(id)) {
         setFeedback({ type: 'error', msg: "You already found this one!" });
         return;
     }
 
     // Success
-    setFoundIds(prev => [...prev, biasId]);
+    setFoundIds(prev => [...prev, id]);
     setSelection(null);
     setFeedback({ type: 'success', msg: "Correct! " + targetSegment.explanation });
+    
+    // Update progress: detecting it correctly in a scenario is high quality (5)
+    updateProgress(id, 5);
   };
 
   const getHighlights = (): Highlight[] => {
     if (!snippet) return [];
     
     return snippet.segments.map(seg => {
-      // Find index in current text
       const start = snippet.text.indexOf(seg.quote);
-      if (start === -1) {
-          // If exact quote match fails, this is a tricky edge case with AI.
-          // For now we accept it might be invisible.
-          return null;
-      }
+      if (start === -1) return null;
       
       const isFound = foundIds.includes(seg.biasId);
       const isRevealed = showAnswer;
@@ -105,40 +108,46 @@ export const BiasDetector: React.FC = () => {
         start,
         end: start + seg.quote.length,
         type: isFound ? 'found' : 'revealed',
-        label: BIASES.find(b => b.id === seg.biasId)?.name
+        label: SourceList.find(b => b.id === seg.biasId)?.name
       };
     }).filter(Boolean) as Highlight[];
   };
-
-  const remainingCount = snippet ? snippet.segments.length - foundIds.length : 0;
 
   return (
     <div className="max-w-4xl mx-auto p-4 md:p-6 space-y-6 pb-32">
       <div className="flex flex-col md:flex-row justify-between items-center gap-4">
         <div>
           <h1 className="text-3xl font-serif italic text-slate-100 flex items-center gap-2">
-            <BrainCircuit className="w-8 h-8 text-indigo-400" />
-            Bias Detector
+            {isPsychMode ? (
+              <BrainCircuit className="w-8 h-8 text-indigo-400" />
+            ) : (
+              <ShieldAlert className="w-8 h-8 text-rose-400" />
+            )}
+            {isPsychMode ? 'Bias Detector' : 'Fallacy Finder'}
           </h1>
-          <p className="text-slate-400 mt-1">Spot the flaws in realistic scenarios.</p>
+          <p className="text-slate-400 mt-1">
+            Spot the {isPsychMode ? 'cognitive flaws' : 'logical errors'} in {isPsychMode ? 'scenarios' : 'dialogues'}.
+          </p>
         </div>
         
         <div className="flex items-center gap-2">
           <select 
             value={context} 
             onChange={e => setContext(e.target.value)}
-            className="bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2 text-sm focus:ring-2 focus:ring-indigo-500"
+            className={`bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2 text-sm focus:ring-2 ${isPsychMode ? 'focus:ring-indigo-500' : 'focus:ring-rose-500'}`}
           >
             <option>Workplace Email</option>
             <option>News Article</option>
             <option>Twitter Thread</option>
             <option>Sales Pitch</option>
             <option>Family Dinner Debate</option>
+            {!isPsychMode && <option>Courtroom Cross-Examination</option>}
+            {!isPsychMode && <option>Political Talk Show</option>}
           </select>
           <button 
             onClick={startGame}
             disabled={loading}
-            className="p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded transition-colors disabled:opacity-50"
+            className={`p-2 text-white rounded transition-colors disabled:opacity-50 ${isPsychMode ? 'bg-indigo-600 hover:bg-indigo-700' : 'bg-rose-600 hover:bg-rose-700'}`}
           >
             <RefreshCw className={`w-5 h-5 ${loading ? 'animate-spin' : ''}`} />
           </button>
@@ -148,22 +157,20 @@ export const BiasDetector: React.FC = () => {
       {loading ? (
         <div className="h-64 flex flex-col items-center justify-center text-slate-500 gap-4">
           <Loader2 className="w-8 h-8 animate-spin" />
-          <p>Generating scenario...</p>
+          <p>Generating {isPsychMode ? 'scenario' : 'dialogue'}...</p>
         </div>
       ) : snippet ? (
         <div className="relative">
-          {/* Main Text Area */}
           <TextCanvas 
             text={snippet.text} 
             highlights={getHighlights()} 
             onSelection={handleSelection} 
           />
           
-          {/* Controls below text */}
           <div className="mt-6 flex flex-wrap gap-4 items-start justify-between">
              <div className="space-y-2">
                 <h3 className="text-slate-400 text-sm font-medium uppercase tracking-wider">
-                  Hidden Biases: {foundIds.length} / {snippet.segments.length}
+                  Hidden {isPsychMode ? 'Biases' : 'Fallacies'}: {foundIds.length} / {snippet.segments.length}
                 </h3>
                 <div className="flex gap-2">
                    {snippet.segments.map((seg, i) => (
@@ -188,7 +195,6 @@ export const BiasDetector: React.FC = () => {
         </div>
       ) : null}
 
-      {/* Bias Selection Modal/Panel - Shown when text is selected */}
       {selection && !loading && !showAnswer && (
         <div className="fixed inset-x-0 bottom-0 p-4 bg-zinc-900 border-t border-zinc-800 shadow-2xl z-50 animate-in slide-in-from-bottom-10">
            <div className="max-w-4xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
@@ -199,14 +205,14 @@ export const BiasDetector: React.FC = () => {
               
               <div className="flex items-center gap-3 w-full md:w-auto">
                  <select 
-                   className="flex-1 md:w-64 bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2"
+                   className={`flex-1 md:w-64 bg-zinc-800 border-zinc-700 text-slate-200 rounded px-3 py-2 focus:ring-2 ${isPsychMode ? 'focus:ring-indigo-500' : 'focus:ring-rose-500'}`}
                    onChange={(e) => {
                      if (e.target.value) handleGuess(e.target.value);
                    }}
                    value=""
                  >
-                   <option value="" disabled>Identify the Bias...</option>
-                   {[...BIASES].sort((a,b) => a.name.localeCompare(b.name)).map(b => (
+                   <option value="" disabled>Identify the {isPsychMode ? 'Bias' : 'Fallacy'}...</option>
+                   {[...SourceList].sort((a,b) => a.name.localeCompare(b.name)).map(b => (
                      <option key={b.id} value={b.id}>{b.name}</option>
                    ))}
                  </select>
@@ -221,7 +227,6 @@ export const BiasDetector: React.FC = () => {
         </div>
       )}
 
-      {/* Feedback Toast */}
       {feedback && (
         <div className={`fixed top-4 right-4 p-4 rounded shadow-lg border z-50 animate-in slide-in-from-right flex items-center gap-3 ${
             feedback.type === 'success' ? 'bg-green-900/90 border-green-700 text-green-100' : 'bg-red-900/90 border-red-700 text-red-100'
@@ -233,3 +238,4 @@ export const BiasDetector: React.FC = () => {
     </div>
   );
 };
+

@@ -1,5 +1,5 @@
 
-import { Bias, QuizQuestion, BiasedSnippet } from "../types";
+import { Bias, QuizQuestion, BiasedSnippet, Fallacy } from "../types";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_NAME = "x-ai/grok-4.1-fast"; 
@@ -226,6 +226,44 @@ export const auditDecision = async (title: string, description: string): Promise
     return JSON.parse(content);
   } catch (error) {
     console.error("Decision audit failed:", error);
+    throw error;
+  }
+};
+
+export const generateFallacyScenario = async (targetFallacies: Fallacy[], context: string): Promise<BiasedSnippet> => {
+  const fallaciesList = targetFallacies.map(f => `- ${f.name} (ID: ${f.id}): ${f.definition}`).join('\n');
+  
+  const prompt = `
+    Write a realistic dialogue between two or more people in the context of '${context}'.
+    The dialogue should be about 200 words long.
+    Embed exactly these ${targetFallacies.length} logical fallacies into the lines of the dialogue:
+    ${fallaciesList}
+    
+    The writing should sound like a natural debate or conversation, not a textbook.
+    
+    Output strictly valid JSON:
+    {
+      "text": "Full dialogue text here...",
+      "segments": [
+        {
+          "quote": "Exact substring from the dialogue line",
+          "biasId": "id from list above",
+          "explanation": "Brief explanation of why this specific line is fallacious"
+        }
+      ]
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a logic and rhetoric expert. JSON only." },
+      { role: "user", content: prompt }
+    ], { 
+      response_format: { type: "json_object" } 
+    });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Fallacy scenario generation failed:", error);
     throw error;
   }
 };
