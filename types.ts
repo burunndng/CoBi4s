@@ -58,6 +58,7 @@ export interface DecisionLog {
     biasId: string;
     reasoning: string;
     challengingQuestion: string;
+    cues?: string[];
   }[];
   userReflections: Record<string, string>; // biasId -> user answer
   finalConclusion: string;
@@ -117,5 +118,6 @@ export interface BiasedSnippet {
     quote: string;
     biasId: string;
     explanation: string;
+    cues?: string[];
   }[];
 }

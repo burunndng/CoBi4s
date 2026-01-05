@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { BIASES, FALLACIES } from '../../constants';
 import { generateBiasScenario, generateFallacyScenario } from '../../services/apiService';
 import { BiasedSnippet, Bias, Fallacy, AppState } from '../../types';
-import { TextCanvas, Highlight } from './TextCanvas';
+import { TextCanvas, Highlight } from '../shared/TextCanvas';
+import { TransferTips } from '../shared/TransferTips';
 import { Loader2, AlertCircle, CheckCircle, BrainCircuit, RefreshCw, Eye, ShieldAlert } from 'lucide-react';
 
 interface BiasDetectorProps {
@@ -15,7 +16,7 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
   const [snippet, setSnippet] = useState<BiasedSnippet | null>(null);
   const [foundIds, setFoundIds] = useState<string[]>([]);
   const [selection, setSelection] = useState<{text: string, rect: DOMRect} | null>(null);
-  const [feedback, setFeedback] = useState<{type: 'success' | 'error', msg: string} | null>(null);
+  const [feedback, setFeedback] = useState<{type: 'success' | 'error', msg: string, cues?: string[]} | null>(null);
   const [showAnswer, setShowAnswer] = useState(false);
   const [context, setContext] = useState("Workplace Email");
 
@@ -86,7 +87,11 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
     // Success
     setFoundIds(prev => [...prev, id]);
     setSelection(null);
-    setFeedback({ type: 'success', msg: "Correct! " + targetSegment.explanation });
+    setFeedback({ 
+      type: 'success', 
+      msg: "Correct! " + targetSegment.explanation,
+      cues: targetSegment.cues 
+    });
     
     // Update progress: detecting it correctly in a scenario is high quality (5)
     updateProgress(id, 5);
@@ -166,6 +171,10 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
             highlights={getHighlights()} 
             onSelection={handleSelection} 
           />
+
+          {feedback?.type === 'success' && feedback.cues && (
+            <TransferTips cues={feedback.cues} />
+          )}
           
           <div className="mt-6 flex flex-wrap gap-4 items-start justify-between">
              <div className="space-y-2">

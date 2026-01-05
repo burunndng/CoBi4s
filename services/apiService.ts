@@ -172,7 +172,8 @@ export const generateBiasScenario = async (targetBiases: Bias[], context: string
         {
           "quote": "Exact substring from text",
           "biasId": "id from list above",
-          "explanation": "Brief explanation"
+          "explanation": "Brief explanation",
+          "cues": ["Specific trigger 1", "Trigger 2"]
         }
       ]
     }
@@ -203,6 +204,7 @@ export const auditDecision = async (title: string, description: string): Promise
     1. The bias name (try to map to standard biases).
     2. A brief explanation of why it applies here.
     3. A single, hard-hitting "Killer Question" to help the user test if they are falling for it.
+    4. A list of 2-3 observable "cues" (feelings, phrases, situations) to watch for in the future.
     
     Output strictly valid JSON:
     {
@@ -210,7 +212,8 @@ export const auditDecision = async (title: string, description: string): Promise
         {
           "biasName": "string",
           "reasoning": "string",
-          "challengingQuestion": "string"
+          "challengingQuestion": "string",
+          "cues": ["cue 1", "cue 2"]
         }
       ]
     }
@@ -248,7 +251,8 @@ export const generateFallacyScenario = async (targetFallacies: Fallacy[], contex
         {
           "quote": "Exact substring from the dialogue line",
           "biasId": "id from list above",
-          "explanation": "Brief explanation of why this specific line is fallacious"
+          "explanation": "Brief explanation of why this specific line is fallacious",
+          "cues": ["Verbal cue", "Tone cue", "Logical trigger"]
         }
       ]
     }
@@ -268,7 +272,7 @@ export const generateFallacyScenario = async (targetFallacies: Fallacy[], contex
   }
 };
 
-export const generateLabStatement = async (targetFallacy: Fallacy): Promise<{ statement: string }> => {
+export const generateLabStatement = async (targetFallacy: Fallacy): Promise<BiasedSnippet> => {
   const prompt = `
     Generate a single, realistic fallacious statement that clearly demonstrates the "${targetFallacy.name}" fallacy.
     Definition: ${targetFallacy.definition}
@@ -277,7 +281,17 @@ export const generateLabStatement = async (targetFallacy: Fallacy): Promise<{ st
     Make it sound like a real comment one might find online or in a meeting.
     
     Output strictly valid JSON:
-    { "statement": "string" }
+    { 
+      "text": "The full statement here",
+      "segments": [
+        {
+          "quote": "The exact fallacious part",
+          "biasId": "${targetFallacy.id}",
+          "explanation": "Why this is fallacious",
+          "cues": ["Verbal cue", "Logical trigger"]
+        }
+      ]
+    }
   `;
 
   try {
@@ -288,7 +302,14 @@ export const generateLabStatement = async (targetFallacy: Fallacy): Promise<{ st
     return JSON.parse(content);
   } catch (error) {
     console.error("Lab statement generation failed:", error);
-    return { statement: targetFallacy.example };
+    return { 
+      text: targetFallacy.example,
+      segments: [{
+        quote: targetFallacy.example,
+        biasId: targetFallacy.id,
+        explanation: targetFallacy.definition
+      }]
+    };
   }
 };
 
@@ -310,7 +331,8 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
       "isSuccess": boolean,
       "score": number (0 to 100),
       "feedback": "Constructive critique of their repair",
-      "improvedVersion": "An even better, more rigorous version of the repair"
+      "improvedVersion": "An even better, more rigorous version of the repair",
+      "cues": ["What to listen for next time", "Situational trigger"]
     }
   `;
 
