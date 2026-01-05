@@ -456,3 +456,47 @@ export const generateContextScenario = async (action: string): Promise<any> => {
     throw error;
   }
 };
+
+export const sendChatMessage = async (history: { role: string, content: string }[], weakBiases: string[]): Promise<string> => {
+  const biasContext = weakBiases.length > 0 
+    ? `The user struggles with: ${weakBiases.join(', ')}. Watch for these specifically.`
+    : "";
+
+  const systemPrompt = `
+    ROLE: You are a Socratic Rationality Coach. You help users debug their own cognition.
+    
+    PRIME DIRECTIVE: 
+    - NEVER lecture. 
+    - NEVER give answers immediately. 
+    - ONLY ask probing questions (Street Epistemology style).
+    - Your goal is to help the user self-identify their cognitive distortions.
+    
+    PROTOCOL:
+    1. Listen: Identify emotional charge and logical claims.
+    2. Diagnose: Internally match their statement to a Cognitive Bias or Logical Fallacy.
+    3. Probe: Ask a question that targets the EVIDENCE for their claim.
+       - Bad: "That is attribution error."
+       - Good: "What evidence do you have that this is his character, rather than his situation?"
+    4. Naming: Only suggest the technical term if the user is stuck or has realized the error.
+    
+    CONTEXT:
+    ${biasContext}
+    
+    TONE:
+    Empathetic but rigorous. Like a kind physics professor or a wise mentor.
+    Keep responses short (under 3 sentences usually).
+  `;
+
+  try {
+    const messages = [
+      { role: "system", content: systemPrompt },
+      ...history
+    ];
+
+    const content = await callOpenRouter(messages); // Standard call, not streaming yet to keep it simple
+    return content;
+  } catch (error) {
+    console.error("Chat message failed:", error);
+    throw error;
+  }
+};

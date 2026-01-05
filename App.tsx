@@ -18,7 +18,8 @@ import {
   Brain,
   FlaskConical,
   Binary,
-  Shuffle
+  Shuffle,
+  MessageSquare
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
@@ -34,6 +35,7 @@ import { DecisionArchitect } from './components/DecisionArchitect/DecisionArchit
 import { LogicLab } from './components/LogicLab/LogicLab';
 import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer';
 import { ContextLab } from './components/ContextLab/ContextLab';
+import { ChatInterface } from './components/SocraticChat/ChatInterface';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -47,7 +49,8 @@ const App: React.FC = () => {
         mode: parsed.mode || 'psychology',
         fallacyProgress: parsed.fallacyProgress || {},
         decisionLogs: parsed.decisionLogs || [],
-        algorithmTests: parsed.algorithmTests || []
+        algorithmTests: parsed.algorithmTests || [],
+        chatHistory: parsed.chatHistory || []
       };
     }
     return INITIAL_STATE;
@@ -147,6 +150,7 @@ const App: React.FC = () => {
           <nav className="flex-1 p-4 space-y-1">
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
+            <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
             <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
             <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" />
             <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
@@ -207,6 +211,7 @@ const App: React.FC = () => {
               <nav className="flex-1 p-6 space-y-4">
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
@@ -233,6 +238,7 @@ const App: React.FC = () => {
                    return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
                  });
               }} />} />
+              <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
               <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
               <Route path="/context" element={<ContextLab />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />

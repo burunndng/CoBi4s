@@ -96,6 +96,22 @@ export interface ContextScenario {
   }[];
 }
 
+  segments: {
+    quote: string;
+    biasId: string;
+    explanation: string;
+    cues?: string[];
+  }[];
+}
+
+export interface ChatMessage {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  timestamp: number;
+  relatedBiasId?: string; // If the AI detects a specific bias
+}
+
 export interface AppState {
   mode: LearningMode;
   progress: Record<string, ProgressState>;
@@ -106,18 +122,9 @@ export interface AppState {
   favorites: string[];
   decisionLogs: DecisionLog[];
   algorithmTests: AlgorithmTest[];
+  chatHistory: ChatMessage[];
   preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;
   };
-}
-
-export interface BiasedSnippet {
-  text: string;
-  segments: {
-    quote: string;
-    biasId: string;
-    explanation: string;
-    cues?: string[];
-  }[];
 }

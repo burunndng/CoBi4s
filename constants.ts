@@ -36,6 +36,7 @@ export const INITIAL_STATE: AppState = {
   favorites: [],
   decisionLogs: [],
   algorithmTests: [],
+  chatHistory: [],
   preferences: {
     flashcardsOnlyFavorites: false,
     learnTab: 'all'
