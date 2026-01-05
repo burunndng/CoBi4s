@@ -138,6 +138,12 @@ We utilize the frameworks defined in `.gemini/The Plan Prompt Engineering.txt`.
 - **The Modernizer**: For refactoring (Before vs. After).
 - **The Sherlock**: For root cause analysis (Context Injection + Hypothesis).
 
+**Subagents & Personas**
+- **The Cognitive Architect** (`.gemini/The Cognitive Architect.md`): 
+  - **Role**: Chief Learning Architect.
+  - **Prime Directive**: "The Transfer Test" (Does this help the user spot patterns in real life?).
+  - **Modes**: Cartographer (Maps data flow), Pedagogue (Designs learning), Weaver (Ensures consistency).
+
 ### Styling
 - **Theme**: Dark mode only (`bg-[#09090b]`, `text-slate-200`).
 - **Components**: Use `surface` class (custom utility likely defined in index.css) for cards/containers.
