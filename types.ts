@@ -52,3 +52,12 @@ export interface QuizQuestion {
   explanation: string;
   isScenario: boolean;
 }
+
+export interface BiasedSnippet {
+  text: string;
+  segments: {
+    quote: string;
+    biasId: string;
+    explanation: string;
+  }[];
+}

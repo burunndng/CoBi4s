@@ -1,5 +1,5 @@
 
-import { Bias, QuizQuestion } from "../types";
+import { Bias, QuizQuestion, BiasedSnippet } from "../types";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_NAME = "x-ai/grok-4.1-fast"; 
@@ -152,5 +152,42 @@ export const generateHint = async (biasName: string): Promise<string> => {
     return content.trim();
   } catch {
     return "Think about the core concept.";
+  }
+};
+
+export const generateBiasScenario = async (targetBiases: Bias[], context: string): Promise<BiasedSnippet> => {
+  const biasesList = targetBiases.map(b => `- ${b.name} (ID: ${b.id}): ${b.definition}`).join('\n');
+  
+  const prompt = `
+    Write a realistic '${context}' of about 150-200 words. 
+    Embed exactly these ${targetBiases.length} cognitive biases into the text:
+    ${biasesList}
+    
+    The writing should sound natural, not like a textbook example.
+    
+    Output strictly valid JSON:
+    {
+      "text": "Full text here...",
+      "segments": [
+        {
+          "quote": "Exact substring from text",
+          "biasId": "id from list above",
+          "explanation": "Brief explanation"
+        }
+      ]
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a cognitive psychology expert. JSON only." },
+      { role: "user", content: prompt }
+    ], { 
+      response_format: { type: "json_object" } 
+    });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Bias scenario generation failed:", error);
+    throw error;
   }
 };

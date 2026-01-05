@@ -75,6 +75,12 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
             onClick={() => navigate('/catalog')} 
           />
           <NavCard 
+            title="Detector" 
+            desc="Spot Flaws" 
+            icon={<Activity size={18} />}
+            onClick={() => navigate('/detector')} 
+          />
+          <NavCard 
             title="Practice" 
             desc="Spaced Repetition" 
             icon={<Target size={18} />}
