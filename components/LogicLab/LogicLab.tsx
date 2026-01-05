@@ -12,7 +12,6 @@ import {
   AlertCircle, 
   RotateCcw, 
   Wand2, 
-  MessageSquareQuote,
   ArrowRight
 } from 'lucide-react';
 
