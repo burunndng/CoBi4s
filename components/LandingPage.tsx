@@ -18,49 +18,49 @@ export const LandingPage: React.FC = () => {
 
   const features = [
     {
-      icon: <Library className="text-indigo-400" />,
+      icon: Library,
       title: "Registry",
       desc: "The Codex.",
       detail: "Reference the 50 laws of human irrationality."
     },
     {
-      icon: <BookOpen className="text-indigo-400" />,
+      icon: BookOpen,
       title: "Flashcards",
       desc: "The Drill.",
       detail: "Spaced repetition for pattern recognition."
     },
     {
-      icon: <BrainCircuit className="text-indigo-400" />,
+      icon: BrainCircuit,
       title: "Simulator",
       desc: "The Sandbox.",
       detail: "Face high-stakes choices and consequences."
     },
     {
-      icon: <ShieldAlert className="text-rose-400" />,
+      icon: ShieldAlert,
       title: "Detector",
       desc: "The Lens.",
       detail: "Highlight hidden biases/fallacies in text."
     },
     {
-      icon: <FlaskConical className="text-rose-400" />,
+      icon: FlaskConical,
       title: "Logic Lab",
       desc: "The Workshop.",
       detail: "Fix broken arguments with steel-manning."
     },
     {
-      icon: <Shuffle className="text-amber-400" />,
+      icon: Shuffle,
       title: "Switcher",
       desc: "The Prism.",
       detail: "Calibrate heuristics for different contexts."
     },
     {
-      icon: <MessageSquare className="text-indigo-400" />,
+      icon: MessageSquare,
       title: "Mirror",
       desc: "The Coach.",
       detail: "Debug your own thoughts in real-time."
     },
     {
-      icon: <Binary className="text-emerald-400" />,
+      icon: Binary,
       title: "Trainer",
       desc: "The Compiler.",
       detail: "Program logic to test your understanding."
@@ -93,21 +93,24 @@ export const LandingPage: React.FC = () => {
 
       {/* Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {features.map((f, i) => (
-          <div 
-            key={i}
-            className="surface p-8 rounded-2xl flex flex-col group h-full"
-          >
-            <div className="mb-8 p-4 bg-white/[0.03] border border-white/5 rounded-2xl inline-block group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-500">
-              {React.cloneElement(f.icon as React.ReactElement, { size: 28 })}
+        {features.map((f, i) => {
+          const Icon = f.icon;
+          return (
+            <div 
+              key={i}
+              className="surface p-8 rounded-2xl flex flex-col group h-full"
+            >
+              <div className="mb-8 p-4 bg-white/[0.03] border border-white/5 rounded-2xl inline-block group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-500">
+                <Icon size={28} className="text-indigo-400" />
+              </div>
+              <div className="flex-1">
+                <h3 className="text-xl font-bold text-white mb-1 uppercase tracking-tight">{f.title}</h3>
+                <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em] mb-4">{f.desc}</p>
+                <p className="text-sm text-slate-500 leading-relaxed font-light">{f.detail}</p>
+              </div>
             </div>
-            <div className="flex-1">
-              <h3 className="text-xl font-bold text-white mb-1 uppercase tracking-tight">{f.title}</h3>
-              <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em] mb-4">{f.desc}</p>
-              <p className="text-sm text-slate-500 leading-relaxed font-light">{f.detail}</p>
-            </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* Philosophy */}
