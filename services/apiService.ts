@@ -373,3 +373,50 @@ export const runAlgorithmTest = async (biasName: string, definition: string, pse
     throw error;
   }
 };
+
+export const generateContextScenario = async (action: string): Promise<any> => {
+  const prompt = `
+    Analyze this specific action: "${action}"
+    
+    Generate 3 distinct contexts where this action might occur.
+    1. Survival/High-Stakes: Where this action is a USEFUL HEURISTIC (saves time/life).
+    2. Social/Professional: Where this action is a HARMFUL BIAS (damages relationships/decisions).
+    3. Neutral/Low-Stakes: Where it doesn't really matter.
+    
+    Output strictly valid JSON:
+    {
+      "action": "${action}",
+      "contexts": [
+        {
+          "type": "Survival",
+          "description": "Brief scenario description...",
+          "verdict": "Useful Heuristic",
+          "explanation": "Why it works here"
+        },
+        {
+          "type": "Social",
+          "description": "Brief scenario description...",
+          "verdict": "Harmful Bias",
+          "explanation": "Why it fails here"
+        },
+        {
+          "type": "Neutral",
+          "description": "Brief scenario description...",
+          "verdict": "Neutral",
+          "explanation": "Why it is irrelevant here"
+        }
+      ]
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are an evolutionary psychologist. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Context scenario generation failed:", error);
+    throw error;
+  }
+};

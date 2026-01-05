@@ -82,6 +82,16 @@ export interface AlgorithmTest {
   status: 'compiled' | 'buggy' | 'critical_failure';
 }
 
+export interface ContextScenario {
+  action: string;
+  contexts: {
+    type: 'Survival' | 'Social' | 'Neutral';
+    description: string;
+    verdict: 'Useful Heuristic' | 'Harmful Bias' | 'Neutral';
+    explanation: string;
+  }[];
+}
+
 export interface AppState {
   mode: LearningMode;
   progress: Record<string, ProgressState>;
