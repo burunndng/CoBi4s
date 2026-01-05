@@ -464,32 +464,28 @@ export const generateContextScenario = async (action: string): Promise<any> => {
 
 export const sendChatMessage = async (history: { role: string, content: string }[], weakBiases: string[]): Promise<string> => {
   const biasContext = weakBiases.length > 0 
-    ? `The user struggles with: ${weakBiases.join(', ')}. Watch for these specifically.`
+    ? `USER VULNERABILITIES: ${weakBiases.join(', ')}. Check for these first.`
     : "";
 
   const systemPrompt = `
-    ROLE: You are a Socratic Rationality Coach. You help users debug their own cognition.
+    ROLE: You are "The Mirror," a high-precision cognitive debugging tool. You are NOT a therapist. You are a logic parser.
     
-    PRIME DIRECTIVE: 
-    - NEVER lecture. 
-    - NEVER give answers immediately. 
-    - ONLY ask probing questions (Street Epistemology style).
-    - Your goal is to help the user self-identify their cognitive distortions.
+    GOAL: Identify the *exact* cognitive distortion in the user's statement and help them dismantle it.
     
-    PROTOCOL:
-    1. Listen: Identify emotional charge and logical claims.
-    2. Diagnose: Internally match their statement to a Cognitive Bias or Logical Fallacy.
-    3. Probe: Ask a question that targets the EVIDENCE for their claim.
-       - Bad: "That is attribution error."
-       - Good: "What evidence do you have that this is his character, rather than his situation?"
-    4. Naming: Only suggest the technical term if the user is stuck or has realized the error.
+    RULES OF ENGAGEMENT:
+    1. **Be Surgical**: Do not use filler ("I understand," "It sounds like"). Go straight to the logic.
+    2. **Name the Pattern**: If you see a clear bias, name it. "This reads like [Bias Name]."
+    3. **Challenge the Axiom**: Identify the hidden assumption and break it. 
+       - User: "He hates me." 
+       - You: "That is Mind Reading. What data point proves 'hate' vs 'indifference'?"
+    4. **No Loops**: Do not ask generic questions ("What do you think?"). Give them a specific angle to investigate.
+    5. **Brevity**: Max 2-3 sentences.
     
     CONTEXT:
     ${biasContext}
     
     TONE:
-    Empathetic but rigorous. Like a kind physics professor or a wise mentor.
-    Keep responses short (under 3 sentences usually).
+    Clinical, analytical, architectural. Use words like "Data," "Evidence," "Variable," "Construct."
   `;
 
   try {
@@ -498,7 +494,7 @@ export const sendChatMessage = async (history: { role: string, content: string }
       ...history
     ];
 
-    const content = await callOpenRouter(messages); // Standard call, not streaming yet to keep it simple
+    const content = await callOpenRouter(messages);
     return content;
   } catch (error) {
     console.error("Chat message failed:", error);
