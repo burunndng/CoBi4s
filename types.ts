@@ -6,6 +6,12 @@ export enum Category {
   MEMORY = 'memory'
 }
 
+export enum FallacyType {
+  FORMAL = 'formal',
+  INFORMAL = 'informal',
+  RHETORICAL = 'rhetorical'
+}
+
 export enum Difficulty {
   BEGINNER = 'beginner',
   INTERMEDIATE = 'intermediate',
@@ -20,6 +26,17 @@ export interface Bias {
   example: string;
   counterStrategy: string;
   relatedBiases: string[];
+  difficulty: Difficulty;
+}
+
+export interface Fallacy {
+  id: string;
+  name: string;
+  type: FallacyType;
+  definition: string;
+  structure?: string;
+  example: string;
+  counterStrategy: string;
   difficulty: Difficulty;
 }
 
@@ -47,8 +64,12 @@ export interface DecisionLog {
   status: 'draft' | 'audited' | 'finalized';
 }
 
+export type LearningMode = 'psychology' | 'logic';
+
 export interface AppState {
+  mode: LearningMode;
   progress: Record<string, ProgressState>;
+  fallacyProgress: Record<string, ProgressState>;
   dailyStreak: number;
   lastStudyDate: string | null;
   totalXp: number;

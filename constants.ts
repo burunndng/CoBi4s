@@ -1,5 +1,8 @@
 
-import { Bias, Category, Difficulty } from './types';
+import { Bias, Category, Difficulty, AppState } from './types';
+import { FALLACIES } from './constants/fallacies';
+
+export { FALLACIES };
 
 export const BIASES: Bias[] = [
     { id: 'confirmation-bias', name: 'Confirmation Bias', category: Category.BELIEF, definition: 'The tendency to search for, interpret, and recall information that supports one\'s prior beliefs.', example: 'A manager ignores successful reports from a remote worker but highlights a single missed email to prove remote work fails.', counterStrategy: 'Actively seek out "disconfirming" evidence. Play devil\'s advocate against your own ideas.', relatedBiases: ['anchoring', 'belief-perseverance'], difficulty: Difficulty.BEGINNER },
@@ -23,8 +26,10 @@ export const BIASES: Bias[] = [
     { id: 'parkinsons-law', name: "Parkinson's Law", category: Category.DECISION_MAKING, definition: 'Work expands so as to fill the time available for its completion.', example: 'Taking two weeks to finish a project that could be done in two days, just because the deadline is two weeks away.', counterStrategy: 'Set artificial, aggressive deadlines for yourself.', relatedBiases: ['planning-fallacy'], difficulty: Difficulty.BEGINNER }
 ];
 
-export const INITIAL_STATE = {
+export const INITIAL_STATE: AppState = {
+  mode: 'psychology',
   progress: {},
+  fallacyProgress: {},
   dailyStreak: 0,
   lastStudyDate: null,
   totalXp: 0,

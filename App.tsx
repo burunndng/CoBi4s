@@ -13,10 +13,12 @@ import {
   CheckCircle2,
   GraduationCap,
   Eye,
-  Scale
+  Scale,
+  ShieldAlert,
+  Brain
 } from 'lucide-react';
-import { BIASES, INITIAL_STATE } from './constants';
-import { AppState } from './types';
+import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
+import { AppState, LearningMode } from './types';
 import Dashboard from './components/Dashboard';
 import Catalog from './components/Catalog';
 import Flashcards from './components/Flashcards';
@@ -36,6 +38,8 @@ const App: React.FC = () => {
       return {
         ...INITIAL_STATE,
         ...parsed,
+        mode: parsed.mode || 'psychology',
+        fallacyProgress: parsed.fallacyProgress || {},
         decisionLogs: parsed.decisionLogs || []
       };
     }
@@ -102,6 +106,29 @@ const App: React.FC = () => {
             <h1 className="serif text-2xl font-medium text-white tracking-tight italic">CogniBias</h1>
             <p className="text-[10px] text-slate-500 uppercase tracking-widest mt-1">Architect Edition</p>
           </div>
+
+          <div className="px-6 py-4">
+            <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-1 flex">
+              <button 
+                onClick={() => setState(prev => ({ ...prev, mode: 'psychology' }))}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                  state.mode === 'psychology' ? 'bg-zinc-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <Brain size={14} />
+                Psychology
+              </button>
+              <button 
+                onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
+                className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                  state.mode === 'logic' ? 'bg-zinc-800 text-rose-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                }`}
+              >
+                <ShieldAlert size={14} />
+                Logic
+              </button>
+            </div>
+          </div>
           
           <nav className="flex-1 p-4 space-y-1">
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
@@ -136,6 +163,30 @@ const App: React.FC = () => {
                 <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Navigation</span>
                 <button onClick={() => setIsMobileMenuOpen(false)}><X size={20} className="text-slate-400 hover:text-white" /></button>
               </div>
+
+              <div className="px-6 py-4 border-b border-[#27272a]">
+                <div className="bg-zinc-900/50 border border-zinc-800 rounded-xl p-1 flex">
+                  <button 
+                    onClick={() => setState(prev => ({ ...prev, mode: 'psychology' }))}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                      state.mode === 'psychology' ? 'bg-zinc-800 text-white shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                    }`}
+                  >
+                    <Brain size={14} />
+                    Psychology
+                  </button>
+                  <button 
+                    onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
+                    className={`flex-1 flex items-center justify-center gap-2 py-2 rounded-lg text-xs font-bold transition-all ${
+                      state.mode === 'logic' ? 'bg-zinc-800 text-rose-400 shadow-lg' : 'text-slate-500 hover:text-slate-300'
+                    }`}
+                  >
+                    <ShieldAlert size={14} />
+                    Logic
+                  </button>
+                </div>
+              </div>
+
               <nav className="flex-1 p-6 space-y-4">
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
