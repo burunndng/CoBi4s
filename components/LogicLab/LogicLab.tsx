@@ -308,11 +308,17 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
       {/* Result Phase */}
       {phase === 'result' && evaluation && snippet && (
         <div className="space-y-8 animate-in zoom-in-95 duration-500">
-           <div className="text-center space-y-2">
+           <div className="text-center space-y-4">
               <div className="inline-block px-4 py-1 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs font-bold uppercase tracking-widest">
                 Lab Report
               </div>
-              <h2 className="text-4xl font-serif text-white">Repair Score: {evaluation.score}%</h2>
+              <h2 className="text-5xl font-serif text-white">{evaluation.score}%</h2>
+              
+              <div className="flex justify-center gap-8 pt-2">
+                 <MetricItem label="Logic" value={evaluation.breakdown?.logic || 0} color="rose" />
+                 <MetricItem label="Intent" value={evaluation.breakdown?.intent || 0} color="indigo" />
+                 <MetricItem label="Clarity" value={evaluation.breakdown?.clarity || 0} color="emerald" />
+              </div>
            </div>
 
            {evaluation.cues && <TransferTips cues={evaluation.cues} />}
@@ -362,6 +368,32 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
            </div>
         </div>
       )}
+    </div>
+  );
+};
+
+const MetricItem: React.FC<{ label: string; value: number; color: 'rose' | 'indigo' | 'emerald' }> = ({ label, value, color }) => {
+  const colorMap = {
+    rose: 'text-rose-400 bg-rose-500/10 border-rose-500/30',
+    indigo: 'text-indigo-400 bg-indigo-500/10 border-indigo-500/30',
+    emerald: 'text-emerald-400 bg-emerald-500/10 border-emerald-500/30'
+  };
+
+  const barColor = {
+    rose: 'bg-rose-500',
+    indigo: 'bg-indigo-500',
+    emerald: 'bg-emerald-500'
+  };
+
+  return (
+    <div className="flex flex-col items-center gap-2">
+      <div className={`px-3 py-1 rounded-lg border text-[10px] font-bold uppercase tracking-tighter ${colorMap[color]}`}>
+        {label}
+      </div>
+      <div className="text-xl font-mono text-white">{value}%</div>
+      <div className="w-16 h-1 bg-zinc-800 rounded-full overflow-hidden">
+        <div className={`h-full transition-all duration-1000 ${barColor[color]}`} style={{ width: `${value}%` }}></div>
+      </div>
     </div>
   );
 };

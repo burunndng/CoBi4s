@@ -324,12 +324,17 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
     CRITERIA:
     1. Did they successfully remove the fallacy?
     2. Did they preserve the core point or concern of the original statement? (The "Steel Man" approach)
-    3. Is the resulting argument logically sound?
+    3. Is the resulting argument logically sound and clear?
     
     Output strictly valid JSON:
     {
       "isSuccess": boolean,
-      "score": number (0 to 100),
+      "score": number (weighted average 0-100),
+      "breakdown": {
+        "logic": number (0-100, success in removing fallacy),
+        "intent": number (0-100, success in preserving core concern),
+        "clarity": number (0-100, effectiveness of the new phrasing)
+      },
       "feedback": "Constructive critique of their repair",
       "improvedVersion": "An even better, more rigorous version of the repair",
       "cues": ["What to listen for next time", "Situational trigger"]
