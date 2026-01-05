@@ -96,3 +96,8 @@
 ### State Updates
 - Always use functional state updates: `setState(prev => ({ ...prev, ...updates }))`.
 - Ensure `localStorage` logic handles quota errors gracefully (though currently simple `setItem`).
+
+---
+
+## 📜 Project Evolution
+- **STATUS.md**: Refer to this file for a detailed log of all modifications, current status, and next steps.
