@@ -29,6 +29,7 @@ export const INITIAL_STATE = {
   lastStudyDate: null,
   totalXp: 0,
   favorites: [],
+  decisionLogs: [],
   preferences: {
     flashcardsOnlyFavorites: false,
     learnTab: 'all'

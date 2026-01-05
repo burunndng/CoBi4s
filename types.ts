@@ -32,25 +32,32 @@ export interface ProgressState {
   masteryLevel: number;
 }
 
+export interface DecisionLog {
+  id: string;
+  timestamp: number;
+  title: string;
+  description: string;
+  detectedBiases: {
+    biasId: string;
+    reasoning: string;
+    challengingQuestion: string;
+  }[];
+  userReflections: Record<string, string>; // biasId -> user answer
+  finalConclusion: string;
+  status: 'draft' | 'audited' | 'finalized';
+}
+
 export interface AppState {
   progress: Record<string, ProgressState>;
   dailyStreak: number;
   lastStudyDate: string | null;
   totalXp: number;
   favorites: string[];
+  decisionLogs: DecisionLog[];
   preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;
   };
-}
-
-export interface QuizQuestion {
-  biasId: string;
-  content: string;
-  options: string[];
-  correctAnswer: string;
-  explanation: string;
-  isScenario: boolean;
 }
 
 export interface BiasedSnippet {

@@ -12,7 +12,8 @@ import {
   X,
   CheckCircle2,
   GraduationCap,
-  Eye
+  Eye,
+  Scale
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE } from './constants';
 import { AppState } from './types';
@@ -24,6 +25,7 @@ import StudyPlan from './components/StudyPlan';
 import AppSettings from './components/AppSettings';
 import AIInstructor from './components/AIInstructor';
 import { BiasDetector } from './components/BiasDetector/BiasDetector';
+import { DecisionArchitect } from './components/DecisionArchitect/DecisionArchitect';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -96,6 +98,7 @@ const App: React.FC = () => {
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
             <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
+            <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
             <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" />
             <NavLink to="/flashcards" icon={<Zap size={18} />} label="Practice" />
             <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
@@ -128,6 +131,7 @@ const App: React.FC = () => {
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/flashcards" icon={<Zap size={18} />} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
@@ -150,6 +154,7 @@ const App: React.FC = () => {
                  });
               }} />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
+              <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
               <Route path="/detector" element={<BiasDetector />} />
               <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
                 setState(prev => {

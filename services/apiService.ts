@@ -191,3 +191,41 @@ export const generateBiasScenario = async (targetBiases: Bias[], context: string
     throw error;
   }
 };
+
+export const auditDecision = async (title: string, description: string): Promise<any> => {
+  const prompt = `
+    Act as a rationality coach. Analyze this decision:
+    Title: "${title}"
+    Context: "${description}"
+    
+    Identify the top 3 cognitive biases that might be influencing this decision.
+    For each, provide:
+    1. The bias name (try to map to standard biases).
+    2. A brief explanation of why it applies here.
+    3. A single, hard-hitting "Killer Question" to help the user test if they are falling for it.
+    
+    Output strictly valid JSON:
+    {
+      "detectedBiases": [
+        {
+          "biasName": "string",
+          "reasoning": "string",
+          "challengingQuestion": "string"
+        }
+      ]
+    }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a critical thinking coach. JSON only." },
+      { role: "user", content: prompt }
+    ], { 
+      response_format: { type: "json_object" } 
+    });
+    return JSON.parse(content);
+  } catch (error) {
+    console.error("Decision audit failed:", error);
+    throw error;
+  }
+};

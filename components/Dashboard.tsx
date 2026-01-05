@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Activity, Zap, Layers, Trophy, Target } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Layers, Trophy, Target, Scale } from 'lucide-react';
 import { AppState, ProgressState } from '../types';
 import { BIASES } from '../constants';
 
@@ -73,6 +73,12 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
             desc="Browse Database" 
             icon={<Layers size={18} />}
             onClick={() => navigate('/catalog')} 
+          />
+          <NavCard 
+            title="Decision Architect" 
+            desc="Audit Decisions" 
+            icon={<Scale size={18} />}
+            onClick={() => navigate('/decision')} 
           />
           <NavCard 
             title="Detector" 
