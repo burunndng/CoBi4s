@@ -102,7 +102,7 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
           />
 
           {/* Neural Bridge: Aura OS Portal */}
-          <div className="pt-2 hidden lg:block">
+          <div className="pt-2">
              <div className="text-[8px] font-black uppercase tracking-[0.5em] text-indigo-500/40 mb-3 px-2">Upstream_System</div>
              <a 
                href="https://auraos.space" 
