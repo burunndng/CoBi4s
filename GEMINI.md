@@ -1,7 +1,7 @@
 # CogniBias Project Context
 
-| **Agents** | 11 specialized agents in `.gemini/` |
-| **Last Updated** | 2026-01-06 (PWA & Performance Sentinel added) |
+| **Agents** | 12 specialized agents in `.gemini/` |
+| **Last Updated** | 2026-01-06 (Critique Agent added) |
 | **Status** | Production-ready with mobile-touch + Neural Bridge |
 
 ---
@@ -31,6 +31,7 @@ npm run test         # Run tests
 
 | Task | Delegate To |
 |------|-------------|
+| Feature Ranking/Evaluation | `The Critique Agent` |
 | PWA/Performance/SW | `The PWA & Performance Sentinel` |
 | Minimalist UI/SaaS Design | `The Design Principle Architect` |
 | Design System Enforcer | `The Theme Architect` |

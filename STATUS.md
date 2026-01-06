@@ -54,7 +54,8 @@
 - **GitHub Actions**: Automated deployment workflow.
 
 ### Agent Customization
-- **Subagent Roster**: Expanded to 11 specialized agents in `.gemini/`. Added **The PWA & Performance Sentinel** for SW lifecycle and bundle optimization.
+- **Subagent Roster**: Expanded to 12 specialized agents in `.gemini/`. Added **The Critique Agent** for feature evaluation and ranking.
+- **Subagent Roster (Tech)**: Added **The PWA & Performance Sentinel** for SW lifecycle and bundle optimization.
 - **Subagent Roster (Design)**: Added **The Design Principle Architect** for high-precision SaaS design (Linear/Stripe style).
 - **Subagent Roster (Original)**: Formalized a library of 6 specialized agents in `.gemini/` (Cognitive Architect, Theme Architect, Module Builder, Schema Guardian, Prompt Engineer, UI Polisher).
 
