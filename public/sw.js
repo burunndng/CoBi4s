@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v6'; 
+const CACHE_NAME = 'cognibias-v7'; // Bumped to force total purge of stale index.html
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -12,7 +12,6 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
-      // Use individual add calls to prevent one failure from stopping the whole cache
       return Promise.allSettled(
         STATIC_ASSETS.map(asset => cache.add(asset))
       );
@@ -36,12 +35,9 @@ self.addEventListener('activate', (event) => {
 
 // 🌊 Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
-  // Only handle GET requests
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-  
-  // Skip cross-origin (except fonts) and API calls
   const isInternal = url.origin === self.location.origin;
   const isFont = url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com');
   
@@ -59,6 +55,12 @@ self.addEventListener('fetch', (event) => {
           console.error('[SW] Fetch failed:', err);
           return cachedResponse;
         });
+
+        // ⚡️ ARCHITECT PREFERENCE: For the main entry point (index.html), 
+        // always prioritize network to prevent stale hashes in build.
+        if (url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
+          return fetchPromise || cachedResponse;
+        }
 
         return cachedResponse || fetchPromise;
       });
