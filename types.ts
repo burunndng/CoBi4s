@@ -155,25 +155,60 @@ export interface TransferLog {
   impact: number; // 1-5 (Critique Agent constraint)
 }
 
+export interface CustomMilestone {
+
+  id: string;
+
+  timestamp: number;
+
+  label: string;
+
+  completed: boolean;
+
+  type: 'study' | 'practice' | 'real-world';
+
+}
+
+
+
 export interface AppState {
 
   mode: LearningMode;
+
   progress: Record<string, ProgressState>;
+
   fallacyProgress: Record<string, ProgressState>;
+
   dailyStreak: number;
+
   lastStudyDate: string | null;
+
   totalXp: number;
+
   favorites: string[];
+
   decisionLogs: DecisionLog[];
+
   algorithmTests: AlgorithmTest[];
+
   shadowBoxingHistory: ShadowBoxingSession[];
+
   chatHistory: ChatMessage[];
+
   transferLogs: TransferLog[];
+
   dailyFocus: {
+
     biasId: string;
+
     lastUpdated: string;
+
     observedToday: boolean;
+
   } | null;
+
+  roadmap: CustomMilestone[]; // ⚡️ Strategic Journey
+
   preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;

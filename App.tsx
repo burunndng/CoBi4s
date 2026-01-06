@@ -61,7 +61,8 @@ const App: React.FC = () => {
         shadowBoxingHistory: parsed.shadowBoxingHistory || [],
         chatHistory: parsed.chatHistory || [],
         transferLogs: parsed.transferLogs || [],
-        dailyFocus: parsed.dailyFocus || null
+        dailyFocus: parsed.dailyFocus || null,
+        roadmap: parsed.roadmap || []
       };
     }
     return INITIAL_STATE;
@@ -177,7 +178,7 @@ const App: React.FC = () => {
             <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" />
             <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
             <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
-            <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" />
+            <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Journey" />
           </nav>
 
           <div className="p-4 border-t border-white/5 space-y-1">
@@ -264,7 +265,7 @@ const App: React.FC = () => {
                 <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Journey" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" onClick={() => setIsMobileMenuOpen(false)} />
                 
@@ -321,7 +322,7 @@ const App: React.FC = () => {
                    });
                 }} />} />
                 <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
-                <Route path="/plan" element={<StudyPlan state={state} />} />
+                <Route path="/plan" element={<StudyPlan state={state} setState={setState} />} />
                 <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
               </Routes>
             </React.Suspense>

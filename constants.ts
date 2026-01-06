@@ -240,6 +240,7 @@ export const INITIAL_STATE: AppState = {
   chatHistory: [],
   transferLogs: [],
   dailyFocus: null,
+  roadmap: [],
   preferences: {
     flashcardsOnlyFavorites: false,
     learnTab: 'all'
