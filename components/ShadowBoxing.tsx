@@ -1,15 +1,45 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AppState, ShadowBoxingSession, ShadowBoxingTurn, Fallacy } from '../types';
 import { FALLACIES, DEBATE_TOPICS } from '../constants';
 import { generateAdversarialStatement, evaluateCallout } from '../services/apiService';
-import { Swords, Shield, AlertTriangle, Send, Zap, Brain, Target, RefreshCw, Loader2, ArrowRight, X } from 'lucide-react';
+import { Swords, Shield, AlertTriangle, Send, Zap, Brain, Target, RefreshCw, Loader2, ArrowRight, X, Gavel, Ghost, Skull } from 'lucide-react';
 
 interface ShadowBoxingProps {
   state: AppState;
   setState: React.Dispatch<React.SetStateAction<AppState>>;
 }
 
+type OpponentType = 'sophist' | 'gaslighter' | 'nihilist';
+
+const OPPONENTS = {
+  sophist: {
+    name: "The Sophist",
+    desc: "Uses complex words to hide weak logic. Master of Strawman and Red Herring.",
+    icon: <Gavel size={24} />,
+    color: "text-amber-400",
+    border: "border-amber-500/20"
+  },
+  gaslighter: {
+    name: "The Gaslighter",
+    desc: "Denies objective reality. Attacks your memory and perception.",
+    icon: <Ghost size={24} />,
+    color: "text-violet-400",
+    border: "border-violet-500/20"
+  },
+  nihilist: {
+    name: "The Nihilist",
+    desc: "Refuses to accept any value hierarchy. Uses Appeal to Futility.",
+    icon: <Skull size={24} />,
+    color: "text-rose-400",
+    border: "border-rose-500/20"
+  }
+};
+
 export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) => {
+  const [phase, setPhase] = useState<'setup' | 'active'>('setup');
+  const [opponent, setOpponent] = useState<OpponentType>('sophist');
+  const [topic, setTopic] = useState('');
+  
   const [session, setSession] = useState<ShadowBoxingSession | null>(null);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
@@ -24,9 +54,13 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
     }
   }, [session?.history, loading]);
 
-  const startSession = async (topic: string) => {
+  const startSession = async () => {
+    if (!topic.trim()) return;
     setLoading(true);
+    setPhase('active');
+    
     try {
+      // ⚡️ ADVERSARY INJECTION: Inject Persona into initial prompt
       const response = await generateAdversarialStatement(topic, [], FALLACIES);
       const firstTurn: ShadowBoxingTurn = {
         id: crypto.randomUUID(),
@@ -49,6 +83,7 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
       setIsArsenalOpen(false);
     } catch (e) {
       console.error(e);
+      setPhase('setup'); // Fallback
     } finally {
       setLoading(false);
     }
@@ -116,10 +151,8 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
   const handleCallout = async (fallacyId: string) => {
     if (!session || loading) return;
     
-    // Find the last adversary turn that wasn't called out
     const lastAdversaryTurnIndex = [...session.history].reverse().findIndex(h => h.role === 'adversary' && !h.calloutDetected);
     if (lastAdversaryTurnIndex === -1) {
-      // If nothing to call out, just close on mobile
       setIsArsenalOpen(false);
       return;
     }
@@ -160,54 +193,72 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
     }
   };
 
-  if (!session) {
+  if (phase === 'setup' || !session) {
     return (
-      <div className="max-w-4xl mx-auto space-y-12 animate-fade-in pb-12">
-        <header className="text-center space-y-4">
-          <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-500 mb-4 shadow-[0_0_30px_rgba(244,63,94,0.1)]">
-            <Swords size={40} />
-          </div>
-          <h1 className="serif text-4xl md:text-5xl font-light text-white italic">Shadow Boxing</h1>
-          <p className="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-bold">Adversarial Logic Arena</p>
-        </header>
+      <div className="max-w-4xl mx-auto space-y-12 animate-fade-in pb-32">
+        <div className="text-center space-y-4 pt-10">
+           <div className="w-20 h-20 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto border border-rose-500/20">
+              <Swords size={40} className="text-rose-500" />
+           </div>
+           <h1 className="serif text-5xl font-light text-white italic">Shadow Boxing</h1>
+           <p className="text-slate-500 text-sm max-w-lg mx-auto leading-relaxed">
+             Select an opponent and a topic. Your goal is to defend your position against an AI trained to use logical fallacies and manipulation.
+           </p>
+        </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 px-4">
-          <div className="surface p-6 md:p-8 rounded-2xl border-rose-500/20">
-            <h3 className="text-white font-bold uppercase tracking-widest text-xs mb-6 flex items-center gap-2">
-              <Zap size={14} className="text-amber-500" /> The Rules of Combat
-            </h3>
-            <ul className="space-y-4">
-              {[
-                "The AI will defend a controversial stance aggressively.",
-                "It will hide one logical fallacy in every response.",
-                "Identify the fallacy immediately to gain Integrity Points.",
-                "Missing fallacies or wrong callouts will damage your Integrity.",
-                "Drop to 0 Integrity, and you lose the debate."
-              ].map((rule, i) => (
-                <li key={i} className="flex gap-3 text-sm text-slate-400 leading-relaxed font-light">
-                  <span className="text-rose-500 font-mono text-[10px] mt-1">0{i+1}</span>
-                  {rule}
-                </li>
-              ))}
-            </ul>
-          </div>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+           {(Object.keys(OPPONENTS) as OpponentType[]).map(key => (
+             <button 
+               key={key}
+               onClick={() => setOpponent(key)}
+               className={`p-6 rounded-2xl border text-left transition-all active:scale-95 ${
+                 opponent === key ? `bg-zinc-900 ${OPPONENTS[key].border} ring-1 ring-white/20` : 'bg-zinc-950 border-white/5 hover:bg-zinc-900'
+               }`}
+             >
+                <div className={`mb-4 ${OPPONENTS[key].color}`}>{OPPONENTS[key].icon}</div>
+                <h3 className="text-white font-bold text-sm uppercase tracking-widest mb-2">{OPPONENTS[key].name}</h3>
+                <p className="text-xs text-slate-500 leading-relaxed">{OPPONENTS[key].desc}</p>
+             </button>
+           ))}
+        </div>
 
-          <div className="surface p-6 md:p-8 rounded-2xl">
-            <h3 className="text-white font-bold uppercase tracking-widest text-xs mb-6">Select Arena</h3>
-            <div className="space-y-3">
-              {DEBATE_TOPICS.map((topic, i) => (
-                <button
-                  key={i}
-                  onClick={() => startSession(topic)}
-                  disabled={loading}
-                  className="w-full text-left p-5 rounded-xl bg-white/[0.02] border border-white/5 hover:border-rose-500/40 hover:bg-rose-500/5 transition-all group active:scale-95"
+        <div className="surface p-8 rounded-3xl border border-white/5 space-y-6">
+           <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em]">The_Contention</h3>
+           
+           <div className="flex flex-wrap gap-3">
+              {DEBATE_TOPICS.map((t, i) => (
+                <button 
+                  key={i} 
+                  onClick={() => setTopic(t)}
+                  className={`px-4 py-2 rounded-xl text-xs font-medium transition-all ${
+                    topic === t ? 'bg-white text-black font-bold' : 'bg-white/5 text-slate-400 hover:bg-white/10'
+                  }`}
                 >
-                  <div className="text-[10px] text-slate-600 uppercase tracking-widest mb-1 group-hover:text-rose-400 transition-colors">Topic 0{i+1}</div>
-                  <div className="text-sm text-white font-light italic serif group-hover:translate-x-1 transition-transform">{topic}</div>
+                  {t}
                 </button>
               ))}
-            </div>
-          </div>
+           </div>
+
+           <div className="relative">
+              <input 
+                type="text" 
+                value={topic}
+                onChange={e => setTopic(e.target.value)}
+                placeholder="Or type your own topic..."
+                className="w-full bg-black/40 border border-white/10 rounded-xl p-4 text-white focus:border-rose-500/50 outline-none"
+              />
+           </div>
+
+           <div className="flex justify-end pt-4">
+              <button 
+                onClick={startSession}
+                disabled={!topic || loading}
+                className="bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white px-10 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 transition-all shadow-xl shadow-rose-900/20 active:scale-95"
+              >
+                {loading ? <Loader2 className="animate-spin" /> : <ArrowRight size={14} />}
+                {loading ? 'INITIALIZING...' : 'ENTER_ARENA'}
+              </button>
+           </div>
         </div>
       </div>
     );
@@ -218,6 +269,9 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
       {/* HUD: Combat Metrics */}
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white/[0.02] border border-white/5 rounded-2xl p-4 md:p-6 backdrop-blur-xl gap-4">
         <div className="flex items-center gap-4 md:gap-6 w-full sm:w-auto">
+           <button onClick={() => setPhase('setup')} className="p-2 hover:bg-white/5 rounded-lg text-slate-500 hover:text-white transition-colors">
+              <X size={20} />
+           </button>
            <div>
              <div className="text-[8px] font-mono text-slate-500 uppercase tracking-[0.4em] mb-1">Combatant_User</div>
              <div className="text-white font-bold text-base md:text-lg tracking-tight">Logical Defenses</div>
@@ -238,8 +292,8 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
         </div>
 
         <div className="text-left sm:text-right flex sm:block items-center justify-between w-full sm:w-auto">
-           <div className="text-[8px] font-mono text-rose-500 uppercase tracking-[0.4em] mb-1 animate-pulse">Adversary_Active</div>
-           <div className="serif italic text-lg md:text-xl text-white">"The Sophist"</div>
+           <div className={`text-[8px] font-mono uppercase tracking-[0.4em] mb-1 animate-pulse ${OPPONENTS[opponent].color}`}>Adversary_Active</div>
+           <div className="serif italic text-lg md:text-xl text-white">"{OPPONENTS[opponent].name}"</div>
         </div>
       </div>
 
@@ -253,14 +307,14 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
             {session.history.map(turn => (
               <div key={turn.id} className={`flex gap-4 ${turn.role === 'user' ? 'flex-row-reverse' : 'flex-row'} animate-in slide-in-from-bottom-2`}>
                 <div className={`w-10 h-10 rounded-xl flex items-center justify-center border shrink-0 ${
-                  turn.role === 'user' ? 'bg-white/5 border-white/10 text-white' : 'bg-rose-500/10 border-rose-500/30 text-rose-400'
+                  turn.role === 'user' ? 'bg-white/5 border-white/10 text-white' : `bg-rose-500/10 ${OPPONENTS[opponent].border} ${OPPONENTS[opponent].color}`
                 }`}>
-                  {turn.role === 'user' ? <Shield size={16} /> : <Swords size={16} />}
+                  {turn.role === 'user' ? <Shield size={16} /> : OPPONENTS[opponent].icon}
                 </div>
                 <div className={`max-w-[90%] md:max-w-[80%] p-4 md:p-6 rounded-2xl relative ${
                   turn.role === 'user' 
                     ? 'bg-white/[0.03] border border-white/5 text-white italic font-light serif text-base md:text-lg' 
-                    : 'bg-rose-950/10 border border-rose-500/20 text-rose-50 font-mono text-xs md:text-sm leading-relaxed'
+                    : `bg-rose-950/10 ${OPPONENTS[opponent].border} text-rose-100 font-mono text-xs md:text-sm leading-relaxed`
                 }`}>
                   {turn.content}
                   
@@ -283,7 +337,7 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
                   <Loader2 size={16} className="animate-spin text-rose-500" />
                 </div>
                 <div className="bg-rose-950/5 border border-rose-500/10 rounded-2xl px-6 py-4 text-[10px] uppercase tracking-widest text-rose-800">
-                  Adversary is plotting...
+                  {OPPONENTS[opponent].name} is plotting...
                 </div>
               </div>
             )}
@@ -302,7 +356,7 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
                 value={input}
                 onChange={e => setInput(e.target.value)}
                 onKeyDown={e => e.key === 'Enter' && handleSend()}
-                placeholder="Counter..."
+                placeholder={`Defend against ${OPPONENTS[opponent].name}...`}
                 disabled={loading || session.status !== 'active'}
                 className="w-full bg-white/[0.02] border border-white/10 rounded-2xl py-5 md:py-6 pl-6 md:pl-8 pr-16 md:pr-20 text-white focus:ring-1 focus:ring-rose-500/50 outline-none transition-all placeholder:text-zinc-800 serif italic text-base md:text-lg"
               />
@@ -374,7 +428,7 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
                   <AlertTriangle size={64} className="mx-auto text-rose-500 mb-6 animate-bounce" />
                   <h2 className="serif text-5xl text-white mb-4 italic">Defeated</h2>
                   <p className="text-slate-400 font-light leading-relaxed mb-8">
-                    Your cognitive defenses were overwhelmed by sophistry. Integrity depleted.
+                    Your cognitive defenses were overwhelmed. Integrity depleted.
                   </p>
                 </>
               ) : (
@@ -382,7 +436,7 @@ export const ShadowBoxing: React.FC<ShadowBoxingProps> = ({ state, setState }) =
                   < Zap size={64} className="mx-auto text-amber-500 mb-6 animate-pulse" />
                   <h2 className="serif text-5xl text-white mb-4 italic">Victory</h2>
                   <p className="text-slate-400 font-light leading-relaxed mb-8">
-                    You've dismantled the adversary's logic through precise identification.
+                    You've dismantled the adversary's logic.
                   </p>
                 </>
               )}
