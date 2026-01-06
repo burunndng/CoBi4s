@@ -80,13 +80,16 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
                <div className="text-xs text-slate-500">Stored locally in your browser.</div>
              </div>
           </div>
-          <input 
-            type="password"
-            value={apiKey}
-            onChange={(e) => saveApiKey(e.target.value)}
-            placeholder="sk-or-v1-..."
-            className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors font-mono"
-          />
+          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+            <input 
+              type="password"
+              value={apiKey}
+              onChange={(e) => saveApiKey(e.target.value)}
+              placeholder="sk-or-v1-..."
+              autoComplete="current-password"
+              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors font-mono"
+            />
+          </form>
         </div>
       </section>
 
