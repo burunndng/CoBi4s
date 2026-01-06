@@ -43,6 +43,8 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   };
 
   const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
+  const currentProgress = bias ? state.progress[bias.id] : null;
+  const masteryLevel = currentProgress?.masteryLevel || 0;
 
   const handleGenerateHint = async (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -155,6 +157,16 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
           
           {/* Front */}
           <div className="absolute inset-0 [backface-visibility:hidden] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl border border-zinc-800/50 group-hover:border-zinc-700/50 transition-colors">
+            
+            {/* Mastery Indicator (Front) */}
+            <div className="absolute top-6 right-6 flex flex-col items-end">
+               <div className="flex items-center gap-2">
+                 <div className={`w-1.5 h-1.5 rounded-full ${masteryLevel >= 80 ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : masteryLevel >= 50 ? 'bg-amber-500' : 'bg-zinc-700'}`}></div>
+                 <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Mastery</span>
+               </div>
+               <span className="text-xs font-mono text-zinc-300 tabular-nums">{masteryLevel}%</span>
+            </div>
+
             {frontContent}
             
             <div className="mt-12 flex flex-col sm:flex-row gap-4" onClick={e => e.stopPropagation()}>
