@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v9'; // ⚡️ NUCLEAR PURGE
+const CACHE_NAME = 'cognibias-v10'; // ⚡️ METICULOUS_RECOVERY
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
 
 // ⚡️ PWA SENTINEL: Infrastructure Core
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  self.skipWaiting(); 
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
@@ -40,18 +40,16 @@ self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
-  
-  // 1. ⚡️ INTERNAL & FONT ONLY
   const isInternal = url.origin === self.location.origin;
   const isFont = url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com');
+  
   if (!isInternal && !isFont) return;
 
-  // 2. ⚡️ ENTRY POINT: Always check network first to get latest hashes
-  const isEntryPoint = url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.includes('index-');
-
-  if (isEntryPoint) {
+  // ⚡️ STRATEGY A: Entry Point (index.html) -> NETWORK-ONLY with NO-CACHE headers
+  const isHtml = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+  if (isHtml) {
     event.respondWith(
-      fetch(event.request)
+      fetch(event.request, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } })
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
@@ -62,13 +60,22 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 3. ⚡️ HASHED ASSETS: Cache-First (they never change)
+  // ⚡️ STRATEGY B: Hashed Assets -> CACHE-FIRST with 404 RECOVERY
   if (url.pathname.includes('/assets/')) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) return cachedResponse;
+
         return fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
+          // 🛑 404 RECOVERY: If an asset is missing, the build is stale.
+          if (networkResponse.status === 404) {
+            console.warn('[SW] Fatal Hash Mismatch! Clearing cache...');
+            caches.delete(CACHE_NAME);
+            // We return the 404, the app will likely fail, but next reload will be fresh.
+            return networkResponse;
+          }
+
+          if (networkResponse.status === 200) {
             const clone = networkResponse.clone();
             caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
           }
@@ -79,16 +86,17 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // 4. 🌊 OTHERS: Stale-While-Revalidate
+  // ⚡️ STRATEGY C: Others -> Stale-While-Revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
         const fetchPromise = fetch(event.request).then((networkResponse) => {
-          if (networkResponse && networkResponse.status === 200) {
+          if (networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
         }).catch(() => cachedResponse);
+
         return cachedResponse || fetchPromise;
       });
     })

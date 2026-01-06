@@ -59,12 +59,18 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
 
       <section className="space-y-4">
         <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">System Status</h2>
-        <div className="surface rounded-xl p-5 flex items-center justify-between">
-          <div>
-             <div className="text-white font-medium text-sm">Engine Status</div>
-             <div className="text-xs text-slate-500 uppercase tracking-widest">Optimized Flash Model Active</div>
+        <div className="surface rounded-xl p-5 space-y-4">
+          <div className="flex items-center justify-between">
+            <div>
+               <div className="text-white font-medium text-sm">Engine Status</div>
+               <div className="text-xs text-slate-500 uppercase tracking-widest">Optimized Flash Model Active</div>
+            </div>
+            <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
           </div>
-          <div className="w-2 h-2 rounded-full bg-emerald-500"></div>
+          <div className="pt-4 border-t border-white/5 flex justify-between items-center text-[10px] font-mono text-slate-600">
+             <span>BUILD_MANIFEST</span>
+             <span className="text-indigo-400">v4.1.10-METICULOUS</span>
+          </div>
         </div>
       </section>
 
