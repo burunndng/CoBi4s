@@ -171,30 +171,39 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
   return JSON.parse(content);
 };
 
-export const runAlgorithmTest = async (biasName: string, definition: string, logicDescription: string): Promise<any> => {
+export const runAlgorithmTest = async (
+  biasName: string, 
+  definition: string, 
+  scaffold: { trigger: string, leap: string, alternative: string }
+): Promise<any> => {
   const prompt = `
     LOGIC COMPILER PROTOCOL:
     Concept: "${biasName}"
-    User Logic Description: "${logicDescription}"
+    Input Scaffold:
+    - TRIGGER: "${scaffold.trigger}"
+    - LOGIC LEAP: "${scaffold.leap}"
+    - ALTERNATIVE: "${scaffold.alternative}"
     
     TASK:
-    1. Parse the user's natural language description into a logical "Circuit" (AST).
-    2. Run 3 adversarial unit tests against this logic to see if it correctly identifies or succumbs to the bias.
+    1. Parse this structured logic into a mental "Circuit" (AST).
+    2. Run 3 adversarial unit tests.
     
     Output JSON: 
     { 
-      "ast": { "root": { "type": "string", "value": "string", "children": [] } },
+      "ast": { "root": { "type": "Input", "value": "${scaffold.trigger}", "children": [
+        { "type": "Assumption", "value": "${scaffold.leap}", "children": [] }
+      ] } },
       "results": [
         { "testCase": "string", "scenario": "string", "isPass": boolean, "error": "string", "suggestion": "string" }
       ], 
       "overallAssessment": "string", 
-      "status": "compiled | buggy | critical_failure" 
+      "status": "compiled | buggy" 
     }
   `;
   const content = await callOpenRouter([
-    { role: "system", content: "You are a logic compiler and cognitive science auditor. JSON only." },
+    { role: "system", content: "You are a logic circuit debugger. JSON only." },
     { role: "user", content: prompt }
-  ], { response_format: { type: "json_object" } });
+  ], { response_format: { type: "json_object" }, temperature: 0.3 });
   return JSON.parse(content);
 };
 
