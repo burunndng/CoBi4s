@@ -11,8 +11,8 @@
       "purpose": "any maskable"
     }
   ],
-  "start_url": "/CoBi4s/index.html",
-  "scope": "/CoBi4s/",
+  "start_url": "./index.html",
+  "scope": "./",
   "display": "standalone",
   "display_override": ["window-controls-overlay", "minimal-ui"],
   "theme_color": "#09090b",
