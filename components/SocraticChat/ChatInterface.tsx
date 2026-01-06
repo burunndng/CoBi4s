@@ -44,6 +44,16 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
     }
   }, [state.chatHistory, loading]);
 
+  const [protocol, setProtocol] = useState<'standard' | 'auditor' | 'conflict'>('standard');
+
+  const getProtocolPrompt = () => {
+    switch (protocol) {
+      case 'auditor': return "PROTOCOL: DECISION AUDITOR. You are a ruthless Risk Officer. Ask structured questions to perform a Pre-Mortem. Demand probabilities and impact scores.";
+      case 'conflict': return "PROTOCOL: CONFLICT RESOLUTION. You are a Mediator. De-escalate. Identify the 'Interest' behind the 'Position'. Separate people from problems.";
+      default: return ""; // Standard Socratic
+    }
+  };
+
   const handleSend = async () => {
     if (!input.trim() || loading) return;
 
@@ -81,6 +91,11 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
         role: m.role,
         content: m.content
       }));
+
+      // Inject Protocol Instruction if not standard
+      if (protocol !== 'standard') {
+        historyPayload.unshift({ role: 'system', content: getProtocolPrompt() });
+      }
 
       // 🌊 COMMENCE STREAM
       await streamChatMessage(
@@ -131,9 +146,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
               {secretMode ? <Octagon size={28} className={accentColor} /> : <MessageSquare size={28} className={accentColor} />}
               {secretMode ? 'The Void' : 'Socratic Mirror'}
             </h1>
-            <p className="text-slate-500 text-[10px] uppercase tracking-[0.4em] font-bold mt-2 pl-1">
-              {secretMode ? 'PROTOCOL_ALPHA // UNRESTRICTED' : 'Neural_Diagnostics // Analysis_Mode'}
-            </p>
+            
+            <div className="flex gap-2 mt-3">
+               {(['standard', 'auditor', 'conflict'] as const).map(p => (
+                 <button 
+                   key={p}
+                   onClick={() => setProtocol(p)}
+                   className={`text-[9px] uppercase tracking-[0.2em] font-bold px-3 py-1.5 rounded-full border transition-all ${
+                     protocol === p ? 'bg-white/10 text-white border-white/20' : 'text-slate-600 border-transparent hover:text-slate-400'
+                   }`}
+                 >
+                   {p}
+                 </button>
+               ))}
+            </div>
           </div>
           
           <div className="flex items-center gap-3">
