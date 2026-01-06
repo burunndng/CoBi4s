@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v10'; // ⚡️ METICULOUS_RECOVERY
+const CACHE_NAME = 'cognibias-v11'; // ⚡️ FORCED_SYNC
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -49,7 +49,7 @@ self.addEventListener('fetch', (event) => {
   const isHtml = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
   if (isHtml) {
     event.respondWith(
-      fetch(event.request, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache' } })
+      fetch(event.request, { cache: 'no-store', headers: { 'Cache-Control': 'no-cache', 'Pragma': 'no-cache' } })
         .then((response) => {
           const clone = response.clone();
           caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
@@ -67,11 +67,9 @@ self.addEventListener('fetch', (event) => {
         if (cachedResponse) return cachedResponse;
 
         return fetch(event.request).then((networkResponse) => {
-          // 🛑 404 RECOVERY: If an asset is missing, the build is stale.
           if (networkResponse.status === 404) {
             console.warn('[SW] Fatal Hash Mismatch! Clearing cache...');
             caches.delete(CACHE_NAME);
-            // We return the 404, the app will likely fail, but next reload will be fresh.
             return networkResponse;
           }
 
