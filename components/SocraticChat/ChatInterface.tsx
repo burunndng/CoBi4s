@@ -3,7 +3,7 @@ import { AppState, ChatMessage, ProgressState } from '../../types';
 import { BIASES, FALLACIES } from '../../constants';
 import { streamChatMessage } from '../../services/apiService';
 import { MessageBubble } from './MessageBubble';
-import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles } from 'lucide-react';
+import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles, Target, Zap } from 'lucide-react';
 
 interface ChatInterfaceProps {
   state: AppState;
@@ -15,6 +15,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
   const [loading, setLoading] = useState(false);
   const [secretMode, setSecretMode] = useState(false);
   const [detectedPatterns, setDetectedPatterns] = useState<string[]>([]);
+  const [isHudOpen, setIsHudOpen] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
 
   // ⚡️ HACKODER: Live Pattern Scanner
@@ -135,10 +136,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
             </p>
           </div>
           
-          <div className="flex items-center gap-3">
-             <button 
-               onClick={() => setSecretMode(!secretMode)}
-               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30"
+                    <div className="flex items-center gap-3">
+                       {/* Mobile HUD Toggle */}
+                       <button 
+                         onClick={() => setIsHudOpen(!isHudOpen)}
+                         className="xl:hidden p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all relative"
+                         title="Toggle Diagnostics"
+                       >
+                         <Target size={18} />
+                         {detectedPatterns.length > 0 && (
+                           <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-black text-[8px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                             {detectedPatterns.length}
+                           </span>
+                         )}
+                       </button>
+          
+                       <button 
+                         onClick={() => setSecretMode(!secretMode)}               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30"
                title="Initialize Secret Protocol"
              >
                <Octagon size={14} />
@@ -213,7 +227,22 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
       </div>
 
       {/* ⚡️ DIAGNOSTIC HUD: PATTERN HARVESTER */}
-      <aside className="w-80 hidden xl:flex flex-col border-l border-white/5 pl-8 py-4 animate-in slide-in-from-right duration-700">
+      <aside className={`
+        fixed xl:relative inset-y-0 right-0 z-50 xl:z-auto
+        w-80 bg-[#070708] xl:bg-transparent
+        border-l border-white/5 pl-8 pr-4 xl:pr-0 py-4
+        transform transition-transform duration-500 ease-in-out
+        ${isHudOpen ? 'translate-x-0 shadow-2xl' : 'translate-x-full xl:translate-x-0'}
+        flex flex-col
+      `}>
+        {/* Mobile Close Handle */}
+        <button 
+          onClick={() => setIsHudOpen(false)}
+          className="xl:hidden absolute left-0 top-1/2 -translate-x-full bg-white/5 border border-white/5 border-r-0 p-2 rounded-l-xl text-slate-500"
+        >
+          <X size={20} />
+        </button>
+
         <div className="mb-8">
            <h3 className="text-[10px] font-bold text-white uppercase tracking-[0.4em] mb-2">Diagnostic_Capture</h3>
            <p className="text-[10px] text-slate-600 uppercase tracking-widest leading-relaxed">

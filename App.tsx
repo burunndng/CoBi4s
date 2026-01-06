@@ -63,8 +63,16 @@ const App: React.FC = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
 
+import { pruneState } from './lib/storageManager';
+
+// ... (rest of imports)
+
+const App: React.FC = () => {
+  // ... (state setup)
+
   useEffect(() => {
-    localStorage.setItem('cognibias-storage', JSON.stringify(state));
+    const safeState = pruneState(state);
+    localStorage.setItem('cognibias-storage', JSON.stringify(safeState));
   }, [state]);
 
   const showToast = useCallback((message: string, type: 'success' | 'error' = 'success') => {
