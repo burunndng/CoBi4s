@@ -27,6 +27,7 @@ export interface Bias {
   counterStrategy: string;
   relatedBiases: string[];
   difficulty: Difficulty;
+  transferCues: string[]; // ⚡️ Lens: Real-world linguistic/situational markers
 }
 
 export interface Fallacy {
@@ -38,6 +39,7 @@ export interface Fallacy {
   example: string;
   counterStrategy: string;
   difficulty: Difficulty;
+  transferCues: string[]; // ⚡️ Lens: Real-world linguistic/situational markers
 }
 
 export interface ProgressState {
@@ -137,21 +139,17 @@ export interface ShadowBoxingSession {
   startTime: number;
 }
 
-export interface SimulationScenario {
+export interface TransferLog {
   id: string;
+  timestamp: number;
   biasId: string;
-  role: string; // "Project Manager", "Parent", etc.
-  situation: string; // The opening context
-  choices: {
-    id: string;
-    text: string;
-    isTrap: boolean; // True if this choice succumbs to the bias
-    outcome: string; // The consequence of this choice
-    explanation: string; // Why it was/wasn't the bias
-  }[];
+  context: 'work' | 'social' | 'internal' | 'news';
+  note: string; // Max 150 chars (Sentinel constraint)
+  impact: number; // 1-5 (Critique Agent constraint)
 }
 
 export interface AppState {
+
   mode: LearningMode;
   progress: Record<string, ProgressState>;
   fallacyProgress: Record<string, ProgressState>;
@@ -163,6 +161,12 @@ export interface AppState {
   algorithmTests: AlgorithmTest[];
   shadowBoxingHistory: ShadowBoxingSession[];
   chatHistory: ChatMessage[];
+  transferLogs: TransferLog[];
+  dailyFocus: {
+    biasId: string;
+    lastUpdated: string;
+    observedToday: boolean;
+  } | null;
   preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;

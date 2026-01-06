@@ -59,7 +59,9 @@ const App: React.FC = () => {
         decisionLogs: parsed.decisionLogs || [],
         algorithmTests: parsed.algorithmTests || [],
         shadowBoxingHistory: parsed.shadowBoxingHistory || [],
-        chatHistory: parsed.chatHistory || []
+        chatHistory: parsed.chatHistory || [],
+        transferLogs: parsed.transferLogs || [],
+        dailyFocus: parsed.dailyFocus || null
       };
     }
     return INITIAL_STATE;
@@ -298,7 +300,7 @@ const App: React.FC = () => {
             }>
               <Routes>
                 <Route path="/" element={<LandingPage />} />
-                <Route path="/dashboard" element={<Dashboard state={state} />} />
+                <Route path="/dashboard" element={<Dashboard state={state} setState={setState} />} />
                 <Route path="/catalog" element={<Catalog state={state} toggleFavorite={(id) => {
                    setState(prev => {
                      const isFav = prev.favorites.includes(id);
@@ -308,21 +310,16 @@ const App: React.FC = () => {
                 <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
                 <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
                 <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
-                <Route path="/context" element={<ContextLab />} />
                 <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
                 <Route path="/decision" element={<DecisionArchitect state={state} />} />
                 <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
                 <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
-                <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
+                <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} setState={setState} toggleFavorite={(id) => {
                    setState(prev => {
                      const isFav = prev.favorites.includes(id);
                      return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
                    });
                 }} />} />
-                <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
-                <Route path="/plan" element={<StudyPlan state={state} />} />
-                <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
-              </Routes>
             </React.Suspense>
           </div>
         </main>

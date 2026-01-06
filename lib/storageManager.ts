@@ -31,5 +31,9 @@ export const pruneState = (state: any) => {
     newState.decisionLogs = newState.decisionLogs.slice(-10); // Keep only last 10 logs
   }
 
+  if (newState.transferLogs && newState.transferLogs.length > 30) {
+    newState.transferLogs = newState.transferLogs.slice(0, 30); // ⚡️ Sentinel: Cap reality logs to 30 entries
+  }
+
   return newState;
 };

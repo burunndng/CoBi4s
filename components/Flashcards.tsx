@@ -1,45 +1,72 @@
 
 import React, { useState, useEffect } from 'react';
-import { Star, Loader2, Shuffle, Type, BookOpen, RotateCw } from 'lucide-react';
+import { Star, Loader2, Shuffle, Type, BookOpen, RotateCw, Target, Send, X, Brain } from 'lucide-react';
 import { BIASES } from '../constants';
-import { AppState } from '../types';
+import { AppState, TransferLog } from '../types';
 import { generateHint, generateAIPoweredScenario } from '../services/apiService';
+import { TransferTips } from './shared/TransferTips';
 
 interface FlashcardProps {
   state: AppState;
   updateProgress: (biasId: string, quality: number) => void;
   toggleFavorite: (biasId: string) => void;
+  setState: React.Dispatch<React.SetStateAction<AppState>>;
 }
 
-const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFavorite }) => {
+const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFavorite, setState }) => {
   const [flipped, setFlipped] = useState(false);
   const [sessionQueue, setSessionQueue] = useState<string[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [hint, setHint] = useState<string | null>(null);
   const [loadingHint, setLoadingHint] = useState(false);
   
-  // Contextual Mode State
-  const [cardMode, setCardMode] = useState<'term' | 'scenario'>('term');
-  const [dynamicScenario, setDynamicScenario] = useState<string | null>(null);
-  const [loadingScenario, setLoadingScenario] = useState(false);
+  // Neural Bridge (Reality Log) State
+  const [showBridge, setShowBridge] = useState(false);
+  const [logNote, setLogNote] = useState('');
+  const [logContext, setLogContext] = useState<TransferLog['context']>('work');
+  const [logImpact, setLogImpact] = useState(3);
 
-  useEffect(() => {
-    let queue = BIASES.map(b => b.id);
-    if (state.preferences.flashcardsOnlyFavorites) queue = queue.filter(id => state.favorites.includes(id));
-    queue.sort((a, b) => (state.progress[a]?.nextReviewDate || 0) - (state.progress[b]?.nextReviewDate || 0));
-    setSessionQueue(queue.slice(0, 10));
-  }, [state.progress, state.favorites]);
+  const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
 
   const handleGrade = (quality: number) => {
     const currentId = sessionQueue[currentIndex];
     updateProgress(currentId, quality);
     
-    // Reset card state for next one
+    // If Acquired (5), offer the Neural Bridge
+    if (quality === 5) {
+      setShowBridge(true);
+    } else {
+      advanceCard();
+    }
+  };
+
+  const advanceCard = () => {
     setFlipped(false);
     setHint(null);
     setDynamicScenario(null);
-    
+    setShowBridge(false);
+    setLogNote('');
     setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
+  };
+
+  const submitRealityLog = () => {
+    if (!bias) return;
+    const newLog: TransferLog = {
+      id: Math.random().toString(36).substr(2, 9),
+      timestamp: Date.now(),
+      biasId: bias.id,
+      context: logContext,
+      note: logNote.slice(0, 150),
+      impact: logImpact
+    };
+
+    setState(prev => ({
+      ...prev,
+      totalXp: prev.totalXp + 50,
+      transferLogs: [newLog, ...prev.transferLogs].slice(0, 50) // Sentinel Pruning
+    }));
+
+    advanceCard();
   };
 
   const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
@@ -105,9 +132,13 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
     <>
       <span className="text-[10px] font-mono text-zinc-500 uppercase mb-4 tracking-[0.2em]">Definition</span>
       <p className="text-white text-lg leading-relaxed mb-6 italic">"{bias.definition}"</p>
-      <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
-         <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Example</span>
-         <p className="text-xs text-zinc-300 leading-relaxed font-medium">"{bias.example}"</p>
+      
+      <div className="space-y-3 w-full">
+         <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
+            <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Example</span>
+            <p className="text-xs text-zinc-300 leading-relaxed font-medium">"{bias.example}"</p>
+         </div>
+         <TransferTips cues={bias.transferCues} />
       </div>
     </>
   ) : (
@@ -115,15 +146,85 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
       <span className="text-[10px] font-mono text-zinc-500 uppercase mb-4 tracking-[0.2em]">Concept</span>
       <h3 className="serif text-3xl text-white italic mb-2">{bias.name}</h3>
       <p className="text-zinc-400 text-sm leading-relaxed mb-6">"{bias.definition}"</p>
-      <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
-         <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Mitigation</span>
-         <p className="text-xs text-zinc-300 leading-relaxed font-medium">{bias.counterStrategy}</p>
+      <div className="space-y-3 w-full">
+        <div className="p-4 bg-zinc-900 border border-zinc-800 rounded-lg w-full">
+           <span className="text-[10px] font-mono text-zinc-500 uppercase block mb-1 tracking-widest">Mitigation</span>
+           <p className="text-xs text-zinc-300 leading-relaxed font-medium">{bias.counterStrategy}</p>
+        </div>
+        <TransferTips cues={bias.transferCues} />
       </div>
     </>
   );
 
   return (
-    <div className="max-w-xl mx-auto py-8 space-y-8 animate-fade-in">
+    <div className="max-w-xl mx-auto py-8 space-y-8 animate-fade-in relative">
+      {/* ⚡️ NEURAL BRIDGE DRAWER */}
+      {showBridge && (
+        <div className="absolute inset-x-0 -bottom-8 z-50 animate-in slide-in-from-bottom duration-500">
+           <div className="surface p-8 rounded-t-[2rem] border-t border-indigo-500/30 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] space-y-6">
+              <div className="flex justify-between items-center">
+                 <div className="flex items-center gap-3 text-[10px] font-black text-indigo-400 uppercase tracking-[0.3em]">
+                   <Brain size={16} /> Neural_Bridge_Protocol
+                 </div>
+                 <button onClick={advanceCard} className="text-zinc-500 hover:text-white p-2">
+                   <X size={20} />
+                 </button>
+              </div>
+
+              <div className="space-y-4">
+                 <div className="text-white text-lg serif italic leading-tight">
+                   Where did you observe "{bias.name}" in the wild today?
+                 </div>
+                 <textarea 
+                   autoFocus
+                   value={logNote}
+                   onChange={e => setLogNote(e.target.value)}
+                   placeholder="Briefly describe the context (max 150 chars)..."
+                   className="w-full bg-black/40 border border-white/5 rounded-2xl p-5 text-sm text-zinc-300 focus:outline-none focus:border-indigo-500/50 transition-all h-32 resize-none italic font-light"
+                 />
+              </div>
+
+              <div className="flex flex-wrap gap-2">
+                 {(['work', 'social', 'internal', 'news'] as const).map(ctx => (
+                   <button 
+                     key={ctx}
+                     onClick={() => setLogContext(ctx)}
+                     className={`px-4 py-2 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all border ${
+                       logContext === ctx ? 'bg-indigo-500/10 border-indigo-500/40 text-indigo-100' : 'bg-white/5 border-white/5 text-zinc-500'
+                     }`}
+                   >
+                     {ctx}
+                   </button>
+                 ))}
+              </div>
+
+              <div className="pt-4 flex items-center justify-between border-t border-white/5">
+                 <div className="flex items-center gap-4">
+                    <span className="text-[10px] font-bold text-zinc-500 uppercase tracking-widest">Impact</span>
+                    <div className="flex gap-1">
+                       {[1,2,3,4,5].map(v => (
+                         <button 
+                           key={v}
+                           onClick={() => setLogImpact(v)}
+                           className={`w-8 h-8 rounded-lg flex items-center justify-center text-[10px] font-mono transition-all ${
+                             logImpact >= v ? 'bg-indigo-500 text-white' : 'bg-white/5 text-zinc-600'
+                           }`}
+                         >
+                           {v}
+                         </button>
+                       ))}
+                    </div>
+                 </div>
+                 <button 
+                   onClick={submitRealityLog}
+                   className="bg-white text-black px-8 py-4 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 active:scale-95 transition-all shadow-xl"
+                 >
+                   LOG_CONTEXT (+50 XP) <Send size={14} />
+                 </button>
+              </div>
+           </div>
+        </div>
+      )}
       <div className="flex justify-between items-center px-2">
         <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest pl-2">Protocol {currentIndex + 1} / {sessionQueue.length}</span>
         
