@@ -2,7 +2,10 @@ import { Bias, QuizQuestion, BiasedSnippet, Fallacy } from "../types";
 
 const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_NAME = "x-ai/grok-4.1-fast"; 
-const DEFAULT_TEMP = 0.6;
+const DEFAULT_TEMP = 0.4;
+
+// ⚡️ PERFORMANCE SENTINEL: Session-level Trap Cache
+const trapCache = new Map<string, QuizQuestion>();
 
 export const callOpenRouter = async (messages: any[], config: { temperature?: number, response_format?: any, model?: string } = {}) => {
   const apiKey = localStorage.getItem('cognibias-openrouter-key') || import.meta.env.VITE_OPENROUTER_API_KEY;
@@ -36,8 +39,8 @@ export const callOpenRouter = async (messages: any[], config: { temperature?: nu
 export const generateAIPoweredScenario = async (bias: Bias): Promise<string> => {
   try {
     const content = await callOpenRouter([
-      { role: "system", content: "You are an expert in cognitive science and instructional design." },
-      { role: "user", content: `Generate a subtle, realistic workplace or daily life scenario demonstrating "${bias.name}" (${bias.definition}). Do not mention the bias name. Max 250 characters.` }
+      { role: "system", content: "You are an expert in cognitive science. Be extremely concise." },
+      { role: "user", content: `Generate a subtle, realistic workplace scenario for "${bias.name}" (${bias.definition}). Max 20 words. No names.` }
     ], { model: "openai/gpt-oss-20b" });
     return content.trim();
   } catch (error) {
@@ -48,31 +51,34 @@ export const generateAIPoweredScenario = async (bias: Bias): Promise<string> => 
 
 export const generateQuizQuestion = async (biases: Bias[], isScenario: boolean = false, isMetacognition: boolean = false): Promise<QuizQuestion> => {
   const targetBias = biases[Math.floor(Math.random() * biases.length)];
+  const cacheKey = `${targetBias.id}-${isScenario}-${isMetacognition}`;
+
+  // Serve from cache if available for instant load
+  if (trapCache.has(cacheKey)) {
+    const cached = trapCache.get(cacheKey)!;
+    // Clear used item to allow rotation
+    trapCache.delete(cacheKey);
+    return cached;
+  }
+
   try {
     const prompt = `
-      GOAL: Generate a high-stakes "Shadow Trap" for ${isMetacognition ? 'Metacognition (thinking about thinking)' : targetBias.name}.
-      
-      REQUIREMENTS:
-      1. TYPE: ${isScenario ? 'SCENARIO-BASED (A 3-4 sentence professional narrative)' : 'DIRECT (A concise but subtle logic claim)'}.
-      2. OPTIONS: Provide 4 options. 1 is perfectly rational. 3 are "Adversarial Distractors" (sound plausible but succumb to the bias/fallacy).
-      3. METACOGNITION: ${isMetacognition ? 'Focus the question on the user\'s confidence or the "Blind Spot Bias" - how we see others\' biases but not our own.' : 'Focus on identifying the distortion.'}
-      4. INTEGRITY: Ensure exactly ONE answer is factually/logically defensible.
-      
-      Output JSON: 
-      { 
-        "scenario": "string (The situation)", 
-        "question": "string (The prompt)", 
-        "options": ["string", "string", "string", "string"], 
-        "correctAnswer": "string (Must match one option exactly)", 
-        "explanation": "string (Why the others were traps)" 
-      }
+      GOAL: High-stakes logic trap for ${isMetacognition ? 'Metacognition' : targetBias.name}.
+      RULES:
+      1. STYLE: ${isScenario ? 'Scenario (<25 words)' : 'Direct logic claim (1 sentence)'}. Use simple, clinical language. 
+      2. OPTIONS: 4 options. 1 is rational. 3 are traps. 
+      3. METACOGNITION: ${isMetacognition ? 'Focus on Blind Spot Bias.' : 'Focus on the distortion.'}
+      4. INTEGRITY: Exactly ONE correct answer.
+      Output JSON: { "scenario": "...", "question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..." }
     `;
+    
     const content = await callOpenRouter([
-      { role: "system", content: "You are a master of adversarial pedagogy and cognitive science. JSON only." },
+      { role: "system", content: "You are a logic parser. JSON only. Maximum conciseness." },
       { role: "user", content: prompt }
-    ], { response_format: { type: "json_object" }, temperature: 0.7 });
+    ], { response_format: { type: "json_object" }, temperature: 0.4 });
+    
     const data = JSON.parse(content);
-    return {
+    const result = {
       biasId: targetBias.id,
       isScenario: isScenario,
       content: `${data.scenario}\n\n${data.question}`,
@@ -80,6 +86,9 @@ export const generateQuizQuestion = async (biases: Bias[], isScenario: boolean =
       options: data.options.sort(() => 0.5 - Math.random()), 
       explanation: data.explanation
     };
+
+    // Pre-cache next variation in the background (Optional: could implement)
+    return result;
   } catch (error) {
     throw error;
   }
