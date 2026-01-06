@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v8'; // ⚡️ AGGRESSIVE PURGE
+const CACHE_NAME = 'cognibias-v9'; // ⚡️ NUCLEAR PURGE
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
 
 // ⚡️ PWA SENTINEL: Infrastructure Core
 self.addEventListener('install', (event) => {
-  self.skipWaiting(); // Force the waiting service worker to become the active service worker.
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
@@ -32,22 +32,22 @@ self.addEventListener('activate', (event) => {
       );
     })
   );
-  // Claim all clients immediately to prevent stale state in existing tabs
   return self.clients.claim();
 });
 
-// 🌊 Network-First Strategy for Entry Points, Stale-While-Revalidate for Assets
+// 🌊 Intelligent Asset Strategy
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
   const url = new URL(event.request.url);
+  
+  // 1. ⚡️ INTERNAL & FONT ONLY
   const isInternal = url.origin === self.location.origin;
   const isFont = url.hostname.includes('fonts.googleapis.com') || url.hostname.includes('fonts.gstatic.com');
-  
   if (!isInternal && !isFont) return;
 
-  // ⚡️ CRITICAL FIX: Bypass cache entirely for index.html and root to prevent stale hashes
-  const isEntryPoint = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+  // 2. ⚡️ ENTRY POINT: Always check network first to get latest hashes
+  const isEntryPoint = url.pathname.endsWith('/') || url.pathname.endsWith('index.html') || url.pathname.includes('index-');
 
   if (isEntryPoint) {
     event.respondWith(
@@ -62,7 +62,24 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // Standard Stale-While-Revalidate for other assets
+  // 3. ⚡️ HASHED ASSETS: Cache-First (they never change)
+  if (url.pathname.includes('/assets/')) {
+    event.respondWith(
+      caches.match(event.request).then((cachedResponse) => {
+        if (cachedResponse) return cachedResponse;
+        return fetch(event.request).then((networkResponse) => {
+          if (networkResponse && networkResponse.status === 200) {
+            const clone = networkResponse.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return networkResponse;
+        });
+      })
+    );
+    return;
+  }
+
+  // 4. 🌊 OTHERS: Stale-While-Revalidate
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
@@ -72,7 +89,6 @@ self.addEventListener('fetch', (event) => {
           }
           return networkResponse;
         }).catch(() => cachedResponse);
-
         return cachedResponse || fetchPromise;
       });
     })
