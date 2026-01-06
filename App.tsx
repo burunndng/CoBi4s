@@ -32,15 +32,17 @@ import Flashcards from './components/Flashcards';
 import Quiz from './components/Quiz';
 import StudyPlan from './components/StudyPlan';
 import AppSettings from './components/AppSettings';
-import AIInstructor from './components/AIInstructor';
-import { BiasDetector } from './components/BiasDetector/BiasDetector';
-import { DecisionArchitect } from './components/DecisionArchitect/DecisionArchitect';
-import { LogicLab } from './components/LogicLab/LogicLab';
-import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer';
-import { ContextLab } from './components/ContextLab/ContextLab';
-import { ChatInterface } from './components/SocraticChat/ChatInterface';
-import { LandingPage } from './components/LandingPage';
-import { ShadowBoxing } from './components/ShadowBoxing';
+
+// ⚡️ SENTINEL: Lazy-Loaded Heavy Modules
+const AIInstructor = React.lazy(() => import('./components/AIInstructor').then(m => ({ default: m.default })));
+const BiasDetector = React.lazy(() => import('./components/BiasDetector/BiasDetector').then(m => ({ default: m.BiasDetector })));
+const DecisionArchitect = React.lazy(() => import('./components/DecisionArchitect/DecisionArchitect').then(m => ({ default: m.DecisionArchitect })));
+const LogicLab = React.lazy(() => import('./components/LogicLab/LogicLab').then(m => ({ default: m.LogicLab })));
+const AlgorithmTrainer = React.lazy(() => import('./components/AlgorithmTrainer/AlgorithmTrainer').then(m => ({ default: m.AlgorithmTrainer })));
+const ContextLab = React.lazy(() => import('./components/ContextLab/ContextLab').then(m => ({ default: m.ContextLab })));
+const ChatInterface = React.lazy(() => import('./components/SocraticChat/ChatInterface').then(m => ({ default: m.ChatInterface })));
+const LandingPage = React.lazy(() => import('./components/LandingPage').then(m => ({ default: m.LandingPage })));
+const ShadowBoxing = React.lazy(() => import('./components/ShadowBoxing').then(m => ({ default: m.ShadowBoxing })));
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -281,33 +283,40 @@ const App: React.FC = () => {
         {/* Main Content */}
         <main className="flex-1 h-full overflow-y-auto pt-16 lg:pt-0 no-scrollbar bg-transparent">
           <div className="max-w-6xl mx-auto p-6 md:p-10 lg:p-12">
-            <Routes>
-              <Route path="/" element={<LandingPage />} />
-              <Route path="/dashboard" element={<Dashboard state={state} />} />
-              <Route path="/catalog" element={<Catalog state={state} toggleFavorite={(id) => {
-                 setState(prev => {
-                   const isFav = prev.favorites.includes(id);
-                   return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
-                 });
-              }} />} />
-              <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
-              <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
-              <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
-              <Route path="/context" element={<ContextLab />} />
-              <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
-              <Route path="/decision" element={<DecisionArchitect state={state} />} />
-              <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
-              <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
-              <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
-                 setState(prev => {
-                   const isFav = prev.favorites.includes(id);
-                   return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
-                 });
-              }} />} />
-              <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
-              <Route path="/plan" element={<StudyPlan state={state} />} />
-              <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
-            </Routes>
+            <React.Suspense fallback={
+              <div className="h-[60vh] flex flex-col items-center justify-center text-slate-700 gap-4 animate-pulse">
+                <Brain size={48} strokeWidth={1} />
+                <span className="text-[10px] font-mono uppercase tracking-[0.5em]">Compiling_Logic...</span>
+              </div>
+            }>
+              <Routes>
+                <Route path="/" element={<LandingPage />} />
+                <Route path="/dashboard" element={<Dashboard state={state} />} />
+                <Route path="/catalog" element={<Catalog state={state} toggleFavorite={(id) => {
+                   setState(prev => {
+                     const isFav = prev.favorites.includes(id);
+                     return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
+                   });
+                }} />} />
+                <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
+                <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
+                <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
+                <Route path="/context" element={<ContextLab />} />
+                <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
+                <Route path="/decision" element={<DecisionArchitect state={state} />} />
+                <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
+                <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
+                <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={(id) => {
+                   setState(prev => {
+                     const isFav = prev.favorites.includes(id);
+                     return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
+                   });
+                }} />} />
+                <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
+                <Route path="/plan" element={<StudyPlan state={state} />} />
+                <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
+              </Routes>
+            </React.Suspense>
           </div>
         </main>
 
