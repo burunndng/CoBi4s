@@ -152,11 +152,15 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
         </div>
       </div>
 
-      <div className="relative h-[420px] cursor-pointer group perspective active:scale-[0.99] transition-transform" onClick={() => setFlipped(!flipped)}>
+      <div 
+        className="relative h-[420px] cursor-pointer group active:scale-[0.99] transition-transform" 
+        style={{ perspective: '1000px' }}
+        onClick={() => setFlipped(!flipped)}
+      >
         <div className={`relative w-full h-full transition-transform duration-500 transform-gpu [transform-style:preserve-3d] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}>
           
           {/* Front */}
-          <div className="absolute inset-0 [backface-visibility:hidden] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl border border-zinc-800/50 group-hover:border-zinc-700/50 transition-colors">
+          <div className="absolute inset-0 [backface-visibility:hidden] -webkit-backface-visibility-hidden surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl border border-zinc-800/50 group-hover:border-zinc-700/50 transition-colors">
             
             {/* Mastery Indicator (Front) */}
             <div className="absolute top-6 right-6 flex flex-col items-end">
@@ -196,7 +200,7 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
           </div>
 
           {/* Back */}
-          <div className="absolute inset-0 [backface-visibility:hidden] [transform:rotateY(180deg)] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl bg-[#0b0b0d] border border-zinc-800">
+          <div className="absolute inset-0 [backface-visibility:hidden] -webkit-backface-visibility-hidden [transform:rotateY(180deg)] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl bg-[#0b0b0d] border border-zinc-800">
             {backContent}
           </div>
 
