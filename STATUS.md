@@ -63,6 +63,7 @@
 - **Storage**: LocalStorage-centric (No DB/Auth).
 
 ## 🛠 Next Steps
-- [ ] Implement Session-Ghosting (Compression for chat history).
+- [x] Mobile-specific touch optimization for the HUD and Sliders.
+- [x] **Neural Bridge Integration**: Implemented a cross-project portal to Aura OS (auraos.space) in Sidebar and Dashboard.
+- [ ] Session-Ghosting (Compression for chat history).
 - [ ] Visual AST (Abstract Syntax Tree) visualization for the Algorithm Trainer.
-- [ ] Mobile-specific touch optimization for the HUD and Sliders.

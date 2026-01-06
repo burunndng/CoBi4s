@@ -140,12 +140,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
              {/* Mobile HUD Toggle */}
              <button 
                onClick={() => setIsHudOpen(!isHudOpen)}
-               className="xl:hidden p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all relative"
+               className="xl:hidden p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all active:scale-90 relative"
                title="Toggle Diagnostics"
              >
-               <Target size={18} />
+               <Target size={20} />
                {detectedPatterns.length > 0 && (
-                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-black text-[8px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
                    {detectedPatterns.length}
                  </span>
                )}
@@ -153,17 +153,17 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
 
              <button 
                onClick={() => setSecretMode(!secretMode)}
-               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30"
+               className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30 active:scale-90"
                title="Initialize Secret Protocol"
              >
-               <Octagon size={14} />
+               <Octagon size={16} />
              </button>
              <button 
                onClick={clearChat}
-               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-slate-600 hover:text-rose-500 transition-all hover:border-rose-500/30"
+               className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-slate-600 hover:text-rose-500 transition-all hover:border-rose-500/30 active:scale-90"
                title="Purge Memory"
              >
-               <Trash2 size={18} />
+               <Trash2 size={20} />
              </button>
           </div>
         </div>
@@ -210,12 +210,12 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
               onKeyDown={e => e.key === 'Enter' && handleSend()}
               placeholder={secretMode ? "Query the void..." : "Log your internal state..."}
               disabled={loading}
-              className={`w-full bg-white/[0.02] border border-white/10 rounded-2xl py-6 pl-8 pr-20 text-white focus:ring-1 ${ringColor} outline-none transition-all placeholder:text-zinc-800 font-light text-lg italic serif`}
+              className={`w-full bg-white/[0.02] border border-white/10 rounded-2xl py-6 pl-8 pr-20 text-white focus:ring-1 ${ringColor} outline-none transition-all placeholder:text-zinc-800 font-light text-base italic serif`}
             />
             <button 
               onClick={handleSend}
               disabled={!input.trim() || loading}
-              className={`absolute right-4 top-1/2 -translate-y-1/2 p-4 ${buttonColor} text-white rounded-xl transition-all shadow-2xl shadow-black/50 disabled:opacity-0 disabled:translate-x-8`}
+              className={`absolute right-4 top-1/2 -translate-y-1/2 p-4 ${buttonColor} text-white rounded-xl transition-all shadow-2xl shadow-black/50 disabled:opacity-0 disabled:translate-x-8 active:scale-95`}
             >
               <Send size={20} />
             </button>
@@ -239,9 +239,9 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
         {/* Mobile Close Handle */}
         <button 
           onClick={() => setIsHudOpen(false)}
-          className="xl:hidden absolute left-0 top-1/2 -translate-x-full bg-white/5 border border-white/5 border-r-0 p-2 rounded-l-xl text-slate-500"
+          className="xl:hidden absolute left-0 top-1/2 -translate-x-full bg-white/5 border border-white/5 border-r-0 p-4 rounded-l-2xl text-slate-500 active:scale-90"
         >
-          <X size={20} />
+          <X size={24} />
         </button>
 
         <div className="mb-8">

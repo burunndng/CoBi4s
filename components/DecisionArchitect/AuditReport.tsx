@@ -45,10 +45,10 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
     <div className="animate-fade-in space-y-8">
       {/* Header */}
       <div className="flex items-center gap-6 mb-8 pb-6 border-b border-white/5">
-        <button onClick={onBack} className="p-2 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft size={20} />
+        <button onClick={onBack} className="p-4 -m-4 hover:bg-white/10 rounded-full text-slate-400 hover:text-white transition-all active:scale-90">
+            <ArrowLeft size={24} />
         </button>
-        <div>
+        <div className="pl-4">
             <div className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-1">Dossier</div>
             <h2 className="text-3xl font-serif text-white italic">{log.title}</h2>
         </div>
@@ -57,7 +57,7 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
          {/* Context Column */}
          <div className="space-y-6">
-            <div className="surface p-8 rounded-2xl">
+            <div className="surface p-6 md:p-8 rounded-2xl">
                 <h3 className="text-[10px] font-bold text-slate-500 uppercase tracking-[0.2em] mb-4">Brief</h3>
                 <p className="text-slate-300 whitespace-pre-wrap leading-relaxed font-light text-sm">{log.description}</p>
             </div>
@@ -74,37 +74,44 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
 
          {/* Analysis Column */}
          <div className="lg:col-span-2 space-y-6">
-            <h3 className="text-xl font-serif text-white flex items-center gap-3 mb-6 italic">
+            <h3 className="text-xl font-serif text-white flex items-center gap-3 mb-6 italic px-4 md:px-0">
                 <AlertTriangle size={20} className="text-rose-500" />
                 Detected Threats
             </h3>
             
             {log.detectedBiases.map((bias, idx) => (
-                <div key={idx} className={`surface p-8 rounded-2xl border-l-4 transition-colors ${getRiskColor(bias.severity)}`}>
-                    <div className="flex justify-between items-start mb-6">
+                <div key={idx} className={`surface p-6 md:p-8 rounded-2xl border-l-4 transition-colors mx-4 md:mx-0 ${getRiskColor(bias.severity)}`}>
+                    <div className="flex flex-col md:flex-row justify-between items-start mb-6 gap-6">
                         <h4 className="font-bold text-xl text-white">{bias.biasId}</h4>
                         {log.status !== 'finalized' && (
-                           <div className="flex flex-col items-end gap-1">
-                              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Risk Severity</span>
+                           <div className="flex flex-col items-start md:items-end gap-2 w-full md:w-auto">
+                              <span className="text-[9px] font-bold uppercase tracking-widest text-slate-500">Risk Severity: <span className="text-white font-mono ml-1">{bias.severity || 1}/10</span></span>
                               <input 
                                 type="range" min="1" max="10" 
                                 value={bias.severity || 1} 
                                 onChange={(e) => handleSeverityChange(idx, Number(e.target.value))}
-                                className="w-24 h-1 bg-zinc-800 rounded-full appearance-none cursor-pointer [&::-webkit-slider-thumb]:appearance-none [&::-webkit-slider-thumb]:w-3 [&::-webkit-slider-thumb]:h-3 [&::-webkit-slider-thumb]:rounded-full [&::-webkit-slider-thumb]:bg-white"
+                                className="w-full md:w-32 h-8 bg-transparent appearance-none cursor-pointer focus:outline-none 
+                                  [&::-webkit-slider-thumb]:appearance-none 
+                                  [&::-webkit-slider-thumb]:w-6 
+                                  [&::-webkit-slider-thumb]:h-6 
+                                  [&::-webkit-slider-thumb]:rounded-full 
+                                  [&::-webkit-slider-thumb]:bg-white 
+                                  [&::-webkit-slider-runnable-track]:h-1.5
+                                  [&::-webkit-slider-runnable-track]:bg-zinc-800
+                                  [&::-webkit-slider-runnable-track]:rounded-full"
                               />
-                              <span className="font-mono text-xs text-white">{bias.severity || 1}/10</span>
                            </div>
                         )}
                     </div>
                     
-                    <p className="text-slate-400 text-sm mb-8 leading-relaxed">{bias.reasoning}</p>
+                    <p className="text-slate-400 text-sm mb-8 leading-relaxed font-light">{bias.reasoning}</p>
                     
                     <div className="bg-white/[0.03] p-6 rounded-xl border border-white/5">
-                        <label className="block text-rose-300 font-bold mb-3 text-xs uppercase tracking-widest flex items-center gap-2">
+                        <label className="block text-rose-300 font-bold mb-3 text-[10px] uppercase tracking-widest flex items-center gap-2">
                             <span className="w-1.5 h-1.5 rounded-full bg-rose-500 animate-pulse"></span>
                             Killer Question
                         </label>
-                        <p className="text-white text-lg serif italic mb-4">"{bias.challengingQuestion}"</p>
+                        <p className="text-white text-lg serif italic mb-4 leading-snug">"{bias.challengingQuestion}"</p>
                         
                         {log.status === 'finalized' ? (
                             <div className="text-slate-300 text-sm italic border-l-2 border-white/10 pl-4 py-1">
@@ -112,7 +119,7 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
                             </div>
                         ) : (
                             <textarea 
-                                className="w-full bg-transparent border-0 border-b border-white/10 focus:border-rose-500 text-slate-200 focus:ring-0 p-0 text-sm mt-2 placeholder:text-zinc-700 resize-none leading-relaxed"
+                                className="w-full bg-transparent border-0 border-b border-white/10 focus:border-rose-500 text-slate-200 focus:ring-0 p-0 text-base mt-2 placeholder:text-zinc-800 resize-none leading-relaxed italic serif"
                                 placeholder="Write your defense here..."
                                 rows={2}
                                 value={log.userReflections[`bias-${idx}`] || ''}
@@ -124,10 +131,10 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
             ))}
 
             {log.status !== 'finalized' && (
-                <div className="surface p-8 rounded-2xl mt-12 border-t border-white/5">
-                    <h3 className="text-sm font-bold text-white mb-6 uppercase tracking-widest">Final Determination</h3>
+                <div className="surface p-6 md:p-8 rounded-2xl mt-12 border-t border-white/5 mx-4 md:mx-0">
+                    <h3 className="text-[10px] font-bold text-white mb-6 uppercase tracking-widest">Final Determination</h3>
                     <textarea 
-                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl p-6 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-sm leading-relaxed"
+                        className="w-full bg-white/[0.03] border border-white/10 rounded-xl p-6 text-white focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none text-base md:text-sm leading-relaxed serif italic"
                         rows={4}
                         placeholder="Synthesize the risk analysis into a final decision..."
                         value={conclusion}
@@ -137,10 +144,10 @@ export const AuditReport: React.FC<AuditReportProps> = ({ log, onUpdate, onBack 
                         <button 
                             onClick={handleFinalize}
                             disabled={!conclusion}
-                            className="px-8 py-3 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-xl text-xs font-bold uppercase tracking-widest flex items-center gap-2 transition-all shadow-lg shadow-emerald-900/20"
+                            className="w-full md:w-auto px-10 py-5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-50 text-white rounded-2xl text-[10px] font-bold uppercase tracking-widest flex items-center justify-center gap-3 transition-all shadow-xl shadow-emerald-900/20 active:scale-95"
                         >
-                            <Save size={16} />
-                            Seal & Archive
+                            <Save size={20} />
+                            Seal & Archive Audit
                         </button>
                     </div>
                 </div>

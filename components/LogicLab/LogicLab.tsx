@@ -155,7 +155,7 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
         {phase === 'result' && (
           <button 
             onClick={startLab}
-            className="flex items-center gap-2 px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-colors"
+            className="flex items-center gap-2 px-5 py-3 bg-zinc-800 hover:bg-zinc-700 text-white rounded-lg text-sm transition-all active:scale-95"
           >
             <RotateCcw size={16} /> New Experiment
           </button>
@@ -168,7 +168,7 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
           <p>Preparing logical specimen...</p>
         </div>
       ) : phase === 'setup' ? (
-        <div className="surface p-12 text-center rounded-2xl border border-zinc-800 space-y-6">
+        <div className="surface p-8 md:p-12 text-center rounded-2xl border border-zinc-800 space-y-6 mx-4 md:mx-0">
           <div className="w-20 h-20 bg-rose-500/10 rounded-full flex items-center justify-center mx-auto">
             <FlaskConical className="w-10 h-10 text-rose-500" />
           </div>
@@ -180,7 +180,7 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
           </div>
           <button 
             onClick={startLab}
-            className="btn-primary bg-rose-600 hover:bg-rose-700 px-8 py-3 rounded-xl"
+            className="btn-primary bg-rose-600 hover:bg-rose-700 px-10 py-4 rounded-2xl active:scale-95 transition-all shadow-xl shadow-rose-900/20"
           >
             Initialize Lab
           </button>
@@ -189,10 +189,10 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
 
       {/* Identify Phase */}
       {phase === 'identify' && snippet && (
-        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500">
+        <div className="space-y-6 animate-in slide-in-from-bottom-4 duration-500 px-4 md:px-0">
           <div className="relative">
-             <h3 className="text-xs font-bold text-rose-500 uppercase tracking-widest mb-2 pl-1">
-               Find the "{targetFallacy?.name}"
+             <h3 className="text-[10px] font-bold text-rose-500 uppercase tracking-[0.3em] mb-4 pl-1">
+               Protocol: Find the "{targetFallacy?.name}"
              </h3>
              <TextCanvas 
                text={snippet.text} 
@@ -201,30 +201,30 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
              />
           </div>
 
-          <div className="bg-zinc-900/50 p-4 rounded-xl border border-zinc-800 text-sm text-slate-400">
-             <p>Highlight the specific part of the statement that commits the <strong>{targetFallacy?.name}</strong>.</p>
-             <p className="text-xs text-slate-500 mt-1 italic">Hint: {targetFallacy?.definition}</p>
+          <div className="bg-zinc-900/50 p-6 rounded-2xl border border-zinc-800 text-sm text-slate-400">
+             <p className="mb-2">Highlight the specific part of the statement that commits the <strong>{targetFallacy?.name}</strong>.</p>
+             <p className="text-xs text-slate-500 italic">Hint: {targetFallacy?.definition}</p>
           </div>
 
           {/* Selection Modal */}
           {selection && (
-            <div className="fixed inset-x-0 bottom-0 p-4 bg-zinc-900 border-t border-zinc-800 shadow-2xl z-50 animate-in slide-in-from-bottom-10">
-               <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
-                  <div className="flex-1">
-                     <p className="text-sm text-slate-500 mb-1">Selected text:</p>
-                     <p className="text-white font-serif italic truncate max-w-lg">"{selection.text}"</p>
+            <div className="fixed inset-x-0 bottom-0 p-6 bg-zinc-900 border-t border-zinc-800 shadow-[0_-20px_50px_rgba(0,0,0,0.5)] z-50 animate-in slide-in-from-bottom-10">
+               <div className="max-w-3xl mx-auto flex flex-col md:flex-row items-center justify-between gap-6">
+                  <div className="flex-1 w-full">
+                     <p className="text-[10px] font-bold uppercase tracking-widest text-slate-600 mb-2">Selected text segment:</p>
+                     <p className="text-white font-serif italic line-clamp-2 md:line-clamp-3">"{selection.text}"</p>
                   </div>
                   
-                  <div className="flex gap-3">
+                  <div className="flex gap-4 w-full md:w-auto">
                      <button 
                        onClick={() => setSelection(null)}
-                       className="px-4 py-2 text-slate-400 hover:text-white"
+                       className="flex-1 md:flex-none px-6 py-4 text-slate-400 hover:text-white active:scale-95 transition-all font-bold uppercase text-[10px] tracking-widest"
                      >
                        Cancel
                      </button>
                      <button 
                        onClick={handleIdentify}
-                       className="btn-primary bg-rose-600 hover:bg-rose-700 px-6 py-2 rounded-lg flex items-center gap-2"
+                       className="flex-1 md:flex-none btn-primary bg-rose-600 hover:bg-rose-700 px-8 py-4 rounded-xl flex items-center justify-center gap-2 active:scale-95 transition-all shadow-lg shadow-rose-900/20"
                      >
                        Confirm Logic Flaw <ChevronRight size={18} />
                      </button>
@@ -234,8 +234,9 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
           )}
 
           {error && (
-            <div className="fixed top-4 right-4 p-4 bg-rose-900/90 border border-rose-700 text-rose-100 rounded-lg shadow-xl z-50 animate-in slide-in-from-right flex items-center gap-3">
-               <AlertCircle size={20} /> {error}
+            <div className="fixed top-4 left-4 right-4 md:left-auto md:w-96 p-5 bg-rose-900 border border-rose-700 text-rose-100 rounded-xl shadow-2xl z-[60] animate-in slide-in-from-top md:slide-in-from-right flex items-start gap-4">
+               <AlertCircle size={24} className="shrink-0 text-rose-300" /> 
+               <p className="text-sm font-medium">{error}</p>
             </div>
           )}
         </div>
@@ -243,21 +244,21 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
 
       {/* Repair Phase */}
       {phase === 'repair' && snippet && (
-        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500">
-           <div className="bg-emerald-900/10 border border-emerald-800/30 p-4 rounded-xl flex items-start gap-3">
-              <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={18} />
+        <div className="space-y-6 animate-in slide-in-from-right-4 duration-500 px-4 md:px-0">
+           <div className="bg-emerald-900/10 border border-emerald-800/30 p-5 rounded-2xl flex items-start gap-4">
+              <CheckCircle className="text-emerald-500 shrink-0 mt-0.5" size={20} />
               <div>
-                <p className="text-emerald-200 text-sm font-bold">Spot on! You found the logical flaw.</p>
-                <p className="text-emerald-500/70 text-xs mt-1">Now, let's fix it.</p>
+                <p className="text-emerald-200 text-sm font-bold">Detection Confirmed.</p>
+                <p className="text-emerald-500/70 text-xs mt-1 uppercase tracking-widest">Initialization: Repair Sequence</p>
               </div>
            </div>
 
            <div className="space-y-4">
-              <label className="text-sm font-medium text-slate-400">Your Challenge: Repair the Argument</label>
+              <label className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 ml-1">Repairing logical structure</label>
               
-              <div className="bg-zinc-900/30 rounded-2xl border border-zinc-800 overflow-hidden">
-                 <div className="p-4 border-b border-zinc-800 bg-zinc-900/50">
-                    <p className="text-slate-500 text-xs uppercase font-bold tracking-widest mb-2">Analysis</p>
+              <div className="bg-zinc-900/30 rounded-3xl border border-zinc-800 overflow-hidden">
+                 <div className="p-6 border-b border-zinc-800 bg-zinc-900/50">
+                    <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-3">Isolate Flaw</p>
                     <TextCanvas 
                       text={snippet.text} 
                       highlights={getHighlights()} 
@@ -265,40 +266,37 @@ export const LogicLab: React.FC<LogicLabProps> = ({ state, updateProgress }) => 
                     />
                  </div>
                  
-                 <div className="p-6">
-                    <div className="flex flex-wrap gap-2 mb-3">
+                 <div className="p-6 md:p-8">
+                    <div className="flex flex-wrap gap-2 mb-6">
                        {getStrategies().map((strat, i) => (
                          <button 
                            key={i}
                            onClick={() => addStrategy(strat.text)}
-                           className="px-3 py-1.5 rounded-lg bg-zinc-800 border border-zinc-700 text-xs text-indigo-300 hover:bg-indigo-900/30 hover:border-indigo-500/50 transition-colors"
+                           className="px-5 py-3 rounded-xl bg-zinc-800 border border-zinc-700 text-[11px] font-bold text-indigo-300 hover:bg-indigo-900/30 hover:border-indigo-500/50 transition-all active:scale-90"
                          >
                            {strat.label}
                          </button>
                        ))}
                     </div>
-                    <p className="text-slate-500 text-xs uppercase font-bold tracking-widest mb-3">Steel Man Version</p>
+                    <p className="text-slate-500 text-[10px] uppercase font-bold tracking-widest mb-3">Steel Man Reconstruction</p>
                     <textarea 
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-xl p-4 text-white focus:ring-2 focus:ring-rose-500 outline-none h-32 resize-none"
-                      placeholder="Rewrite the argument to be logically sound but keep the core point..."
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-2xl p-6 text-white focus:ring-1 focus:ring-rose-500 outline-none h-48 resize-none text-base font-serif italic"
+                      placeholder="Rewrite the argument to be logically sound..."
                       value={userRepair}
                       onChange={e => setUserRepair(e.target.value)}
                     />
-                    <p className="text-[10px] text-slate-600 mt-3">
-                        Tip: Remove character attacks, emotional manipulation, or structural errors. Focus on verifiable premises.
-                    </p>
                  </div>
               </div>
            </div>
 
-           <div className="flex justify-end gap-3">
+           <div className="flex justify-end gap-3 pt-4">
               <button 
                 onClick={handleRepairSubmit}
                 disabled={loading || userRepair.length < 10}
-                className="btn-primary bg-rose-600 hover:bg-rose-700 px-8 py-3 rounded-xl flex items-center gap-2 disabled:opacity-50"
+                className="w-full md:w-auto btn-primary bg-rose-600 hover:bg-rose-700 px-10 py-5 rounded-2xl flex items-center justify-center gap-3 disabled:opacity-50 active:scale-95 transition-all shadow-xl shadow-rose-900/40"
               >
-                {loading ? <Loader2 className="animate-spin" size={20} /> : <Wand2 size={20} />}
-                Submit for Evaluation
+                {loading ? <Loader2 className="animate-spin" size={24} /> : <Wand2 size={24} />}
+                <span className="font-bold">SUBMIT FOR EVALUATION</span>
               </button>
            </div>
         </div>

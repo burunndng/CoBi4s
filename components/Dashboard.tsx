@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords, ExternalLink } from 'lucide-react';
 import { AppState, ProgressState } from '../types';
 import { BIASES } from '../constants';
 
@@ -100,6 +100,31 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
             icon={<Zap size={18} />}
             onClick={() => navigate('/flashcards')} 
           />
+
+          {/* Neural Bridge: Aura OS Portal */}
+          <div className="pt-2 hidden lg:block">
+             <div className="text-[8px] font-black uppercase tracking-[0.5em] text-indigo-500/40 mb-3 px-2">Upstream_System</div>
+             <a 
+               href="https://auraos.space" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               className="surface border-indigo-500/20 bg-indigo-500/5 p-5 rounded-2xl text-left flex items-center justify-between group active:scale-[0.98] transition-all hover:border-indigo-500/50"
+             >
+                <div className="flex items-center gap-4">
+                  <div className="p-3 bg-indigo-500/10 border border-indigo-500/20 rounded-xl text-indigo-400 group-hover:bg-indigo-500/20 transition-all">
+                    <ExternalLink size={20} />
+                  </div>
+                  <div>
+                    <div className="text-indigo-100 font-bold text-xs uppercase tracking-[0.2em]">AURA_OS</div>
+                    <div className="text-[10px] text-indigo-500/70 mt-0.5 uppercase tracking-widest font-mono">NEURAL_BRIDGE</div>
+                  </div>
+                </div>
+                <div className="relative">
+                   <div className="absolute inset-0 bg-indigo-500 blur-md opacity-20 group-hover:opacity-40 transition-opacity"></div>
+                   <ArrowRight size={14} className="relative text-indigo-400 group-hover:text-white group-hover:translate-x-1 transition-all" />
+                </div>
+             </a>
+          </div>
         </div>
       </div>
     </div>

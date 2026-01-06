@@ -78,14 +78,14 @@ export const InputForm: React.FC<InputFormProps> = ({ onComplete, onCancel }) =>
           <button 
             type="button" 
             onClick={onCancel}
-            className="px-4 py-2 text-slate-400 hover:text-white transition-colors"
+            className="px-6 py-4 text-slate-400 hover:text-white transition-all active:scale-95 text-[10px] font-bold uppercase tracking-widest"
             disabled={loading}
           >
             Cancel
           </button>
           <button 
             type="submit" 
-            className="px-6 py-2 bg-rose-600 hover:bg-rose-700 text-white rounded-lg font-medium flex items-center gap-2 disabled:opacity-50"
+            className="px-8 py-4 bg-rose-600 hover:bg-rose-700 text-white rounded-xl font-bold uppercase text-[10px] tracking-widest flex items-center gap-2 disabled:opacity-50 active:scale-95 shadow-lg shadow-rose-900/20"
             disabled={loading}
           >
             {loading ? <Loader2 className="animate-spin" size={18} /> : <BrainCircuit size={18} />}

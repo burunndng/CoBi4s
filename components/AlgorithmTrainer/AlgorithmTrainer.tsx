@@ -77,14 +77,14 @@ export const AlgorithmTrainer: React.FC<AlgorithmTrainerProps> = ({ state, setSt
         <div className="flex gap-2">
            <button 
              onClick={() => setView('history')}
-             className={`px-4 py-2 rounded-lg text-sm font-medium transition-colors ${view === 'history' ? 'bg-zinc-800 text-white' : 'text-slate-400 hover:text-white'}`}
+             className={`px-5 py-3 rounded-lg text-sm font-medium transition-colors active:scale-95 ${view === 'history' ? 'bg-zinc-800 text-white' : 'text-slate-400 hover:text-white'}`}
            >
              <History size={18} className="inline mr-2" />
              Logs
            </button>
            <button 
              onClick={() => { setView('new'); setSelectedId(null); setPseudoCode(''); }}
-             className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center shadow-lg shadow-indigo-900/20"
+             className="px-5 py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg text-sm font-medium transition-colors flex items-center shadow-lg shadow-indigo-900/20 active:scale-95"
            >
              <Plus size={18} className="mr-2" />
              New Program

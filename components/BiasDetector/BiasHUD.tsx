@@ -59,43 +59,43 @@ export const BiasHUD: React.FC<BiasHUDProps> = ({ selection, onCancel, onSelect,
                 "{selection.text}"
               </p>
             </div>
-            <button onClick={onCancel} className="text-slate-500 hover:text-white transition-colors">
-              <X size={20} />
+            <button onClick={onCancel} className="text-slate-500 hover:text-white transition-all p-4 -m-4 active:scale-90">
+              <X size={24} />
             </button>
           </div>
         </div>
 
         {/* Command Bar */}
         <div className="p-4 border-b border-white/5 bg-black/20 flex items-center gap-3">
-          <Search size={16} className="text-slate-500" />
+          <Search size={18} className="text-slate-500" />
           <input 
             autoFocus
             type="text" 
             placeholder="Type to filter patterns..." 
-            className="bg-transparent border-none outline-none text-white w-full placeholder:text-slate-600 font-mono text-sm"
+            className="bg-transparent border-none outline-none text-white w-full placeholder:text-slate-600 font-mono text-base"
             value={filter}
             onChange={(e) => { setFilter(e.target.value); setActiveCategory(null); }}
           />
         </div>
 
         {/* Grid Content */}
-        <div className="flex-1 overflow-hidden flex">
+        <div className="flex-1 overflow-hidden flex flex-col md:flex-row">
           
           {/* Sidebar: Categories */}
           {!filter && (
-            <div className="w-48 border-r border-white/5 bg-white/[0.01] overflow-y-auto p-2 space-y-1">
+            <div className="w-full md:w-48 border-b md:border-b-0 md:border-r border-white/5 bg-white/[0.01] overflow-x-auto md:overflow-y-auto p-2 flex md:flex-col gap-1 no-scrollbar">
               {Object.keys(categories).map(cat => (
                 <button
                   key={cat}
                   onClick={() => setActiveCategory(cat)}
-                  className={`w-full text-left px-4 py-3 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all ${
+                  className={`flex-shrink-0 text-left px-5 py-4 rounded-xl text-xs font-bold uppercase tracking-wider flex items-center gap-3 transition-all active:scale-95 ${
                     activeCategory === cat 
                       ? `bg-white/5 text-white ${accentClass} border` 
                       : 'text-slate-500 hover:text-slate-300 hover:bg-white/5'
                   }`}
                 >
                   {getCategoryIcon(cat)}
-                  {cat.replace(/_/g, ' ')}
+                  <span className="whitespace-nowrap">{cat.replace(/_/g, ' ')}</span>
                 </button>
               ))}
             </div>
@@ -104,9 +104,9 @@ export const BiasHUD: React.FC<BiasHUDProps> = ({ selection, onCancel, onSelect,
           {/* Main: Biases List */}
           <div className="flex-1 overflow-y-auto p-4 bg-[#050505]">
             {!activeCategory && !filter ? (
-              <div className="h-full flex flex-col items-center justify-center text-slate-600 space-y-4">
+              <div className="h-full flex flex-col items-center justify-center text-slate-600 py-12 space-y-4">
                 <Grid size={32} className="opacity-20" />
-                <p className="text-xs uppercase tracking-widest font-bold">Select a Category</p>
+                <p className="text-xs uppercase tracking-widest font-bold text-center">Select a Category to begin analysis</p>
               </div>
             ) : (
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
@@ -114,7 +114,7 @@ export const BiasHUD: React.FC<BiasHUDProps> = ({ selection, onCancel, onSelect,
                   <button
                     key={bias.id}
                     onClick={() => onSelect(bias.id)}
-                    className={`text-left p-4 rounded-xl border border-white/5 bg-white/[0.02] group transition-all duration-200 ${hoverClass}`}
+                    className={`text-left p-5 rounded-xl border border-white/5 bg-white/[0.02] group transition-all duration-200 active:scale-[0.97] ${hoverClass}`}
                   >
                     <h4 className="text-white font-bold text-sm mb-1 group-hover:text-white transition-colors">{bias.name}</h4>
                     <p className="text-[10px] text-slate-500 leading-tight line-clamp-2 group-hover:text-slate-400">

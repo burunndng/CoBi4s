@@ -46,17 +46,18 @@ export const CalibrationSlider: React.FC<CalibrationSliderProps> = ({ userValue,
           onChange={(e) => !isLocked && onChange(Number(e.target.value))}
           disabled={isLocked}
           style={{ touchAction: 'none' }}
-          className="relative w-full h-2 bg-transparent appearance-none cursor-pointer z-20 focus:outline-none 
+          className="relative w-full h-8 bg-transparent appearance-none cursor-pointer z-20 focus:outline-none 
             [&::-webkit-slider-thumb]:appearance-none 
-            [&::-webkit-slider-thumb]:w-6 
-            [&::-webkit-slider-thumb]:h-6 
+            [&::-webkit-slider-thumb]:w-8 
+            [&::-webkit-slider-thumb]:h-8 
             [&::-webkit-slider-thumb]:rounded-full 
             [&::-webkit-slider-thumb]:bg-white 
             [&::-webkit-slider-thumb]:border-2 
             [&::-webkit-slider-thumb]:border-zinc-900 
             [&::-webkit-slider-thumb]:shadow-lg 
             [&::-webkit-slider-thumb]:transition-transform 
-            [&::-webkit-slider-thumb]:hover:scale-110"
+            [&::-webkit-slider-thumb]:hover:scale-110
+            [&::-webkit-slider-thumb]:active:scale-125"
         />
       </div>
 

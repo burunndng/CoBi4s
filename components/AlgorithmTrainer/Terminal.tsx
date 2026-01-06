@@ -14,8 +14,8 @@ export const Terminal: React.FC<TerminalProps> = ({ test, onBack }) => {
   return (
     <div className="space-y-6 animate-in zoom-in-95 duration-500">
       <div className="flex items-center gap-4">
-        <button onClick={onBack} className="p-2 hover:bg-white/5 rounded-full text-slate-400 hover:text-white transition-colors">
-            <ArrowLeft size={20} />
+        <button onClick={onBack} className="p-4 -m-4 hover:bg-white/5 rounded-full text-slate-400 hover:text-white transition-all active:scale-90">
+            <ArrowLeft size={24} />
         </button>
         <div>
             <h2 className="text-xl font-medium text-white flex items-center gap-2">

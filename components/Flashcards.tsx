@@ -123,46 +123,46 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   return (
     <div className="max-w-xl mx-auto py-8 space-y-8 animate-fade-in">
       <div className="flex justify-between items-center px-2">
-        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest">Protocol {currentIndex + 1} / {sessionQueue.length}</span>
+        <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-widest pl-2">Protocol {currentIndex + 1} / {sessionQueue.length}</span>
         
         <div className="flex gap-4">
            {/* Mode Toggle */}
-           <div className="flex bg-zinc-900 p-1 rounded-lg border border-zinc-800">
+           <div className="flex bg-zinc-900 p-1.5 rounded-xl border border-zinc-800">
               <button 
                 onClick={() => setCardMode('term')}
-                className={`p-1.5 rounded ${cardMode === 'term' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                className={`p-3 rounded-lg transition-all active:scale-90 ${cardMode === 'term' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                 title="Term Mode"
               >
-                <Type size={14} />
+                <Type size={18} />
               </button>
               <button 
                 onClick={() => setCardMode('scenario')}
-                className={`p-1.5 rounded ${cardMode === 'scenario' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
+                className={`p-3 rounded-lg transition-all active:scale-90 ${cardMode === 'scenario' ? 'bg-zinc-800 text-white shadow-sm' : 'text-zinc-500 hover:text-zinc-300'}`}
                 title="Scenario Mode"
               >
-                <BookOpen size={14} />
+                <BookOpen size={18} />
               </button>
            </div>
 
-           <button onClick={() => toggleFavorite(bias.id)} className="text-zinc-500 hover:text-white transition-colors">
-             <Star size={18} fill={state.favorites.includes(bias.id) ? "currentColor" : "none"} />
+           <button onClick={() => toggleFavorite(bias.id)} className="text-zinc-500 hover:text-white transition-all p-3.5 -m-1 active:scale-75">
+             <Star size={20} fill={state.favorites.includes(bias.id) ? "currentColor" : "none"} />
            </button>
         </div>
       </div>
 
-      <div className="relative h-[420px] cursor-pointer group perspective" onClick={() => setFlipped(!flipped)}>
+      <div className="relative h-[420px] cursor-pointer group perspective active:scale-[0.99] transition-transform" onClick={() => setFlipped(!flipped)}>
         <div className={`relative w-full h-full transition-transform duration-500 transform-gpu [transform-style:preserve-3d] ${flipped ? '[transform:rotateY(180deg)]' : ''}`}>
           
           {/* Front */}
           <div className="absolute inset-0 [backface-visibility:hidden] surface rounded-xl p-10 flex flex-col items-center justify-center text-center shadow-2xl border border-zinc-800/50 group-hover:border-zinc-700/50 transition-colors">
             {frontContent}
             
-            <div className="mt-12 flex gap-4" onClick={e => e.stopPropagation()}>
+            <div className="mt-12 flex flex-col sm:flex-row gap-4" onClick={e => e.stopPropagation()}>
               {cardMode === 'scenario' && (
                  <button 
                    onClick={handleRefreshScenario}
                    disabled={loadingScenario}
-                   className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-indigo-400 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-zinc-900"
+                   className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-indigo-400 transition-all flex items-center justify-center gap-2 px-5 py-3 rounded-xl hover:bg-zinc-900 active:scale-95 border border-transparent hover:border-zinc-800"
                  >
                    {loadingScenario ? <Loader2 size={12} className="animate-spin" /> : <Shuffle size={12} />}
                    New Scenario
@@ -170,12 +170,12 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
               )}
 
               {hint ? (
-                <p className="text-xs text-zinc-400 font-medium max-w-xs leading-relaxed animate-fade-in">{hint}</p>
+                <p className="text-xs text-zinc-400 font-medium max-w-xs leading-relaxed animate-fade-in text-center px-4">{hint}</p>
               ) : (
                 <button 
                   onClick={handleGenerateHint} 
                   disabled={loadingHint}
-                  className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-amber-400 transition-colors flex items-center gap-2 px-3 py-1.5 rounded hover:bg-zinc-900"
+                  className="text-[10px] font-bold uppercase tracking-widest text-zinc-500 hover:text-amber-400 transition-all flex items-center justify-center gap-2 px-5 py-3 rounded-xl hover:bg-zinc-900 active:scale-95 border border-transparent hover:border-zinc-800"
                 >
                   {loadingHint ? <Loader2 size={12} className="animate-spin" /> : "Request Hint"}
                 </button>

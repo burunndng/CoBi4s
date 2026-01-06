@@ -174,13 +174,35 @@ const App: React.FC = () => {
             <NavLink to="/" icon={<HelpCircle size={18} />} label="About" />
             <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" />
           </div>
+
+          {/* Neural Bridge: Aura OS Portal */}
+          <div className="p-4 border-t border-white/5 mt-auto">
+            <div className="px-4 mb-3">
+              <span className="text-[9px] font-black uppercase tracking-[0.4em] text-indigo-500/50">System_Bridge</span>
+            </div>
+            <a 
+              href="https://auraos.space" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="flex items-center gap-4 px-5 py-4 rounded-xl transition-all group active:scale-[0.98] border border-indigo-500/10 bg-indigo-500/5 hover:bg-indigo-500/10 hover:border-indigo-500/30"
+            >
+              <div className="text-indigo-400 group-hover:text-indigo-300 transition-colors">
+                <Shuffle size={18} className="animate-pulse" />
+              </div>
+              <span className="text-sm font-bold tracking-widest text-indigo-100 group-hover:text-white transition-colors">AURA_OS</span>
+              <div className="ml-auto flex items-center gap-2">
+                 <div className="w-1 h-1 rounded-full bg-indigo-500 shadow-[0_0_8px_indigo]"></div>
+                 <ArrowRight size={12} className="text-indigo-500 group-hover:translate-x-1 transition-transform" />
+              </div>
+            </a>
+          </div>
         </aside>
 
         {/* Mobile Header */}
         <header className="lg:hidden fixed top-0 w-full bg-black/40 backdrop-blur-xl z-30 border-b border-white/5 h-16 flex items-center justify-between px-5">
           <span className="serif text-xl text-white italic">CogniBias</span>
-          <button onClick={() => setIsMobileMenuOpen(true)} className="p-2 text-slate-400 hover:text-white transition-colors">
-            <MenuIcon size={20} />
+          <button onClick={() => setIsMobileMenuOpen(true)} className="p-3 -mr-2 text-slate-400 hover:text-white transition-all active:scale-90">
+            <MenuIcon size={24} />
           </button>
         </header>
 
@@ -190,28 +212,28 @@ const App: React.FC = () => {
             <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" onClick={() => setIsMobileMenuOpen(false)} />
             <div className="absolute right-0 top-0 bottom-0 w-72 bg-zinc-950/90 backdrop-blur-2xl border-l border-white/10 flex flex-col animate-in slide-in-from-right duration-300 shadow-2xl">
               <div className="p-6 border-b border-white/10 flex justify-between items-center">
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">Navigation</span>
-                <button onClick={() => setIsMobileMenuOpen(false)}><X size={20} className="text-slate-400 hover:text-white" /></button>
+                <span className="text-[10px] font-bold text-slate-500 uppercase tracking-widest">Navigation</span>
+                <button onClick={() => setIsMobileMenuOpen(false)} className="p-4 -m-4 active:scale-90"><X size={24} className="text-slate-400 hover:text-white" /></button>
               </div>
 
               <div className="px-6 py-6 border-b border-white/10">
-                <div className="bg-white/[0.03] border border-white/5 rounded-xl p-1 flex">
+                <div className="bg-white/[0.03] border border-white/5 rounded-xl p-1.5 flex">
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'psychology' }))}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all active:scale-95 ${
                       state.mode === 'psychology' ? 'bg-white/10 text-white shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
-                    <Brain size={12} />
+                    <Brain size={14} />
                     Psychology
                   </button>
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
-                    className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
+                    className={`flex-1 flex items-center justify-center gap-2 py-3 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all active:scale-95 ${
                       state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
-                    <ShieldAlert size={12} />
+                    <ShieldAlert size={14} />
                     Logic
                   </button>
                 </div>
@@ -233,6 +255,23 @@ const App: React.FC = () => {
                 <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" onClick={() => setIsMobileMenuOpen(false)} />
+                
+                {/* Neural Bridge: Mobile */}
+                <div className="pt-6 mt-6 border-t border-white/10">
+                  <div className="px-1 mb-4">
+                    <span className="text-[10px] font-black uppercase tracking-[0.4em] text-indigo-500/50">System_Bridge</span>
+                  </div>
+                  <a 
+                    href="https://auraos.space" 
+                    target="_blank" 
+                    rel="noopener noreferrer"
+                    className="flex items-center gap-4 px-5 py-5 rounded-2xl transition-all group active:scale-95 border border-indigo-500/10 bg-indigo-500/5"
+                  >
+                    <Shuffle size={20} className="text-indigo-400" />
+                    <span className="text-base font-bold tracking-widest text-indigo-100 uppercase">Aura_OS_Portal</span>
+                    <ArrowRight size={16} className="ml-auto text-indigo-500" />
+                  </a>
+                </div>
               </nav>
             </div>
           </div>
@@ -293,7 +332,7 @@ const NavLink: React.FC<{ to: string; icon: React.ReactNode; label: string; onCl
     <Link 
       to={to} 
       onClick={onClick}
-      className={`flex items-center gap-3 px-4 py-3 rounded-lg transition-all group ${
+      className={`flex items-center gap-4 px-5 py-4 rounded-xl transition-all group active:scale-[0.98] ${
         isActive 
           ? 'bg-white/10 text-white' 
           : 'text-slate-400 hover:text-white hover:bg-white/5'
@@ -302,8 +341,8 @@ const NavLink: React.FC<{ to: string; icon: React.ReactNode; label: string; onCl
       <div className={`transition-colors ${isActive ? 'text-white' : 'text-slate-500 group-hover:text-white'}`}>
         {icon}
       </div>
-      <span className="text-sm font-medium">{label}</span>
-      {isActive && <div className="ml-auto w-1 h-1 rounded-full bg-white"></div>}
+      <span className="text-sm font-medium tracking-wide">{label}</span>
+      {isActive && <div className="ml-auto w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_8px_white]"></div>}
     </Link>
   );
 };

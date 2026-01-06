@@ -29,7 +29,7 @@ export const TestHistory: React.FC<TestHistoryProps> = ({ tests, onSelect, onDel
       {tests.map(test => (
         <div 
           key={test.id}
-          className="group surface p-5 rounded-2xl border border-transparent hover:border-zinc-700 transition-all cursor-pointer relative flex flex-col"
+          className="group surface p-5 rounded-2xl border border-transparent hover:border-zinc-700 transition-all cursor-pointer relative flex flex-col active:scale-[0.98]"
           onClick={() => onSelect(test.id)}
         >
           <div className="flex justify-between items-start mb-3">
@@ -37,7 +37,7 @@ export const TestHistory: React.FC<TestHistoryProps> = ({ tests, onSelect, onDel
                <h3 className="font-bold text-slate-200 group-hover:text-white transition-colors">
                  {getConceptName(test.biasId)}
                </h3>
-               <p className="text-xs text-slate-500 font-mono mt-1 italic">STATUS: {test.status.toUpperCase()}</p>
+               <p className="text-xs text-slate-500 font-mono mt-1 italic uppercase">STATUS: {test.status.toUpperCase()}</p>
             </div>
             <div className={`w-2 h-2 rounded-full mt-1.5 ${
                test.status === 'compiled' ? 'bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.5)]' : 
@@ -47,7 +47,7 @@ export const TestHistory: React.FC<TestHistoryProps> = ({ tests, onSelect, onDel
           </div>
 
           <div className="bg-zinc-950/50 p-3 rounded-lg border border-zinc-900 mb-4 flex-1">
-             <pre className="text-[10px] text-zinc-600 font-mono line-clamp-3">
+             <pre className="text-[10px] text-zinc-600 font-mono line-clamp-3 whitespace-pre-wrap">
                 {test.pseudoCode}
              </pre>
           </div>
@@ -57,16 +57,16 @@ export const TestHistory: React.FC<TestHistoryProps> = ({ tests, onSelect, onDel
                 <Calendar size={10} />
                 {new Date(test.timestamp).toLocaleDateString()}
              </div>
-             <div className="flex items-center gap-1 group-hover:text-indigo-400 transition-colors">
+             <div className="flex items-center gap-1 group-hover:text-indigo-400 transition-colors uppercase tracking-widest font-bold">
                 View Trace <ChevronRight size={10} />
              </div>
           </div>
 
           <button 
              onClick={(e) => { e.stopPropagation(); onDelete(test.id); }}
-             className="absolute top-4 right-10 p-2 text-slate-600 hover:text-red-400 opacity-0 group-hover:opacity-100 transition-opacity"
+             className="absolute top-4 right-4 p-4 -m-4 text-slate-700 hover:text-red-400 lg:opacity-0 lg:group-hover:opacity-100 transition-all active:scale-90"
           >
-             <Trash2 size={14} />
+             <Trash2 size={16} />
           </button>
         </div>
       ))}

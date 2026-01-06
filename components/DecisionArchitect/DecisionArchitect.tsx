@@ -57,10 +57,10 @@ export const DecisionArchitect: React.FC<DecisionArchitectProps> = ({ state, set
           </p>
         </div>
         
-        <div className="flex gap-2 bg-white/[0.03] p-1 rounded-xl border border-white/5">
+        <div className="flex gap-2 bg-white/[0.03] p-1.5 rounded-xl border border-white/5">
            <button 
              onClick={() => setView('list')}
-             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+             className={`px-8 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${
                view === 'list' ? 'bg-white/10 text-white shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
              }`}
            >
@@ -69,7 +69,7 @@ export const DecisionArchitect: React.FC<DecisionArchitectProps> = ({ state, set
            </button>
            <button 
              onClick={() => { setView('new'); setActiveLogId(null); }}
-             className={`px-6 py-2.5 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all ${
+             className={`px-8 py-3 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all active:scale-95 ${
                view === 'new' ? 'bg-rose-500/20 text-rose-400 border border-rose-500/30' : 'text-slate-500 hover:text-white hover:bg-white/5'
              }`}
            >
