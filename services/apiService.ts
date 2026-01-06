@@ -83,11 +83,13 @@ export const generateSimulatorStep = async (bias: Bias, phase: 'pre' | 'teach' |
 export const generateHint = async (biasName: string): Promise<string> => {
   try {
     const content = await callOpenRouter([
-      { role: "user", content: `Short, 1-sentence cryptic hint for: "${biasName}". No spoilers. Max 10 words.` }
+      { role: "system", content: "You are a helpful tutor. Provide a short, clever clue." },
+      { role: "user", content: `Give a 1-sentence hint for the cognitive bias "${biasName}" without saying the name. Focus on the mechanism.` }
     ], { model: "openai/gpt-oss-20b" });
     return content.trim();
-  } catch {
-    return "Think about the core concept.";
+  } catch (e) {
+    console.error("Hint generation failed:", e);
+    return "Think about the definition.";
   }
 };
 
