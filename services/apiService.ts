@@ -163,10 +163,28 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
   return JSON.parse(content);
 };
 
-export const runAlgorithmTest = async (biasName: string, definition: string, pseudoCode: string): Promise<any> => {
-  const prompt = `Unit Test Logic: Concept="${biasName}", Code="${pseudoCode}". Run 3 tests. Output JSON: { "results": [{ "testCase": string, "scenario": string, "isPass": boolean, "error": string, "suggestion": string }], "overallAssessment": string, "status": string }`;
+export const runAlgorithmTest = async (biasName: string, definition: string, logicDescription: string): Promise<any> => {
+  const prompt = `
+    LOGIC COMPILER PROTOCOL:
+    Concept: "${biasName}"
+    User Logic Description: "${logicDescription}"
+    
+    TASK:
+    1. Parse the user's natural language description into a logical "Circuit" (AST).
+    2. Run 3 adversarial unit tests against this logic to see if it correctly identifies or succumbs to the bias.
+    
+    Output JSON: 
+    { 
+      "ast": { "root": { "type": "string", "value": "string", "children": [] } },
+      "results": [
+        { "testCase": "string", "scenario": "string", "isPass": boolean, "error": "string", "suggestion": "string" }
+      ], 
+      "overallAssessment": "string", 
+      "status": "compiled | buggy | critical_failure" 
+    }
+  `;
   const content = await callOpenRouter([
-    { role: "system", content: "You are a logic compiler. JSON only." },
+    { role: "system", content: "You are a logic compiler and cognitive science auditor. JSON only." },
     { role: "user", content: prompt }
   ], { response_format: { type: "json_object" } });
   return JSON.parse(content);

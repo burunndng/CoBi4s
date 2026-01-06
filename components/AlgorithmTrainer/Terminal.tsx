@@ -1,7 +1,8 @@
 import React from 'react';
 import { AlgorithmTest } from '../../types';
 import { BIASES, FALLACIES } from '../../constants';
-import { ArrowLeft, Terminal as TerminalIcon, CheckCircle2, XCircle, AlertTriangle, ShieldCheck } from 'lucide-react';
+import { ArrowLeft, Terminal as TerminalIcon, CheckCircle2, XCircle, AlertTriangle, ShieldCheck, Workflow } from 'lucide-react';
+import { VisualAST } from './VisualAST';
 
 interface TerminalProps {
   test: AlgorithmTest;
@@ -12,78 +13,105 @@ export const Terminal: React.FC<TerminalProps> = ({ test, onBack }) => {
   const concept = [...BIASES, ...FALLACIES].find(b => b.id === test.biasId);
 
   return (
-    <div className="space-y-6 animate-in zoom-in-95 duration-500">
-      <div className="flex items-center gap-4">
+    <div className="space-y-8 animate-in zoom-in-95 duration-500">
+      <div className="flex items-center gap-6">
         <button onClick={onBack} className="p-4 -m-4 hover:bg-white/5 rounded-full text-slate-400 hover:text-white transition-all active:scale-90">
             <ArrowLeft size={24} />
         </button>
         <div>
-            <h2 className="text-xl font-medium text-white flex items-center gap-2">
-               Test Results: <span className="text-indigo-400">{concept?.name}</span>
+            <h2 className="text-3xl font-serif text-white italic">
+               Synthesis Results: <span className="text-indigo-400">{concept?.name}</span>
             </h2>
-            <p className="text-slate-500 text-xs font-mono uppercase tracking-widest">Compiler_Output_Log_{test.id.slice(0, 8)}</p>
+            <p className="text-slate-500 text-[10px] font-mono uppercase tracking-[0.4em] mt-1">Compiler_Build_Log_{test.id.slice(0, 8)}</p>
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-         {/* Code Snapshot */}
-         <div className="surface rounded-2xl border border-zinc-800 bg-[#09090b] overflow-hidden flex flex-col">
-            <div className="px-4 py-2 bg-zinc-900/50 border-b border-zinc-800 text-[10px] text-zinc-500 font-mono flex items-center gap-2">
-               <TerminalIcon size={12} /> READ_ONLY_SNAPSHOT.pseudo
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+         {/* Visual AST or Source Description */}
+         <div className="space-y-6">
+            {test.ast ? (
+              <VisualAST root={test.ast.root} />
+            ) : (
+              <div className="surface rounded-3xl border border-white/5 bg-zinc-950 overflow-hidden flex flex-col p-8">
+                 <div className="text-[10px] text-slate-500 font-bold tracking-[0.3em] uppercase mb-6 flex items-center gap-2">
+                    <Workflow size={12} /> Source_Description
+                 </div>
+                 <p className="text-lg serif italic text-slate-300 leading-relaxed">
+                    "{test.pseudoCode}"
+                 </p>
+              </div>
+            )}
+
+            <div className="surface rounded-3xl p-8 border border-white/5 bg-white/[0.01]">
+               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-6 pl-1">Unit_Tests</h3>
+               <div className="space-y-4">
+                  {test.results.map((res, idx) => (
+                     <div key={idx} className="bg-black/20 p-5 rounded-2xl border border-white/5 flex items-start gap-5 group hover:border-white/10 transition-colors">
+                        <div className="shrink-0 mt-1">
+                           {res.isPass ? <CheckCircle2 className="text-emerald-500" size={20} /> : <XCircle className="text-rose-500" size={20} />}
+                        </div>
+                        <div className="space-y-2">
+                           <p className="text-sm font-bold text-white uppercase tracking-tight">{res.testCase}</p>
+                           <p className="text-xs text-slate-500 font-medium leading-relaxed italic">"{res.scenario}"</p>
+                           {!res.isPass && (
+                              <div className="bg-rose-500/5 p-4 rounded-xl border border-rose-500/10 space-y-2 mt-2">
+                                 <p className="text-[11px] text-rose-300 font-mono flex items-center gap-2">
+                                    <AlertTriangle size={12} /> {res.error}
+                                 </p>
+                                 {res.suggestion && (
+                                    <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-2">
+                                       <ShieldCheck size={12} /> {res.suggestion}
+                                    </p>
+                                 )}
+                              </div>
+                           )}
+                        </div>
+                     </div>
+                  ))}
+               </div>
             </div>
-            <pre className="p-6 text-sm font-mono text-indigo-300 leading-relaxed overflow-x-auto">
-               {test.pseudoCode}
-            </pre>
          </div>
 
-         {/* Assessment */}
-         <div className="space-y-4">
-            <div className={`p-6 rounded-2xl border ${
-               test.status === 'compiled' ? 'bg-emerald-900/10 border-emerald-800/30' : 
-               test.status === 'buggy' ? 'bg-amber-900/10 border-amber-800/30' : 
-               'bg-rose-900/10 border-rose-800/30'
+         {/* Assessment Column */}
+         <div className="space-y-6">
+            <div className={`p-10 rounded-[2.5rem] border relative overflow-hidden ${
+               test.status === 'compiled' ? 'bg-emerald-500/5 border-emerald-500/20' : 
+               test.status === 'buggy' ? 'bg-amber-500/5 border-amber-500/20' : 
+               'bg-rose-500/5 border-rose-500/20'
             }`}>
-               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest mb-3">Overall Assessment</h3>
-               <p className="text-slate-200 text-sm leading-relaxed">{test.overallAssessment}</p>
-               <div className="mt-4 flex items-center gap-2">
-                  <div className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
-                     test.status === 'compiled' ? 'bg-emerald-500/20 border-emerald-500/50 text-emerald-400' : 
-                     test.status === 'buggy' ? 'bg-amber-500/20 border-amber-500/50 text-amber-400' : 
-                     'bg-rose-500/20 border-rose-500/50 text-rose-400'
+               <h3 className="text-[10px] font-black text-slate-500 uppercase tracking-[0.4em] mb-8">System_Verdict</h3>
+               <p className="text-xl md:text-2xl font-serif italic text-slate-100 leading-relaxed mb-10">"{test.overallAssessment}"</p>
+               
+               <div className="flex items-center gap-4">
+                  <div className={`px-6 py-2 rounded-xl text-[10px] font-black uppercase tracking-[0.2em] border ${
+                     test.status === 'compiled' ? 'bg-emerald-500/10 border-emerald-500/30 text-emerald-400' : 
+                     test.status === 'buggy' ? 'bg-amber-500/10 border-amber-500/30 text-amber-400' : 
+                     'bg-rose-500/10 border-rose-500/30 text-rose-400'
                   }`}>
-                     Status: {test.status.replace('_', ' ')}
+                     {test.status.replace('_', ' ')}
                   </div>
+                  <div className="h-px flex-1 bg-white/5"></div>
+               </div>
+
+               {/* Background visual flair */}
+               <div className="absolute top-0 right-0 p-8 opacity-5">
+                  <Workflow size={120} />
                </div>
             </div>
 
-            <div className="space-y-3">
-               <h3 className="text-xs font-bold text-slate-500 uppercase tracking-widest pl-2">Logic unit tests</h3>
-               {test.results.map((res, idx) => (
-                  <div key={idx} className="surface p-4 rounded-xl border border-zinc-800 flex items-start gap-4">
-                     <div className="shrink-0 mt-1">
-                        {res.isPass ? <CheckCircle2 className="text-emerald-500" size={18} /> : <XCircle className="text-rose-500" size={18} />}
-                     </div>
-                     <div className="space-y-2">
-                        <div>
-                           <p className="text-xs font-bold text-white uppercase tracking-tighter">{res.testCase}</p>
-                           <p className="text-xs text-slate-500 mt-0.5">Scenario: {res.scenario}</p>
-                        </div>
-                        {!res.isPass && (
-                           <div className="bg-rose-950/20 p-3 rounded-lg border border-rose-900/30 space-y-2">
-                              <p className="text-[11px] text-rose-300 font-mono flex items-center gap-2">
-                                 <AlertTriangle size={12} /> {res.error}
-                              </p>
-                              {res.suggestion && (
-                                 <p className="text-[11px] text-emerald-400 font-mono flex items-center gap-2">
-                                    <ShieldCheck size={12} /> {res.suggestion}
-                                 </p>
-                              )}
-                           </div>
-                        )}
-                     </div>
+            {/* In-the-Wild Context */}
+            {concept && (
+               <div className="surface p-8 rounded-3xl border border-white/5 bg-indigo-500/5">
+                  <h3 className="text-[10px] font-black text-indigo-400 uppercase tracking-[0.4em] mb-4">Neural_Lens</h3>
+                  <div className="flex flex-wrap gap-2">
+                     {concept.transferCues?.map((cue, i) => (
+                        <span key={i} className="px-3 py-1.5 bg-black/40 border border-white/5 rounded-lg text-[10px] text-indigo-200/70 font-medium tracking-wide">
+                           {cue}
+                        </span>
+                     ))}
                   </div>
-               ))}
-            </div>
+               </div>
+            )}
          </div>
       </div>
     </div>

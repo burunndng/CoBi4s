@@ -84,6 +84,13 @@ export interface AlgorithmTest {
   }[];
   overallAssessment: string;
   status: 'compiled' | 'buggy' | 'critical_failure';
+  ast?: {
+    root: {
+      type: string;
+      value: string;
+      children?: any[];
+    }
+  };
 }
 
 export interface ContextScenario {
