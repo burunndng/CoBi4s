@@ -81,6 +81,8 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
              </div>
           </div>
           <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
+            {/* Hidden username field for accessibility/password managers */}
+            <input type="text" name="username" autoComplete="username" className="hidden" aria-hidden="true" value="cognibias-user" readOnly />
             <input 
               type="password"
               value={apiKey}

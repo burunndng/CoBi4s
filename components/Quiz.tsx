@@ -1,32 +1,48 @@
 
 import React, { useState } from 'react';
-import { Check, ArrowRight, Loader2, Award, ClipboardCheck, Zap } from 'lucide-react';
-import { Bias, QuizQuestion } from '../types';
+import { Check, ArrowRight, Loader2, Award, ClipboardCheck, Zap, ShieldAlert, Heart, XCircle } from 'lucide-react';
+import { Bias, QuizQuestion, AppState } from '../types';
 import { generateQuizQuestion } from '../services/apiService';
 
 interface QuizProps {
-  biases: Bias[];
-  onXpGain: (xp: number) => void;
+  state: AppState;
+  updateProgress: (id: string, quality: number) => void;
 }
 
-const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
+const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
   const [selected, setSelected] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
-  const [score, setScore] = useState(0);
+  const [integrity, setIntegrity] = useState(100);
   const [count, setCount] = useState(0);
+  const [error, setError] = useState<string | null>(null);
+
+  const biases = state.mode === 'psychology' ? Object.values(state.progress).map(p => ({ id: p.biasId, name: p.biasId, definition: '' })) : [];
 
   const fetchNextQuestion = async () => {
     setLoading(true);
     setAnswered(false);
     setSelected(null);
+    setError(null);
     try {
-      const q = await generateQuizQuestion(biases);
+      // Use fallback if no progress yet
+      const sourceBiases = state.mode === 'psychology' ? 
+        (Object.keys(state.progress).length > 0 ? Object.keys(state.progress).map(id => ({ id, name: id })) : [{ id: 'confirmation_bias', name: 'Confirmation Bias' }]) :
+        (Object.keys(state.fallacyProgress).length > 0 ? Object.keys(state.fallacyProgress).map(id => ({ id, name: id })) : [{ id: 'ad_hominem', name: 'Ad Hominem' }]);
+
+      const q = await generateQuizQuestion(sourceBiases as any[]);
+      
+      // Defensive check for AI response integrity
+      if (!q || !q.options || q.options.length === 0) {
+        throw new Error("AI generated malformed logic trap.");
+      }
+      
       setQuestion(q);
     } catch (err) {
       console.error(err);
+      setError("The logic engine stuttered. Re-initializing...");
     } finally {
       setLoading(false);
     }
@@ -34,7 +50,7 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
 
   const handleStart = () => {
     setActive(true);
-    setScore(0);
+    setIntegrity(100);
     setCount(0);
     fetchNextQuestion();
   };
@@ -43,9 +59,14 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
     if (answered) return;
     setSelected(option);
     setAnswered(true);
-    if (option === question?.correctAnswer) {
-      setScore(s => s + 1);
-      onXpGain(15);
+    
+    const isCorrect = option === question?.correctAnswer;
+    
+    if (isCorrect) {
+      updateProgress(question!.biasId, 5);
+    } else {
+      setIntegrity(prev => Math.max(0, prev - 25));
+      updateProgress(question!.biasId, 1);
     }
     setCount(c => c + 1);
   };
@@ -53,47 +74,52 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
   if (!active) {
     return (
       <div className="max-w-xl mx-auto py-12 animate-fade-in">
-        <div className="surface p-10 md:p-14 rounded-xl text-center space-y-8">
+        <div className="surface p-10 md:p-14 rounded-3xl text-center space-y-8 border-rose-500/10">
           <div className="flex justify-center">
-            <div className="p-4 rounded-full border border-zinc-800 relative">
-              <ClipboardCheck size={32} className="text-zinc-500" />
+            <div className="p-6 rounded-full border border-rose-500/20 bg-rose-500/5 relative animate-pulse">
+              <ShieldAlert size={40} className="text-rose-500" />
               <div className="absolute -top-1 -right-1">
-                <Zap size={14} className="text-blue-500 fill-blue-500" />
+                <Zap size={18} className="text-amber-500 fill-amber-500" />
               </div>
             </div>
           </div>
-          <div className="space-y-2">
-            <h2 className="serif text-3xl text-white italic">Assessment</h2>
-            <p className="text-zinc-500 text-sm max-w-sm mx-auto">System optimized for low-latency scenario generation.</p>
+          <div className="space-y-3">
+            <h2 className="serif text-4xl text-white italic">Shadow Quiz</h2>
+            <p className="text-slate-500 text-sm max-w-sm mx-auto uppercase tracking-widest leading-relaxed">
+              Adversarial assessment protocol. <br/> Identify the trap or lose integrity.
+            </p>
           </div>
           <button 
             onClick={handleStart}
-            className="btn-primary w-full py-4 rounded-md text-xs font-bold uppercase tracking-widest"
+            className="btn-primary w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-rose-900/20 active:scale-95 transition-all"
           >
-            Initiate Sequence
+            INITIALIZE_TRAP_SEQUENCE
           </button>
         </div>
       </div>
     );
   }
 
-  if (count >= 5 && answered) {
+  if (integrity <= 0 || (count >= 5 && answered)) {
+    const isDefeated = integrity <= 0;
     return (
       <div className="max-w-md mx-auto py-12 text-center animate-fade-in">
-        <div className="surface p-12 rounded-xl space-y-8">
-          <div className="p-4 bg-zinc-900 w-fit mx-auto rounded-full border border-zinc-800">
-            <Award size={40} className="text-white" />
+        <div className={`surface p-12 rounded-3xl space-y-8 border ${isDefeated ? 'border-rose-500/30' : 'border-emerald-500/30'}`}>
+          <div className={`p-6 w-fit mx-auto rounded-full border ${isDefeated ? 'bg-rose-500/10 border-rose-500/20 text-rose-500' : 'bg-emerald-500/10 border-emerald-500/20 text-emerald-500'}`}>
+            {isDefeated ? <XCircle size={48} /> : <Award size={48} />}
           </div>
           <div>
-            <div className="text-4xl font-serif text-white italic">{Math.round((score/5)*100)}%</div>
-            <p className="text-zinc-500 text-[10px] font-bold uppercase tracking-widest mt-2">Precision Metric</p>
+            <h2 className="serif text-5xl text-white italic mb-2">{isDefeated ? 'Overwhelmed' : 'Shields Up'}</h2>
+            <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-2">
+              Final Integrity: {integrity}%
+            </p>
           </div>
           <div className="grid gap-3 pt-4">
-            <button onClick={handleStart} className="btn-primary w-full py-3 rounded-md text-xs font-bold uppercase tracking-widest">
-              Restart Protocol
+            <button onClick={handleStart} className="btn-primary w-full py-4 rounded-xl text-[10px] font-bold uppercase tracking-widest active:scale-95 transition-all">
+              Re-Initialize Sequence
             </button>
-            <button onClick={() => setActive(false)} className="text-zinc-500 hover:text-white py-3 text-xs font-bold uppercase tracking-widest transition-colors">
-              Exit Simulator
+            <button onClick={() => setActive(false)} className="text-slate-500 hover:text-white py-3 text-[10px] font-bold uppercase tracking-widest transition-colors active:scale-95">
+              Retreat to Command
             </button>
           </div>
         </div>
@@ -102,40 +128,62 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto py-8 space-y-6">
-      <div className="flex justify-between items-end border-b border-zinc-800 pb-4">
-        <div>
-          <h2 className="serif text-xl text-white italic">Assessment</h2>
-          <p className="text-[10px] text-zinc-500 uppercase font-mono tracking-widest mt-1">Item {count + 1} of 5</p>
+    <div className="max-w-3xl mx-auto py-8 space-y-8 animate-fade-in">
+      {/* Integrity HUD */}
+      <div className="flex justify-between items-center bg-white/[0.02] border border-white/5 rounded-2xl p-6 backdrop-blur-xl">
+        <div className="flex items-center gap-6">
+           <div>
+             <div className="text-[8px] font-mono text-slate-500 uppercase tracking-[0.4em] mb-1">Assessing_Logic</div>
+             <div className="text-white font-bold text-lg tracking-tight italic serif">Trap 0{count + 1}</div>
+           </div>
+           <div className="h-10 w-px bg-white/5"></div>
+           <div className="w-48 md:w-64">
+              <div className="flex justify-between text-[8px] font-mono uppercase tracking-widest mb-1.5">
+                 <span className={integrity < 40 ? 'text-rose-500 animate-pulse' : 'text-slate-500'}>Integrity_Matrix</span>
+                 <span className="text-white">{integrity}%</span>
+              </div>
+              <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                 <div 
+                   className={`h-full transition-all duration-1000 ${integrity > 60 ? 'bg-emerald-500' : integrity > 30 ? 'bg-amber-500' : 'bg-rose-600'}`}
+                   style={{ width: `${integrity}%` }}
+                 />
+              </div>
+           </div>
         </div>
-        <div className="flex items-center gap-2">
-          <div className="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></div>
-          <div className="text-[10px] font-bold uppercase tracking-widest text-zinc-400">Score: {score}</div>
-        </div>
+        <Heart size={20} className={integrity < 40 ? 'text-rose-500 animate-pulse' : 'text-slate-800'} />
       </div>
 
-      <div className="min-h-[400px] flex flex-col justify-center">
+      <div className="min-h-[400px] flex flex-col">
         {loading ? (
-          <div className="flex flex-col items-center gap-4 text-zinc-600 animate-pulse">
-            <Loader2 className="animate-spin" size={24} />
-            <span className="text-[10px] font-mono uppercase tracking-widest">Synthesizing...</span>
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 text-slate-700">
+            <Loader2 className="animate-spin" size={32} />
+            <span className="text-[10px] font-mono uppercase tracking-[0.5em] animate-pulse">Setting_Trap...</span>
+          </div>
+        ) : error ? (
+          <div className="flex-1 flex flex-col items-center justify-center gap-6 text-rose-500 surface rounded-3xl p-12">
+             <ShieldAlert size={48} />
+             <p className="text-sm font-mono uppercase tracking-widest">{error}</p>
+             <button onClick={fetchNextQuestion} className="px-8 py-3 bg-rose-500/10 border border-rose-500/20 text-rose-500 rounded-xl text-[10px] font-bold uppercase tracking-widest active:scale-95 transition-all">Retry Link</button>
           </div>
         ) : question && (
-          <div className="animate-fade-in space-y-10">
-             <div className="surface p-8 border-l-2 border-white">
-                <p className="text-sm text-zinc-200 leading-relaxed whitespace-pre-wrap italic">"{question.content}"</p>
+          <div className="space-y-10">
+             <div className="surface p-10 rounded-3xl border-l-4 border-white shadow-2xl relative overflow-hidden group">
+                <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity">
+                   <ShieldAlert size={120} />
+                </div>
+                <p className="text-xl md:text-2xl text-slate-100 leading-relaxed italic serif relative z-10">"{question.content}"</p>
              </div>
 
-             <div className="grid gap-3">
+             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                {question.options.map((opt, idx) => {
                  const isCorrect = opt === question.correctAnswer;
                  const isSelected = opt === selected;
-                 let style = 'border-zinc-800 hover:bg-zinc-900 text-zinc-400';
+                 let style = 'bg-white/[0.02] border-white/5 hover:bg-white/[0.05] hover:border-white/10 text-slate-400';
                  
                  if (answered) {
-                   if (isCorrect) style = 'border-white bg-zinc-100 text-black font-semibold';
-                   else if (isSelected) style = 'border-red-900 bg-red-950/20 text-red-500';
-                   else style = 'opacity-30 border-zinc-900';
+                   if (isCorrect) style = 'border-emerald-500/50 bg-emerald-500/10 text-emerald-100 font-bold shadow-[0_0_20px_rgba(16,185,129,0.1)]';
+                   else if (isSelected) style = 'border-rose-500/50 bg-rose-500/10 text-rose-100';
+                   else style = 'opacity-20 grayscale border-white/5';
                  }
 
                  return (
@@ -143,31 +191,36 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
                      key={idx}
                      disabled={answered}
                      onClick={() => handleAnswer(opt)}
-                     className={`w-full p-4 rounded-md border text-left text-sm transition-all flex items-center gap-4 ${style}`}
+                     className={`w-full p-6 rounded-2xl border text-left text-sm transition-all flex items-start gap-4 active:scale-[0.98] ${style}`}
                    >
-                     <span className={`w-6 h-6 flex items-center justify-center border rounded font-mono text-[10px] ${
-                        answered && isCorrect ? 'border-black/20 text-black/40' : 'border-zinc-800 text-zinc-600'
+                     <span className={`w-6 h-6 flex items-center justify-center border rounded-lg font-mono text-[10px] shrink-0 mt-0.5 ${
+                        answered && isCorrect ? 'bg-emerald-500 border-emerald-400 text-black' : 'border-white/10 text-slate-600'
                      }`}>
                         {String.fromCharCode(65 + idx)}
                      </span>
-                     {opt}
+                     <span className="leading-snug">{opt}</span>
                    </button>
                  );
                })}
              </div>
 
              {answered && (
-               <div className="surface p-8 border border-zinc-800 animate-fade-in space-y-4">
-                  <div className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-zinc-500">
-                    <Check size={12} /> Rationale
+               <div className="surface p-8 rounded-3xl border border-white/5 animate-in slide-in-from-bottom-4 duration-500 space-y-6">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 text-[10px] font-black uppercase tracking-[0.3em] text-slate-500">
+                      <Check size={14} className="text-emerald-500" /> System_Rationale
+                    </div>
+                    <div className={`text-[10px] font-black uppercase tracking-[0.3em] ${selected === question.correctAnswer ? 'text-emerald-500' : 'text-rose-500'}`}>
+                      {selected === question.correctAnswer ? '✓ INTEGRITY_MAINTAINED' : '✗ SYSTEM_BREACH'}
+                    </div>
                   </div>
-                  <p className="text-sm text-zinc-300 leading-relaxed">{question.explanation}</p>
+                  <p className="text-sm text-slate-300 leading-relaxed font-light border-l-2 border-white/10 pl-6 italic">"{question.explanation}"</p>
                   <div className="pt-4 flex justify-end">
                     <button 
                       onClick={fetchNextQuestion}
-                      className="px-6 py-2 border border-white text-white text-[10px] font-bold uppercase tracking-widest hover:bg-white hover:text-black transition-all"
+                      className="px-10 py-4 bg-white text-black rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-50 transition-all active:scale-95 shadow-xl"
                     >
-                      Advance <ArrowRight size={12} className="inline ml-1" />
+                      Initialize_Next_Trap <ArrowRight size={14} className="inline ml-2" strokeWidth={3} />
                     </button>
                   </div>
                </div>
@@ -178,5 +231,7 @@ const Quiz: React.FC<QuizProps> = ({ biases, onXpGain }) => {
     </div>
   );
 };
+
+export default Quiz;
 
 export default Quiz;

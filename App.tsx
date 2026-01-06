@@ -169,7 +169,6 @@ const App: React.FC = () => {
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
             <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" />
             <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
-            <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" />
             <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
             <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
             <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" />
@@ -257,7 +256,6 @@ const App: React.FC = () => {
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" onClick={() => setIsMobileMenuOpen(false)} />

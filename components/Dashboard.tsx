@@ -130,6 +130,12 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
             icon={<Zap size={18} />}
             onClick={() => navigate('/flashcards')} 
           />
+          <NavCard 
+            title="Shadow Quiz" 
+            desc="Integrity Test" 
+            icon={<ShieldAlert size={20} className="text-amber-500" />}
+            onClick={() => navigate('/quiz')} 
+          />
 
           {/* Neural Bridge: Aura OS Portal */}
           <div className="pt-2">
