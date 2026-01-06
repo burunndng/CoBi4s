@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback } from 'react';
 import { HashRouter, Routes, Route, Link, useLocation } from 'react-router-dom';
 import { 
@@ -24,6 +23,7 @@ import {
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
+import { pruneState } from './lib/storageManager';
 import Dashboard from './components/Dashboard';
 import Catalog from './components/Catalog';
 import Flashcards from './components/Flashcards';
@@ -38,9 +38,6 @@ import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer
 import { ContextLab } from './components/ContextLab/ContextLab';
 import { ChatInterface } from './components/SocraticChat/ChatInterface';
 import { LandingPage } from './components/LandingPage';
-
-// --- Types & Constants ---
-// (Moved to separate files: types.ts and constants.ts)
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -62,13 +59,6 @@ const App: React.FC = () => {
   });
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
-
-import { pruneState } from './lib/storageManager';
-
-// ... (rest of imports)
-
-const App: React.FC = () => {
-  // ... (state setup)
 
   useEffect(() => {
     const safeState = pruneState(state);
@@ -213,7 +203,7 @@ const App: React.FC = () => {
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
-                      state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
+                      state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-xl border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
                     <ShieldAlert size={12} />
