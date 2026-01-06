@@ -311,7 +311,7 @@ const App: React.FC = () => {
                 <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
                 <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
                 <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
-                <Route path="/decision" element={<DecisionArchitect state={state} />} />
+                <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
                 <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
                 <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
                 <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} setState={setState} toggleFavorite={(id) => {
