@@ -57,6 +57,7 @@ const App: React.FC = () => {
     }
     return INITIAL_STATE;
   });
+  
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [toasts, setToasts] = useState<{ id: number; message: string; type: 'success' | 'error' }[]>([]);
 

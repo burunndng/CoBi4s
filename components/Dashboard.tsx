@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle } from 'lucide-react';
 import { AppState, ProgressState } from '../types';
 import { BIASES } from '../constants';
 
