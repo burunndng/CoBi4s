@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v7'; // Bumped to force total purge of stale index.html
+const CACHE_NAME = 'cognibias-v8'; // ⚡️ AGGRESSIVE PURGE
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -8,7 +8,7 @@ const STATIC_ASSETS = [
 
 // ⚡️ PWA SENTINEL: Infrastructure Core
 self.addEventListener('install', (event) => {
-  self.skipWaiting();
+  self.skipWaiting(); // Force the waiting service worker to become the active service worker.
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
@@ -23,17 +23,20 @@ self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((keys) => {
       return Promise.all(
-        keys.filter((key) => key !== CACHE_NAME).map((key) => {
-          console.log('[SW] Purging old cache:', key);
-          return caches.delete(key);
+        keys.map((key) => {
+          if (key !== CACHE_NAME) {
+            console.log('[SW] PURGING_STALE_CACHE:', key);
+            return caches.delete(key);
+          }
         })
       );
     })
   );
+  // Claim all clients immediately to prevent stale state in existing tabs
   return self.clients.claim();
 });
 
-// 🌊 Stale-While-Revalidate Strategy
+// 🌊 Network-First Strategy for Entry Points, Stale-While-Revalidate for Assets
 self.addEventListener('fetch', (event) => {
   if (event.request.method !== 'GET') return;
 
@@ -43,6 +46,23 @@ self.addEventListener('fetch', (event) => {
   
   if (!isInternal && !isFont) return;
 
+  // ⚡️ CRITICAL FIX: Bypass cache entirely for index.html and root to prevent stale hashes
+  const isEntryPoint = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
+
+  if (isEntryPoint) {
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(event.request))
+    );
+    return;
+  }
+
+  // Standard Stale-While-Revalidate for other assets
   event.respondWith(
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
@@ -51,16 +71,7 @@ self.addEventListener('fetch', (event) => {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
-        }).catch((err) => {
-          console.error('[SW] Fetch failed:', err);
-          return cachedResponse;
-        });
-
-        // ⚡️ ARCHITECT PREFERENCE: For the main entry point (index.html), 
-        // always prioritize network to prevent stale hashes in build.
-        if (url.pathname.endsWith('/') || url.pathname.endsWith('index.html')) {
-          return fetchPromise || cachedResponse;
-        }
+        }).catch(() => cachedResponse);
 
         return cachedResponse || fetchPromise;
       });
