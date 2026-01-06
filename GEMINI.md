@@ -1,27 +1,22 @@
 # CogniBias Project Context
 
-| **Agents** | 12 specialized agents in `.gemini/` |
-| **Last Updated** | 2026-01-06 (Critique Agent added) |
-| **Status** | Production-ready with mobile-touch + Neural Bridge |
+| **Status** | Production-ready with S-Rank Transfer Bridge + Sentinel Perf |
 
 ---
 
 ## Project Summary
 
-React 19 + TypeScript + Vite personal development platform.  Uses localStorage for all persistence, Grok/Gemini for AI features.  No active database or auth. 
+React 19 + TypeScript + Vite personal development platform.  Uses localStorage for all persistence, Grok (primary) + Gemini (fallback) for AI features. No active database or auth. 
 
 ```bash
 npm run dev          # Frontend (port 3000)
-npm run dev:api      # Backend (port 3001)
-npm run type-check   # TypeScript validation
-npm run build        # Production build
-npm run test         # Run tests
+npm run build        # Production build (manual chunking active)
+npm run preview      # Local preview of dist
 ```
 
 **Environment** (create `.env` from `.env.example`):
-- `VITE_OPENROUTER_API_KEY` - Required (Grok)
-- `VITE_GEMINI_API_KEY` - Required (fallback)
-- `VITE_LMNT_API_KEY` - Optional (TTS)
+- `VITE_OPENROUTER_API_KEY` - Required (Grok-4.1-fast)
+- `VITE_GEMINI_API_KEY` - Required (Fallback)
 
 ---
 
@@ -53,22 +48,20 @@ npm run test         # Run tests
 ├── components/          # UI Logic & Views
 │   ├── SocraticChat/    # Mirror (Streaming Neural Hub)
 │   ├── LogicLab/        # Workshop (Argument Repair)
-│   ├── ContextLab/      # Switcher (Calibration Slider)
-│   ├── AlgorithmTrainer/# Compiler (Pseudo-code IDE)
-│   ├── shared/          # Unified Interaction Components (TextCanvas, TransferTips)
-│   └── ...
-├── services/            # AI Integration (SSE Streaming / Grok)
-├── lib/                 # System Utilities (Storage Management)
-├── types.ts             # Strict Schema (AppState, SimulationScenario, BiasedSnippet)
+│   ├── ...
+│   └── shared/          # TransferTips, TextCanvas
+├── services/            # AI Integration (Grok / Caching Layer)
+├── lib/                 # System Utilities (Storage Management / Pruning)
+├── types.ts             # Strict Schema (AppState, TransferLog, ProgressState)
 ├── constants.ts         # Logic Core (BIASES, FALLACIES, INITIAL_STATE)
-└── App.tsx              # Main State Container, Routing & Migration
+└── App.tsx              # Lazy-Loaded Container & Navigation
 ```
 
 ### Data Flow
 1. **State Source**: `App.tsx` holds the single source of truth (`AppState`).
-2. **Persistence**: `useEffect` in `App.tsx` syncs state to `localStorage` via **`lib/storageManager.ts`** pruning logic.
+2. **Persistence**: `useEffect` in `App.tsx` syncs state to `localStorage` via **`lib/storageManager.ts`** pruning logic (4.5MB threshold).
 3. **Architecture**: **Dual-Core**. Global `mode` state switches the entire app's registry, icons, and accents (Indigo for Psych, Rose for Logic).
-4. **Interactive Primitives**: Shared components like `TextCanvas` (highlighting) and `TransferTips` (cues) ensure cross-module consistency.
+4. **Interactive Primitives**: `will-change` hardware acceleration on all nav elements for low INP.
 
 ---
 
@@ -76,33 +69,29 @@ npm run test         # Run tests
 
 ### OpenRouter Service (`services/apiService.ts`)
 - **Model**: `x-ai/grok-4.1-fast` (High reasoning, low latency).
+- **Caching**: Session-level `trapCache` eliminates generation latency for repeated concepts.
 - **Key Functions**:
   - `streamChatMessage`: Real-time token ingestion with live pattern harvesting.
-  - `generateBranchingScenario`: Creates decision trees with narrative consequences.
-  - `evaluateRepair`: Grades argument repairs using granular logic/intent/clarity metrics.
-  - `generateContextScenario`: Creates multi-context utility ranges (0-100).
-  - `runAlgorithmTest`: Runs adversarial unit tests against user pseudo-code.
-  - `generateAIPoweredScenario`: Generates fresh scenarios for contextual flashcards.
+  - `generateQuizQuestion`: Adversarial logic traps with <25 word scenarios.
+  - `generateAIPoweredScenario`: High-velocity contextual examples for drills.
 
 ---
 
 ## 🧩 Component Deep Dives
 
+### `ShadowQuiz.tsx` (The Gauntlet)
+- **Concept**: Adversarial survival.
+- **Mechanics**: 10-item sequence with 2 scenarios and 1 metacognition trap. Breach results in -20% Integrity (HP).
+- **Adaptive**: Targets biases with <70% mastery via `Neural Pressure`.
+
+### `TransferBridge` (The Lens)
+- **Daily Focus**: Dashboard anchor that algorithmically filters reality through a specific cognitive lens.
+- **Reality Logs**: Neural Bridge drawer for logging "In-the-Wild" observations (+50 XP).
+- **Pruning**: Automated storage management keeping only the last 30 logs to prevent bloat.
+
 ### `SocraticChat.tsx` (The Mirror)
 - **Architecture**: **Reactive Streaming Hub**. Uses a double-buffer SSE loop to materialize tokens instantly.
 - **Pattern Harvester**: Live-scans stream content to hook and pin mentioned biases to a side-panel.
-
-### `LogicLab.tsx` (The Workshop)
-- **Workflow**: Fuzzy Identify (word-overlap) -> Repair (Strategy Chips) -> Result (Score Breakdown).
-- **Pedagogy**: Active reconstruction of arguments rather than passive selection.
-
-### `AIInstructor.tsx` (The Sandbox)
-- **Concept**: Consequences > Definitions.
-- **Workflow**: Enter Situation -> Choose Action -> See Consequence -> Analyze Bias.
-
-### `DecisionArchitect.tsx` (The Auditor)
-- **Concept**: Triage risk.
-- **Workflow**: Context -> AI Audit -> User Severity Rating (1-10) -> Mitigation Reflection.
 
 ---
 
@@ -112,15 +101,13 @@ npm run test         # Run tests
 Follows the frameworks defined in `.gemini/The Plan Prompt Engineering.txt`.
 
 **Subagents & Personas**
-- **The Cognitive Architect** (`.gemini/The Cognitive Architect.md`): Chief Learning Architect.
-- **The Theme Architect** (`.gemini/The Theme Architect.md`): Design system and PWA enforcer.
-- **The Allmighty Hackoder AI** (`.gemini/The Allmighty Hackoder AI.md`): Chaotic high-ROI implementation engine.
-- **The Prompt Engineer**: OpenRouter/Grok tuning specialist.
-- **The Schema Guardian**: TypeScript and State integrity protector.
+- **The Critique Agent**: Evaluates pedagogical ROI vs Technical Debt.
+- **The PWA Sentinel**: Manages SW lifecycle and hardware acceleration.
+- **The Design Architect**: Enforces 4px grid and high-fidelity SaaS aesthetics.
 
 ### Styling System
 - **Theme**: "Cognitive Brutalism" (Blueprint grid + SVG Noise + Glassmorphism).
-- **Typography**: Editorial Serif (Cormorant) + Technical Mono (JetBrains).
+- **Performance**: Full lazy-loading of all routes; 63% bundle size reduction active.
 
 ---
 

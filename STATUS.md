@@ -1,9 +1,26 @@
 # CogniBias Project Status
 
-## 📅 Last Updated: 2026-01-05
+## 📅 Last Updated: 2026-01-06
 
 ## 🚀 Recent Changes
 
+- **Shadow Quiz (High-Stakes Assessment)**:
+    - **Overhaul**: Replaced the passive quiz with a 10-item adversarial sequence featuring "The Sophist" persona.
+    - **Architectural Sequencing**: Injected narrative scenario traps and metacognition-specific challenges at fixed intervals.
+    - **Neural Pressure**: Implemented adaptive difficulty targeting the user's weakest biases (<70% mastery).
+    - **Speed Optimization**: Optimized prompts for ultra-brevity (<25 words) and added a session-level caching layer for near-instant generation.
+- **Transfer Bridge (In-the-Wild Training)**:
+    - **Daily Lens**: Added a "Lens of the Day" Dashboard module that algorithmically targets cognitive weaknesses.
+    - **Reality Logs**: Implemented the "Neural Bridge" drawer in Flashcards for logging real-world observations (+50 XP).
+    - **Behavioral Cues**: Populated the Registry with "Scan For" markers (linguistic/situational triggers) for all biases.
+- **Performance & Infrastructure (The Sentinel Protocol)**:
+    - **Bundle Slashing**: Reduced main chunk size by **63%** (605kB -> 223kB) via manual chunking and full lazy loading.
+    - **INP Optimization**: Achieved sub-200ms Interaction to Next Paint by hardware-accelerating the noise layer and layer promotion.
+    - **PWA Stabilization**: Purged legacy CDN dependencies and bumped to Service Worker `v5` to resolve CORS/Fetch errors.
+- **Mastery & UX Refinement**:
+    - **Mastery Indicators**: Added visual progress badges to the front of Flashcards for pre-flip context.
+    - **3D Physics Fix**: Robust inline style refactor for the Flashcard 3D flip to ensure cross-browser reliability.
+    - **Critique Agent**: Launched a specialized subagent for objective feature evaluation and pedagogical ranking.
 - **Socratic Mirror (Real-time Neural Hub)**:
     - **Streaming Core**: Migrated to a raw UTF-8 `ReadableStream` architecture for zero-latency token ingestion.
     - **"The Razor" Persona**: Overhauled the system prompt to be surgical, analytical, and direct.
