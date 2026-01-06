@@ -323,33 +323,25 @@ export const generateBranchingScenario = async (bias: Bias): Promise<any> => {
     }
   };
   
-  export const generateAdversarialStatement = async (
+export const generateAdversarialStatement = async (
     topic: string, 
     history: { role: string, content: string }[], 
     fallacyList: Fallacy[]
   ): Promise<{ content: string, fallacyId: string }> => {
-    const fallacies = fallacyList.map(f => `${f.name} (ID: ${f.id})`).join(', ');
+    const fallacy = fallacyList[Math.floor(Math.random() * fallacyList.length)];
     const prompt = `
       TOPIC: "${topic}"
-      YOUR GOAL: You are a hostile debater. You must defend your position aggressively.
-      ADVERSARIAL RULE: You MUST inject exactly ONE logical fallacy into your next response.
-      FALLACY OPTIONS: ${fallacies}
+      FALLACY_TO_INJECT: "${fallacy.name}" (ID: ${fallacy.id})
       
-      INSTRUCTIONS:
-      1. Look at the history.
-      2. Counter the user's points (if any).
-      3. Inject the chosen fallacy in a way that sounds plausible or emotional.
-      4. Return ONLY JSON.
+      GOAL: Aggressive, hostile debater. 
+      RULE: Response must be under 25 words. 
+      INSTRUCTION: Counter the user and hide the FALLACY inside. 
       
-      Output JSON:
-      {
-        "content": "Your debate response here...",
-        "fallacyId": "The ID of the fallacy you injected"
-      }
+      Output JSON: { "content": "...", "fallacyId": "${fallacy.id}" }
     `;
   
     const content = await callOpenRouter([
-      { role: "system", content: "You are a master debater and logic trap setter. JSON only." },
+      { role: "system", content: "You are a master of hostile rhetoric and logical traps. JSON only. Maximum 25 words." },
       { role: "user", content: prompt }
     ], { response_format: { type: "json_object" }, temperature: 0.8 });
     
