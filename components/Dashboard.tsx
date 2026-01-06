@@ -1,7 +1,7 @@
 
 import React, { useMemo, useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords, ExternalLink, ShieldAlert, Target, CheckCircle2, MoreHorizontal } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords, ExternalLink, ShieldAlert, Target, CheckCircle2, MoreHorizontal, Binary } from 'lucide-react';
 import { AppState, ProgressState, Bias } from '../types';
 import { BIASES } from '../constants';
 import { CognitiveRadar } from './visualizations/CognitiveRadar';
