@@ -1,17 +1,18 @@
 import React from 'react';
-import { 
-  Library, 
-  BookOpen, 
-  BrainCircuit, 
-  ShieldAlert, 
-  FlaskConical, 
-  Shuffle, 
-  MessageSquare, 
-  Binary, 
+import {
+  Library,
+  BookOpen,
+  BrainCircuit,
+  ShieldAlert,
+  FlaskConical,
+  Shuffle,
+  MessageSquare,
+  Binary,
   ArrowRight,
   TrendingUp
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { NeuralBackground } from './visualizations/NeuralBackground';
 
 export const LandingPage: React.FC = () => {
   const navigate = useNavigate();
@@ -68,10 +69,12 @@ export const LandingPage: React.FC = () => {
   ];
 
     return (
-      <div className="space-y-32 py-20 animate-fade-in pb-32">
+      <div className="space-y-32 py-20 animate-fade-in pb-32 relative">
+        {/* Neural Network Background */}
+        <NeuralBackground />
+
         {/* Hero Section */}
-        <section className="text-center space-y-12 max-w-4xl mx-auto px-4">
-          <div className="space-y-6">
+        <section className="text-center space-y-12 max-w-4xl mx-auto px-4 relative z-10">          <div className="space-y-6">
             <div className="inline-block px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/5 text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
               Version_4.1 // Cognitive_Architect
             </div>

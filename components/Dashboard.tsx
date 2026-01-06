@@ -4,6 +4,7 @@ import { useNavigate } from 'react-router-dom';
 import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords, ExternalLink } from 'lucide-react';
 import { AppState, ProgressState } from '../types';
 import { BIASES } from '../constants';
+import { CognitiveRadar } from './visualizations/CognitiveRadar';
 
 interface DashboardProps {
   state: AppState;
@@ -15,6 +16,21 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
   const masteredCount = useMemo(() => {
     return (Object.values(state.progress) as ProgressState[]).filter(p => p.masteryLevel >= 80).length;
   }, [state.progress]);
+
+  const radarData = useMemo(() => {
+    // Mock categorization for visual impact (in a real app, categorize BIASES)
+    const psychScore = (Object.values(state.progress) as ProgressState[]).length * 10;
+    const logicScore = (Object.values(state.fallacyProgress || {}) as ProgressState[]).length * 10;
+    
+    return [
+      { subject: 'Psych', A: Math.min(100, psychScore + 20), fullMark: 100 },
+      { subject: 'Logic', A: Math.min(100, logicScore + 10), fullMark: 100 },
+      { subject: 'Speed', A: Math.min(100, state.totalXp / 50), fullMark: 100 },
+      { subject: 'Focus', A: Math.min(100, state.dailyStreak * 5 + 30), fullMark: 100 },
+      { subject: 'Defense', A: 40, fullMark: 100 },
+      { subject: 'Strategy', A: 65, fullMark: 100 },
+    ];
+  }, [state]);
 
   const focusBias = useMemo(() => {
     const now = Date.now();
@@ -39,7 +55,21 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
       </header>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <MetricTile label="Mastery" value={`${Math.round((masteredCount / BIASES.length) * 100)}%`} icon={<Trophy size={14} />} color="text-amber-500" />
+        {/* Viz Tile */}
+        <div className="surface p-4 rounded-2xl flex flex-col justify-between group relative overflow-hidden">
+           <div className="absolute inset-0 opacity-50 pointer-events-none">
+              <CognitiveRadar data={radarData} />
+           </div>
+           <div className="relative z-10 flex justify-between items-start">
+              <div className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500">Cognitive_Map</div>
+              <Activity size={14} className="text-indigo-400" />
+           </div>
+           <div className="relative z-10 text-right mt-auto">
+              <div className="text-2xl font-mono tabular-nums text-white tracking-tighter">{masteredCount}</div>
+              <div className="text-[9px] text-slate-500 uppercase tracking-widest">Mastered_Nodes</div>
+           </div>
+        </div>
+
         <MetricTile label="Streak" value={`${state.dailyStreak}d`} icon={<Activity size={14} />} color="text-emerald-500" />
         <MetricTile label="Exp" value={state.totalXp} icon={<Zap size={14} />} color="text-indigo-400" />
         <MetricTile label="Core" value={`${masteredCount}/${BIASES.length}`} icon={<Layers size={14} />} color="text-white" />
