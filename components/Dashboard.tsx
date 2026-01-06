@@ -47,23 +47,23 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Main Focus Card */}
-        <div className="lg:col-span-2 surface p-10 rounded-2xl relative overflow-hidden group min-h-[400px]">
+        <div className="lg:col-span-2 surface p-12 rounded-[2rem] relative overflow-hidden group min-h-[420px] border-indigo-500/10 shadow-[0_0_0_1px_rgba(255,255,255,0.05),0_10px_40px_-10px_rgba(0,0,0,0.5)]">
           <div className="relative z-10 flex flex-col h-full justify-between">
             <div>
-               <div className="flex items-center gap-3 text-[10px] font-bold text-white uppercase tracking-[0.3em] mb-8">
-                 <div className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_8px_rgba(99,102,241,0.5)]"></div>
-                 Current Focus
+               <div className="flex items-center gap-3 text-[10px] font-bold text-indigo-400 uppercase tracking-[0.4em] mb-10">
+                 <div className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shadow-[0_0_12px_rgba(99,102,241,0.8)]"></div>
+                 Active_Cognitive_Target
                </div>
-               <h2 className="serif text-6xl text-white mb-6 leading-tight italic font-light">{focusBias.name}</h2>
-               <p className="text-slate-400 text-lg max-w-lg leading-relaxed font-light">{focusBias.definition}</p>
+               <h2 className="serif text-7xl text-white mb-8 leading-none italic font-light tracking-tight">{focusBias.name}</h2>
+               <p className="text-slate-400 text-xl max-w-lg leading-relaxed font-light opacity-90">{focusBias.definition}</p>
             </div>
             
-            <div className="pt-10 flex items-center gap-6">
+            <div className="pt-12 flex items-center gap-8">
               <button 
                 onClick={() => navigate('/instructor')}
-                className="btn-primary px-8 py-4 rounded-full text-[10px] font-bold uppercase tracking-widest flex items-center gap-2"
+                className="btn-primary px-10 py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.2em] flex items-center gap-3 active:scale-95 transition-all shadow-2xl shadow-indigo-900/40"
               >
-                Launch Simulation <ArrowRight size={14} />
+                Launch_Simulation <ArrowRight size={16} strokeWidth={3} />
               </button>
               <div className="h-px flex-1 bg-white/5"></div>
             </div>
@@ -132,27 +132,27 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
 };
 
 const MetricTile: React.FC<{ label: string; value: string | number; icon: React.ReactNode; color: string }> = ({ label, value, icon, color }) => (
-  <div className="surface p-6 rounded-2xl flex flex-col justify-between group">
-    <div className="flex items-center justify-between mb-4">
-      <div className={`text-[10px] font-bold uppercase tracking-[0.3em] text-slate-500 group-hover:text-slate-300 transition-colors`}>{label}</div>
+  <div className="surface p-8 rounded-2xl flex flex-col justify-between group active:scale-[0.98] transition-all">
+    <div className="flex items-center justify-between mb-6">
+      <div className={`text-[10px] font-bold uppercase tracking-[0.4em] text-slate-500 group-hover:text-slate-300 transition-colors`}>{label}</div>
       <div className={`${color} opacity-40 group-hover:opacity-100 transition-opacity`}>{icon}</div>
     </div>
-    <div className="text-3xl font-mono text-white tracking-tighter leading-none">{value}</div>
+    <div className="text-4xl font-mono tabular-nums text-white tracking-tighter leading-none">{value}</div>
   </div>
 );
 
 const NavCard: React.FC<{ title: string; desc: string; icon: React.ReactNode; onClick: () => void }> = ({ title, desc, icon, onClick }) => (
   <button 
     onClick={onClick}
-    className="surface surface-hover p-5 rounded-2xl text-left flex items-center justify-between group flex-1"
+    className="surface surface-hover p-6 rounded-2xl text-left flex items-center justify-between group flex-1 active:scale-[0.98]"
   >
-    <div className="flex items-center gap-4">
-      <div className="p-3 bg-white/[0.03] border border-white/5 rounded-xl text-slate-400 group-hover:text-indigo-400 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-300">
+    <div className="flex items-center gap-5">
+      <div className="p-3.5 bg-white/[0.03] border border-white/5 rounded-xl text-slate-400 group-hover:text-indigo-400 group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-300">
         {icon}
       </div>
       <div>
-        <div className="text-white font-bold text-xs uppercase tracking-widest">{title}</div>
-        <div className="text-[10px] text-slate-500 mt-0.5 uppercase tracking-wider">{desc}</div>
+        <div className="text-white font-bold text-[11px] uppercase tracking-[0.2em]">{title}</div>
+        <div className="text-[10px] text-slate-500 mt-1 uppercase tracking-widest font-medium opacity-80 group-hover:opacity-100 transition-opacity">{desc}</div>
       </div>
     </div>
     <ArrowRight size={14} className="text-slate-700 group-hover:text-white transition-all transform group-hover:translate-x-1" />

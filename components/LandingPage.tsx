@@ -67,78 +67,58 @@ export const LandingPage: React.FC = () => {
     }
   ];
 
-  return (
-    <div className="max-w-6xl mx-auto pb-32 px-4 animate-fade-in">
-      {/* Hero */}
-      <div className="py-32 text-center space-y-8">
-        <div className="inline-block px-4 py-1 rounded-full bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 text-[10px] font-bold uppercase tracking-[0.4em] mb-4">
-          The Cognitive Gym
-        </div>
-        <h1 className="text-7xl md:text-9xl font-serif italic text-white tracking-tighter leading-none">
-          Cogni<span className="text-indigo-500">Bias</span>
-        </h1>
-        <p className="text-xl md:text-2xl text-slate-400 max-w-2xl mx-auto leading-relaxed font-light italic">
-          Stop memorizing biases. <span className="text-white">Start engineering your perspective.</span>
-        </p>
-        
-        <div className="pt-12">
-          <button 
-            onClick={() => navigate('/dashboard')}
-            className="group btn-primary bg-white text-black hover:bg-zinc-200 px-12 py-5 rounded-full font-bold tracking-[0.2em] text-[10px] flex items-center gap-4 mx-auto transition-all shadow-2xl shadow-white/10"
-          >
-            INITIALIZE SYSTEM <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
-          </button>
-        </div>
-      </div>
-
-      {/* Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {features.map((f, i) => {
-          const Icon = f.icon;
-          return (
-            <div 
-              key={i}
-              className="surface p-8 rounded-2xl flex flex-col group h-full"
+    return (
+      <div className="space-y-32 py-20 animate-fade-in pb-32">
+        {/* Hero Section */}
+        <section className="text-center space-y-12 max-w-4xl mx-auto px-4">
+          <div className="space-y-6">
+            <div className="inline-block px-4 py-1.5 rounded-full bg-white/[0.03] border border-white/5 text-[10px] font-black uppercase tracking-[0.5em] text-slate-500 mb-4 animate-in fade-in slide-in-from-bottom-4 duration-1000">
+              Version_4.1 // Cognitive_Architect
+            </div>
+            <h1 className="serif text-7xl md:text-8xl font-light text-white italic leading-[0.9] tracking-tighter animate-in fade-in slide-in-from-bottom-8 duration-1000 delay-100">
+              Master the <span className="text-indigo-500/80">Architecture</span> <br/> 
+              of Your Own <span className="text-rose-500/80">Logic</span>
+            </h1>
+            <p className="text-slate-500 text-xl md:text-2xl font-light max-w-2xl mx-auto leading-relaxed animate-in fade-in slide-in-from-bottom-12 duration-1000 delay-200">
+              A high-fidelity instrument for identifying cognitive biases, dismantling fallacies, and calibrating human intuition.
+            </p>
+          </div>
+  
+          <div className="flex flex-col sm:flex-row justify-center items-center gap-8 animate-in fade-in slide-in-from-bottom-16 duration-1000 delay-300">
+            <button 
+              onClick={() => navigate('/dashboard')}
+              className="group inline-flex items-center gap-4 bg-white text-black px-12 py-6 rounded-2xl font-black uppercase tracking-[0.2em] text-xs hover:bg-indigo-50 transition-all active:scale-95 shadow-[0_20px_50px_rgba(255,255,255,0.1)]"
             >
-              <div className="mb-8 p-4 bg-white/[0.03] border border-white/5 rounded-2xl inline-block group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-500">
-                <Icon size={28} className="text-indigo-400" />
+              INITIALIZE_SYSTEM <ArrowRight size={18} className="group-hover:translate-x-1 transition-transform" strokeWidth={3} />
+            </button>
+            
+            <div className="flex items-center gap-4 px-6 py-3 rounded-xl border border-white/5 bg-white/[0.02] text-[10px] font-mono text-slate-600 uppercase tracking-widest">
+               <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></div>
+               Core_Engine: Operational
+            </div>
+          </div>
+        </section>
+  
+        {/* Feature Grid */}
+        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 px-4">
+          {features.map((f, i) => (
+            <div 
+              key={i} 
+              className="surface p-10 rounded-3xl group border-white/[0.03] hover:border-white/10 transition-all duration-500 flex flex-col justify-between min-h-[320px] active:scale-[0.98]"
+            >
+              <div>
+                <div className="w-14 h-14 rounded-2xl bg-white/[0.02] border border-white/5 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-indigo-500/10 group-hover:border-indigo-500/20 transition-all duration-500 mb-8">
+                  {f.icon}
+                </div>
+                <h3 className="text-white font-bold text-lg uppercase tracking-[0.1em] mb-4">{f.title}</h3>
+                <p className="text-slate-500 text-sm leading-relaxed font-light group-hover:text-slate-400 transition-colors">{f.description}</p>
               </div>
-              <div className="flex-1">
-                <h3 className="text-xl font-bold text-white mb-1 uppercase tracking-tight">{f.title}</h3>
-                <p className="text-[10px] font-bold text-indigo-400 uppercase tracking-[0.3em] mb-4">{f.desc}</p>
-                <p className="text-sm text-slate-500 leading-relaxed font-light">{f.detail}</p>
+              
+              <div className="mt-8 pt-8 border-t border-white/5 flex items-center justify-between opacity-0 group-hover:opacity-100 transition-all duration-500 transform translate-y-2 group-hover:translate-y-0">
+                 <span className="text-[10px] font-bold text-indigo-400 uppercase tracking-widest">View Module</span>
+                 <ArrowRight size={14} className="text-indigo-500" />
               </div>
             </div>
-          );
-        })}
-      </div>
-
-      {/* Philosophy */}
-      <div className="mt-32 border-t border-white/5 pt-16">
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-12 text-center md:text-left">
-           <div className="space-y-4">
-             <div className="flex items-center gap-3 justify-center md:justify-start">
-               <TrendingUp size={20} className="text-emerald-500" />
-               <h4 className="text-white font-bold uppercase tracking-widest text-xs">Active Transfer</h4>
-             </div>
-             <p className="text-xs text-slate-500 leading-relaxed">Training designed specifically to bridge the gap between abstract theory and real-world behavior.</p>
-           </div>
-           <div className="space-y-4">
-             <div className="flex items-center gap-3 justify-center md:justify-start">
-               <ShieldAlert size={20} className="text-rose-500" />
-               <h4 className="text-white font-bold uppercase tracking-widest text-xs">Adversarial Logic</h4>
-             </div>
-             <p className="text-xs text-slate-500 leading-relaxed">Don't just fix your thoughts; stress-test them against AI unit tests and adversarial scenarios.</p>
-           </div>
-           <div className="space-y-4">
-             <div className="flex items-center gap-3 justify-center md:justify-start">
-               <BrainCircuit size={20} className="text-indigo-500" />
-               <h4 className="text-white font-bold uppercase tracking-widest text-xs">Architect Mindset</h4>
-             </div>
-             <p className="text-xs text-slate-500 leading-relaxed">Approach your mind as a codebase: identify bugs, refactor logic, and build robust heuristics.</p>
-           </div>
-        </div>
-      </div>
-    </div>
-  );
-};
+          ))}
+        </section>
+  };
