@@ -1,31 +1,46 @@
 # CogniBias Project Context
 
-## 🚀 Project Overview
-**CogniBias** is a "Dual-Core" personal development platform designed to help users identify, understand, and mitigate cognitive biases and logical fallacies. It utilizes a **"Cognitive Brutalism"** aesthetic—a high-fidelity, editorial dark-mode theme designed for the "Cognitive Architect."
-
-### Core Engines (The Toolkit)
-- **The Library (Registry)**: Polymorphic database supporting both **Biases** (Psychology) and **Fallacies** (Logic).
-- **The Drill (Flashcards 2.0)**: Contextual spaced repetition featuring **Scenario Mode** for pattern recognition.
-- **The Sandbox (Simulator)**: Branching "Choose Your Own Adventure" scenarios with real-time consequences.
-- **The Arena (Shadow Boxing)**: Adversarial debate training with health bars and real-time fallacy callouts.
-- **The Lens (Detector)**: Interactive pattern-recognition tool with a categorized **HUD Command Palette**.
-- **The Workshop (Logic Lab)**: Advanced "Argument Repair" module with steel-manning, repair chips, and granular AI metrics.
-- **The Prism (Switcher)**: Nuance calibration tool using a **Range-Vibe Hybrid** slider to distinguish biases from heuristics.
-- **The Coach (Mirror)**: Real-time **Streaming Neural Hub** for Socratic coaching and live pattern harvesting.
-- **The Compiler (Trainer)**: Pseudo-code IDE for "programming" concepts to test structural understanding.
-- **The Auditor (Architect)**: Red-team "pre-mortem" tool with a **Severity Risk Matrix**.
+| **Agents** | 11 specialized agents in `.gemini/` |
+| **Last Updated** | 2026-01-06 (PWA & Performance Sentinel added) |
+| **Status** | Production-ready with mobile-touch + Neural Bridge |
 
 ---
 
-## 🛠 Tech Stack
-- **Framework**: React 19 + TypeScript 5.6 + Vite 6
-- **Styling**: Tailwind CSS + "Cognitive Brutalism" (Blueprint grid, Noise texture, Glassmorphism).
-- **Routing**: `react-router-dom` (HashRouter)
-- **Icons**: `lucide-react`
-- **AI**: 
-  - Primary: OpenRouter (`apiService.ts` - `x-ai/grok-4.1-fast`)
-  - Interaction: **Streaming SSE** (Server-Sent Events) for zero-latency feedback.
-- **Persistence**: `localStorage` (Key: `cognibias-storage`) - Strict "No DB, No Auth" architecture.
+## Project Summary
+
+React 19 + TypeScript + Vite personal development platform.  Uses localStorage for all persistence, Grok/Gemini for AI features.  No active database or auth. 
+
+```bash
+npm run dev          # Frontend (port 3000)
+npm run dev:api      # Backend (port 3001)
+npm run type-check   # TypeScript validation
+npm run build        # Production build
+npm run test         # Run tests
+```
+
+**Environment** (create `.env` from `.env.example`):
+- `VITE_OPENROUTER_API_KEY` - Required (Grok)
+- `VITE_GEMINI_API_KEY` - Required (fallback)
+- `VITE_LMNT_API_KEY` - Optional (TTS)
+
+---
+
+## Agent Delegation
+
+**You are a Swarm Lead.** Delegate to specialists in `.gemini/`:
+
+| Task | Delegate To |
+|------|-------------|
+| PWA/Performance/SW | `The PWA & Performance Sentinel` |
+| Minimalist UI/SaaS Design | `The Design Principle Architect` |
+| Design System Enforcer | `The Theme Architect` |
+| New module/component | `The Module Builder` |
+| TypeScript/State integrity | `The Schema Guardian` |
+| OpenRouter/Prompt tuning | `The Prompt Engineer` |
+| High-ROI rapid coding | `The Allmighty Hackoder AI` |
+| Visualizations/D3 | `The Data Viz Expert` |
+| UI/UX Polish | `The UI Polisher` |
+| Chief Learning Architect | `The Cognitive Architect` |
 
 ---
 
