@@ -182,6 +182,7 @@ const App: React.FC = () => {
               <>
                 <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
                 <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
+                <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
               </>
             )}
 
@@ -276,6 +277,7 @@ const App: React.FC = () => {
                   <>
                     <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
                     <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
+                    <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
                   </>
                 )}
 

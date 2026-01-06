@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Star, Loader2, Shuffle, Type, BookOpen, RotateCw, Target, Send, X, Brain } from 'lucide-react';
-import { BIASES } from '../constants';
+import { BIASES, FALLACIES } from '../constants';
 import { AppState, TransferLog } from '../types';
 import { generateHint, generateAIPoweredScenario } from '../services/apiService';
 import { TransferTips } from './shared/TransferTips';
@@ -30,24 +30,28 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   const [dynamicScenario, setDynamicScenario] = useState<string | null>(null);
   const [loadingScenario, setLoadingScenario] = useState(false);
 
+  // ⚡️ CONTEXT-AWARE SOURCE SELECTION
+  const SourceList = state.mode === 'psychology' ? BIASES : FALLACIES;
+  const progressMap = state.mode === 'psychology' ? state.progress : state.fallacyProgress;
+
   useEffect(() => {
-    let queue = BIASES.map(b => b.id);
+    let queue = SourceList.map(b => b.id);
     if (state.preferences.flashcardsOnlyFavorites) {
       queue = queue.filter(id => state.favorites.includes(id));
     }
     
     // Sort by nextReviewDate
-    queue.sort((a, b) => (state.progress[a]?.nextReviewDate || 0) - (state.progress[b]?.nextReviewDate || 0));
+    queue.sort((a, b) => (progressMap[a]?.nextReviewDate || 0) - (progressMap[b]?.nextReviewDate || 0));
     
-    // ⚡️ ARCHITECT FIX: If queue is still empty (e.g. no favorites), fall back to all biases
+    // Fallback: If queue empty, sort by mastery (lowest first)
     if (queue.length === 0) {
-      queue = BIASES.map(b => b.id).sort((a, b) => (state.progress[a]?.masteryLevel || 0) - (state.progress[b]?.masteryLevel || 0));
+      queue = SourceList.map(b => b.id).sort((a, b) => (progressMap[a]?.masteryLevel || 0) - (progressMap[b]?.masteryLevel || 0));
     }
 
     setSessionQueue(queue.slice(0, 10));
-  }, [state.progress, state.favorites, state.preferences.flashcardsOnlyFavorites]);
+  }, [progressMap, state.favorites, state.preferences.flashcardsOnlyFavorites, state.mode]);
 
-  const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
+  const bias = sessionQueue[currentIndex] ? SourceList.find(b => b.id === sessionQueue[currentIndex]) : null;
 
   const handleGrade = (quality: number) => {
     const currentId = sessionQueue[currentIndex];
@@ -90,7 +94,7 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
     advanceCard();
   };
 
-  const currentProgress = bias ? state.progress[bias.id] : null;
+  const currentProgress = bias ? progressMap[bias.id] : null;
   const masteryLevel = currentProgress?.masteryLevel || 0;
 
   const handleGenerateHint = async (e: React.MouseEvent) => {
