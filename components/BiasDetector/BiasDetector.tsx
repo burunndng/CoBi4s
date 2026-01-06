@@ -138,6 +138,8 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
         
         <div className="flex items-center gap-2 bg-white/[0.03] p-1 rounded-xl border border-white/5">
           <select 
+            id="scenario-context"
+            name="scenario-context"
             value={context} 
             onChange={e => setContext(e.target.value)}
             className="bg-transparent text-slate-300 text-xs font-bold uppercase tracking-wider px-4 py-2 outline-none cursor-pointer hover:text-white"

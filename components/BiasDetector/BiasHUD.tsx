@@ -70,6 +70,8 @@ export const BiasHUD: React.FC<BiasHUDProps> = ({ selection, onCancel, onSelect,
           <Search size={18} className="text-slate-500" />
           <input 
             autoFocus
+            id="pattern-filter"
+            name="pattern-filter"
             type="text" 
             placeholder="Type to filter patterns..." 
             className="bg-transparent border-none outline-none text-white w-full placeholder:text-slate-600 font-mono text-base"

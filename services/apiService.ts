@@ -117,12 +117,20 @@ export const generateHint = async (biasName: string): Promise<string> => {
 };
 
 export const generateBiasScenario = async (targetBiases: Bias[], context: string): Promise<BiasedSnippet> => {
-  const biasesList = targetBiases.map(b => `- ${b.name} (ID: ${b.id}): ${b.definition}`).join('\n');
-  const prompt = `Write a realistic '${context}' text. Embed exactly these biases:\n${biasesList}\nOutput JSON: { "text": string, "segments": [{ "quote": string, "biasId": string, "explanation": string, "cues": string[] }] }`;
+  const biasesList = targetBiases.map(b => `- ${b.name}: ${b.definition}`).join('\n');
+  const prompt = `
+    CONTEXT: ${context}
+    TARGET_BIASES: ${biasesList}
+    
+    GOAL: Write a realistic text (MAX 30 WORDS). 
+    REQUIREMENT: Embed segments that demonstrate the target biases.
+    
+    Output JSON: { "text": "...", "segments": [{ "quote": "...", "biasId": "...", "explanation": "...", "cues": ["..."] }] }
+  `;
   const content = await callOpenRouter([
-    { role: "system", content: "You are a cognitive psychology expert. JSON only." },
+    { role: "system", content: "You are a master of subtle cognitive distortions. JSON only. MAX 30 WORDS." },
     { role: "user", content: prompt }
-  ], { response_format: { type: "json_object" } });
+  ], { response_format: { type: "json_object" }, temperature: 0.7 });
   return JSON.parse(content);
 };
 
