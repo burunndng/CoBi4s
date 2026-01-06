@@ -15,45 +15,79 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
   const [active, setActive] = useState(false);
   const [loading, setLoading] = useState(false);
   const [question, setQuestion] = useState<QuizQuestion | null>(null);
+  const [nextQuestion, setNextQuestion] = useState<QuizQuestion | null>(null); // ⚡️ Pipeline Buffer
   const [selected, setSelected] = useState<string | null>(null);
   const [answered, setAnswered] = useState(false);
   const [integrity, setIntegrity] = useState(100);
   const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const fetchNextQuestion = async () => {
+  const getSourceBiases = () => {
+    const allBiases = state.mode === 'psychology' ? BIASES : FALLACIES;
+    const progressMap = state.mode === 'psychology' ? state.progress : state.fallacyProgress;
+    
+    let weakBiases = allBiases.filter(b => {
+      const p = progressMap[b.id];
+      return !p || p.masteryLevel < 70;
+    });
+
+    if (weakBiases.length === 0) {
+      weakBiases = [...allBiases].sort((a, b) => 
+        (progressMap[a.id]?.masteryLevel || 0) - (progressMap[b.id]?.masteryLevel || 0)
+      ).slice(0, 10);
+    }
+    return weakBiases;
+  };
+
+  const preFetchNext = async (currentCount: number) => {
+    // Stop pre-fetching if we've reached the end
+    if (currentCount >= SESSION_LENGTH - 1) return;
+
+    try {
+      const weakBiases = getSourceBiases();
+      // Architecture Sequencing logic
+      const nextCount = currentCount + 1;
+      const isScenario = nextCount === 2 || nextCount === 6;
+      const isMetacognition = nextCount === 4;
+      
+      const targetBias = weakBiases[Math.floor(Math.random() * weakBiases.length)];
+      const q = await generateQuizQuestion([targetBias] as any[], isScenario, isMetacognition);
+      setNextQuestion(q);
+    } catch (err) {
+      console.error("Background synthesis failed", err);
+    }
+  };
+
+  const advanceToNext = () => {
+    if (nextQuestion) {
+      setQuestion(nextQuestion);
+      setNextQuestion(null);
+      setAnswered(false);
+      setSelected(null);
+      // Fire background fetch for the FOLLOWING one
+      preFetchNext(count);
+    } else {
+      // Fallback if user is faster than API
+      fetchImmediate(count);
+    }
+  };
+
+  const fetchImmediate = async (currentCount: number) => {
     setLoading(true);
     setAnswered(false);
     setSelected(null);
     setError(null);
     try {
-      // ⚡️ NEURAL PRESSURE: Target weak points
-      const allBiases = state.mode === 'psychology' ? BIASES : FALLACIES;
-      const progressMap = state.mode === 'psychology' ? state.progress : state.fallacyProgress;
-      
-      let weakBiases = allBiases.filter(b => {
-        const p = progressMap[b.id];
-        return !p || p.masteryLevel < 70;
-      });
-
-      if (weakBiases.length === 0) {
-        weakBiases = [...allBiases].sort((a, b) => 
-          (progressMap[a.id]?.masteryLevel || 0) - (progressMap[b.id]?.masteryLevel || 0)
-        ).slice(0, 10);
-      }
-
-      // 🧠 ARCHITECTURAL SEQUENCING:
-      const isScenario = count === 2 || count === 6; // Positions 3 and 7
-      const isMetacognition = count === 4; // Position 5
+      const weakBiases = getSourceBiases();
+      const isScenario = currentCount === 2 || currentCount === 6;
+      const isMetacognition = currentCount === 4;
       
       const targetBias = weakBiases[Math.floor(Math.random() * weakBiases.length)];
       const q = await generateQuizQuestion([targetBias] as any[], isScenario, isMetacognition);
       
-      if (!q || !q.options || q.options.length === 0) {
-        throw new Error("AI generated malformed logic trap.");
-      }
-      
       setQuestion(q);
+      // Warm up the buffer for the next one
+      preFetchNext(currentCount);
     } catch (err) {
       console.error(err);
       setError("The logic engine stuttered. Re-initializing...");
@@ -62,11 +96,13 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
     }
   };
 
-  const handleStart = () => {
+  const handleStart = async () => {
     setActive(true);
     setIntegrity(100);
     setCount(0);
-    fetchNextQuestion();
+    setQuestion(null);
+    setNextQuestion(null);
+    fetchImmediate(0);
   };
 
   const handleAnswer = (option: string) => {
@@ -104,6 +140,8 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
             </p>
           </div>
           <button 
+            id="start-trap-sequence"
+            name="start-trap-sequence"
             onClick={handleStart}
             className="btn-primary w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-rose-900/20 active:scale-95 transition-all"
           >
@@ -232,9 +270,15 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
                     </div>
                   </div>
                   <p className="text-sm text-slate-300 leading-relaxed font-light border-l-2 border-white/10 pl-6 italic">"{question.explanation}"</p>
-                  <div className="pt-4 flex justify-end">
+                  <div className="pt-4 flex items-center justify-end gap-4">
+                    {!nextQuestion && count < SESSION_LENGTH && (
+                      <div className="flex items-center gap-2 text-[8px] font-mono text-slate-600 uppercase tracking-widest animate-pulse">
+                        <Loader2 size={10} className="animate-spin" />
+                        Buffering_Next_Trap
+                      </div>
+                    )}
                     <button 
-                      onClick={fetchNextQuestion}
+                      onClick={advanceToNext}
                       className="px-10 py-4 bg-white text-black rounded-xl text-[10px] font-black uppercase tracking-[0.2em] hover:bg-emerald-50 transition-all active:scale-95 shadow-xl"
                     >
                       Initialize_Next_Trap <ArrowRight size={14} className="inline ml-2" strokeWidth={3} />
