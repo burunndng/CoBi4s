@@ -4,7 +4,7 @@ const OPENROUTER_URL = "https://openrouter.ai/api/v1/chat/completions";
 const MODEL_NAME = "x-ai/grok-4.1-fast"; 
 const DEFAULT_TEMP = 0.6;
 
-export const callOpenRouter = async (messages: any[], config: { temperature?: number, response_format?: any } = {}) => {
+export const callOpenRouter = async (messages: any[], config: { temperature?: number, response_format?: any, model?: string } = {}) => {
   const apiKey = localStorage.getItem('cognibias-openrouter-key') || import.meta.env.VITE_OPENROUTER_API_KEY;
   if (!apiKey) throw new Error("API_KEY_MISSING");
 
@@ -17,7 +17,7 @@ export const callOpenRouter = async (messages: any[], config: { temperature?: nu
       "Content-Type": "application/json"
     },
     body: JSON.stringify({
-      model: MODEL_NAME,
+      model: config.model || MODEL_NAME,
       messages: messages,
       temperature: config.temperature ?? DEFAULT_TEMP,
       response_format: config.response_format
@@ -38,7 +38,7 @@ export const generateAIPoweredScenario = async (bias: Bias): Promise<string> => 
     const content = await callOpenRouter([
       { role: "system", content: "You are an expert in cognitive science and instructional design." },
       { role: "user", content: `Generate a subtle, realistic workplace or daily life scenario demonstrating "${bias.name}" (${bias.definition}). Do not mention the bias name. Max 250 characters.` }
-    ]);
+    ], { model: "openai/gpt-oss-20b" });
     return content.trim();
   } catch (error) {
     console.error("Scenario generation failed:", error);
@@ -84,7 +84,7 @@ export const generateHint = async (biasName: string): Promise<string> => {
   try {
     const content = await callOpenRouter([
       { role: "user", content: `Short, 1-sentence cryptic hint for: "${biasName}". No spoilers. Max 10 words.` }
-    ]);
+    ], { model: "openai/gpt-oss-20b" });
     return content.trim();
   } catch {
     return "Think about the core concept.";
