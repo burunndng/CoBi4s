@@ -171,24 +171,33 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
   return JSON.parse(content);
 };
 
-export const generateLogicPieces = async (biasName: string, definition: string): Promise<any> => {
+export const generateDeconstructionCase = async (biasName: string, definition: string): Promise<any> => {
   const prompt = `
-    LOGIC PIECE GENERATOR:
+    FORENSIC DECONSTRUCTOR:
     Concept: "${biasName}"
     Definition: "${definition}"
     
-    TASK: Generate 3 variants for each stage of this bias's logical structure. 
-    Some should be "correct" representations, others should be subtle "red herrings" (logical errors that aren't quite this bias).
+    TASK:
+    1. Write a short, realistic, messy scenario (max 40 words) where this bias occurs.
+    2. Extract 4-5 short "Evidence Fragments" from the text (quotes or paraphrases).
+    3. Identify which fragment corresponds to:
+       - The TRIGGER (The external event)
+       - The DISTORTION (The biased thought/lie)
+       - The REALITY (The objective truth or rational alternative)
+       - NOISE (Irrelevant details)
     
     Output JSON:
     {
-      "triggers": ["string", "string", "string"],
-      "leaps": ["string", "string", "string"],
-      "alternatives": ["string", "string", "string"]
+      "scenario": "string",
+      "fragments": [
+        { "id": "1", "text": "string", "type": "TRIGGER | DISTORTION | REALITY | NOISE" },
+        { "id": "2", "text": "string", "type": "TRIGGER | DISTORTION | REALITY | NOISE" },
+        ...
+      ]
     }
   `;
   const content = await callOpenRouter([
-    { role: "system", content: "You are a cognitive logic puzzle designer. JSON only." },
+    { role: "system", content: "You are a cognitive forensic analyst. JSON only." },
     { role: "user", content: prompt }
   ], { response_format: { type: "json_object" }, temperature: 0.8 });
   return JSON.parse(content);
