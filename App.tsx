@@ -32,6 +32,7 @@ import Flashcards from './components/Flashcards';
 import Quiz from './components/Quiz';
 import StudyPlan from './components/StudyPlan';
 import AppSettings from './components/AppSettings';
+import { Logo } from './components/Logo';
 
 // ⚡️ SENTINEL: Lazy-Loaded Heavy Modules
 const AIInstructor = React.lazy(() => import('./components/AIInstructor').then(m => ({ default: m.default })));
@@ -129,9 +130,14 @@ const App: React.FC = () => {
         
         {/* Desktop Sidebar */}
         <aside className="hidden lg:flex flex-col w-72 border-r border-white/5 bg-white/[0.02] backdrop-blur-xl z-40">
-          <div className="p-8 border-b border-white/5">
-            <h1 className="serif text-3xl font-light text-white tracking-tight italic">CogniBias</h1>
-            <p className="text-[10px] text-slate-500 uppercase tracking-[0.3em] mt-1 font-bold">Architect Edition</p>
+          <div className="p-8 border-b border-white/5 flex items-center gap-4">
+            <div className="p-2 bg-indigo-500/10 rounded-lg border border-indigo-500/20 text-indigo-400">
+              <Logo size={28} />
+            </div>
+            <div>
+              <h1 className="serif text-xl font-light text-white tracking-tight italic">CogniBias</h1>
+              <p className="text-[9px] text-slate-500 uppercase tracking-[0.3em] font-bold">Architect Edition</p>
+            </div>
           </div>
 
           <div className="px-6 py-6">
@@ -203,7 +209,10 @@ const App: React.FC = () => {
 
         {/* Mobile Header */}
         <header className="lg:hidden fixed top-0 w-full bg-black/40 backdrop-blur-xl z-30 border-b border-white/5 h-16 flex items-center justify-between px-5">
-          <span className="serif text-xl text-white italic">CogniBias</span>
+          <div className="flex items-center gap-3">
+            <Logo size={24} className="text-indigo-400" />
+            <span className="serif text-xl text-white italic">CogniBias</span>
+          </div>
           <button onClick={() => setIsMobileMenuOpen(true)} className="p-3 -mr-2 text-slate-400 hover:text-white transition-all active:scale-90">
             <MenuIcon size={24} />
           </button>
