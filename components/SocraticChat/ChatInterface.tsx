@@ -71,8 +71,6 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
     }
   }, [state.chatHistory, loading]);
 
-  const [protocol, setProtocol] = useState<'standard' | 'auditor' | 'conflict'>('standard');
-
   const getProtocolPrompt = () => {
     switch (protocol) {
       case 'auditor': return "PROTOCOL: DECISION AUDITOR. You are a ruthless Risk Officer. Ask structured questions to perform a Pre-Mortem. Demand probabilities and impact scores.";
