@@ -27,14 +27,28 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
     setSelected(null);
     setError(null);
     try {
-      // Use fallback if no progress yet
-      const sourceBiases = state.mode === 'psychology' ? 
-        (Object.keys(state.progress).length > 0 ? Object.keys(state.progress).map(id => ({ id, name: id })) : [{ id: 'confirmation_bias', name: 'Confirmation Bias' }]) :
-        (Object.keys(state.fallacyProgress).length > 0 ? Object.keys(state.fallacyProgress).map(id => ({ id, name: id })) : [{ id: 'ad_hominem', name: 'Ad Hominem' }]);
-
-      const q = await generateQuizQuestion(sourceBiases as any[]);
+      // ⚡️ NEURAL PRESSURE: Target weak points
+      const allBiases = state.mode === 'psychology' ? BIASES : FALLACIES;
+      const progressMap = state.mode === 'psychology' ? state.progress : state.fallacyProgress;
       
-      // Defensive check for AI response integrity
+      // Filter for biases the user hasn't mastered yet (<70%)
+      let weakBiases = allBiases.filter(b => {
+        const p = progressMap[b.id];
+        return !p || p.masteryLevel < 70;
+      });
+
+      // If everything is mastered, pull from everything but sort by lowest
+      if (weakBiases.length === 0) {
+        weakBiases = [...allBiases].sort((a, b) => 
+          (progressMap[a.id]?.masteryLevel || 0) - (progressMap[b.id]?.masteryLevel || 0)
+        ).slice(0, 10);
+      }
+
+      // Adaptive Intensity: Use fewer options if the user is struggling, but here we increase subtlty
+      const targetBias = weakBiases[Math.floor(Math.random() * weakBiases.length)];
+      
+      const q = await generateQuizQuestion([targetBias]);
+      
       if (!q || !q.options || q.options.length === 0) {
         throw new Error("AI generated malformed logic trap.");
       }
