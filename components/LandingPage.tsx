@@ -8,7 +8,9 @@ import {
   Shuffle, 
   MessageSquare, 
   Binary, 
-  ArrowRight
+  ArrowRight,
+  Swords,
+  Target
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { NeuralBackground } from './visualizations/NeuralBackground';
