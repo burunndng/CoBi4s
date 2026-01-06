@@ -20,7 +20,8 @@ import {
   Shuffle,
   MessageSquare,
   HelpCircle,
-  Swords
+  Swords,
+  ArrowRight
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
