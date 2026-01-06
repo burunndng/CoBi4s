@@ -247,6 +247,13 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
              >
                <Trash2 size={20} />
              </button>
+             <button 
+               onClick={clearChat}
+               className="p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-slate-600 hover:text-rose-500 transition-all hover:border-rose-500/30 active:scale-90"
+               title="Purge Memory"
+             >
+               <Trash2 size={20} />
+             </button>
           </div>
         </div>
 
