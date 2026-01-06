@@ -127,6 +127,13 @@ const App: React.FC = () => {
     showToast(`Data Updated`, 'success');
   }, [showToast]);
 
+  const toggleFavorite = useCallback((id: string) => {
+    setState(prev => {
+      const isFav = prev.favorites.includes(id);
+      return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
+    });
+  }, []);
+
   return (
     <HashRouter>
       <div className="flex h-[100dvh] bg-transparent text-slate-200">
@@ -300,12 +307,7 @@ const App: React.FC = () => {
               <Routes>
                 <Route path="/" element={<LandingPage />} />
                 <Route path="/dashboard" element={<Dashboard state={state} setState={setState} />} />
-                <Route path="/catalog" element={<Catalog state={state} toggleFavorite={(id) => {
-                   setState(prev => {
-                     const isFav = prev.favorites.includes(id);
-                     return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
-                   });
-                }} />} />
+                <Route path="/catalog" element={<Catalog state={state} toggleFavorite={toggleFavorite} />} />
                 <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
                 <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
                 <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
