@@ -10,6 +10,11 @@
     - **Pattern Harvester HUD**: Added a real-time diagnostic side-panel that "hooks" mentioned biases/fallacies during chat.
     - **Secret Mode (The Void)**: Implemented a hidden "Easter Egg" mode accessible via a subtle Octagon trigger.
     - **Mobile Optimization**: Converted HUD to a responsive slide-out drawer with notification badges.
+- **Android PWA & Mobile Polish**:
+    - **Service Worker 2.0**: Implemented a robust `sw.js` with stale-while-revalidate caching and versioning to enable offline use.
+    - **Native Feel**: Disabled Android's "pull-to-refresh" gesture to maintain immersion; implemented `active:scale-95` haptic-visuals for all buttons.
+    - **Adaptive Iconry**: Enhanced `manifest.json` with a high-res maskable icon and theme-color synchronization for a "native app" look on Android.
+    - **Touch Precision**: Added `touch-action: none` to critical inputs like the Calibration Slider to prevent gesture collisions.
 - **System Stability & Build Quality**:
     - **Import Sanitization**: Resolved critical `ReferenceError` crashes (`Target`, `Shuffle`, `BrainCircuit`) by auditing and fixing missing icon imports across all components.
     - **App.tsx Refactor**: Repaired codebase corruption and duplicate imports introduced during rapid feature iterations.

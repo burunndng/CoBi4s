@@ -46,6 +46,21 @@
       -webkit-tap-highlight-color: transparent;
       user-select: none;
       position: relative;
+      overscroll-behavior-y: none; /* 🚫 Prevent pull-to-refresh on Android */
+    }
+
+    /* 📱 Mobile Optimization */
+    @media (max-width: 768px) {
+      body {
+        padding-bottom: env(safe-area-inset-bottom);
+        padding-top: env(safe-area-inset-top);
+      }
+    }
+
+    /* ⚡️ Haptic Feedback Primitive */
+    button:active, .clickable:active {
+      transform: scale(0.96);
+      transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1);
     }
 
     /* Noise Overlay */

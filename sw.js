@@ -1,31 +1,56 @@
-
-const CACHE_NAME = 'cognibias-v1';
-const ASSETS = [
-  './',
-  './index.html',
-  './index.tsx',
-  './App.tsx',
-  './manifest.json'
+const CACHE_NAME = 'cognibias-v2';
+const STATIC_ASSETS = [
+  '/',
+  '/index.html',
+  '/manifest.json'
 ];
 
+// ⚡️ HACKODER: Robust PWA Engine
 self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+      return cache.addAll(STATIC_ASSETS);
     })
   );
 });
 
+self.addEventListener('activate', (event) => {
+  event.waitUntil(
+    caches.keys().then((keys) => {
+      return Promise.all(
+        keys.filter((key) => key !== CACHE_NAME).map((key) => caches.delete(key))
+      );
+    })
+  );
+  return self.clients.claim();
+});
+
 self.addEventListener('fetch', (event) => {
-  // Stale-while-revalidate strategy
+  // Skip cross-origin and API calls
+  if (!event.request.url.startsWith(self.location.origin)) return;
+
   event.respondWith(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.match(event.request).then((cachedResponse) => {
-        const fetchPromise = fetch(event.request).then((networkResponse) => {
-          cache.put(event.request, networkResponse.clone());
-          return networkResponse;
+    caches.match(event.request).then((cachedResponse) => {
+      if (cachedResponse) return cachedResponse;
+
+      return fetch(event.request).then((response) => {
+        // Only cache successful GET requests
+        if (!response || response.status !== 200 || response.type !== 'basic' || event.request.method !== 'GET') {
+          return response;
+        }
+
+        const responseToCache = response.clone();
+        caches.open(CACHE_NAME).then((cache) => {
+          cache.put(event.request, responseToCache);
         });
-        return cachedResponse || fetchPromise;
+
+        return response;
+      }).catch(() => {
+        // Fallback for offline HTML navigation
+        if (event.request.mode === 'navigate') {
+          return caches.match('/index.html');
+        }
       });
     })
   );
