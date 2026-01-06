@@ -1,8 +1,8 @@
-const CACHE_NAME = 'cognibias-v2';
+const CACHE_NAME = 'cognibias-v3';
 const STATIC_ASSETS = [
-  '/',
-  '/index.html',
-  '/manifest.json'
+  '/CoBi4s/',
+  '/CoBi4s/index.html',
+  '/CoBi4s/manifest.json'
 ];
 
 // ⚡️ HACKODER: Robust PWA Engine
