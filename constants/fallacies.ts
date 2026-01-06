@@ -230,3 +230,52 @@ export const FALLACIES: Fallacy[] = [
     difficulty: Difficulty.INTERMEDIATE
   }
 ];
+
+// ⚡️ NEW FALLACIES
+export const NEW_FALLACIES: Fallacy[] = [
+  {
+    id: 'appeal-to-ignorance',
+    name: 'Appeal to Ignorance',
+    type: FallacyType.INFORMAL,
+    definition: 'Asserting that a proposition is true because it has not yet been proven false (or vice versa).',
+    example: 'You can\'t prove that ghosts don\'t exist, so they must be real.',
+    counterStrategy: 'Remind them that the inability to disprove a claim does not make it true.',
+    difficulty: Difficulty.BEGINNER
+  },
+  {
+    id: 'false-cause',
+    name: 'False Cause',
+    type: FallacyType.INFORMAL,
+    definition: 'Presuming that a real or perceived relationship between things means that one is the cause of the other.',
+    example: 'Pointing to a fancy chart, Roger shows how temperatures have been rising over the past few centuries, whilst at the same time the numbers of pirates have been decreasing; thus pirates cool the world and global warming is a hoax.',
+    counterStrategy: 'Explain that correlation does not imply causation.',
+    difficulty: Difficulty.BEGINNER
+  },
+  {
+    id: 'loaded-question',
+    name: 'Loaded Question',
+    type: FallacyType.RHETORICAL,
+    definition: 'Asking a question that has an assumption built into it so that it can\'t be answered without appearing guilty.',
+    example: 'Grace and Helen were both romantically interested in Brad. One day, with Brad sitting within earshot, Grace asked in an inquisitive tone whether Helen was having any problems with a fungal infection.',
+    counterStrategy: 'Identify the implicit assumption and refuse to answer the question as framed.',
+    difficulty: Difficulty.INTERMEDIATE
+  },
+  {
+    id: 'bandwagon',
+    name: 'Bandwagon Fallacy',
+    type: FallacyType.SOCIAL,
+    definition: 'Appealing to popularity or the fact that many people do something as an attempted form of validation.',
+    example: 'Shamus pointed a drunken finger at Sean and asked him to explain how so many people could believe in leprechauns if they\'re only a silly old superstition.',
+    counterStrategy: 'Point out that popularity has no bearing on truth (e.g., people once believed the earth was flat).',
+    difficulty: Difficulty.BEGINNER
+  },
+  {
+    id: 'begging-the-question',
+    name: 'Begging the Question',
+    type: FallacyType.FORMAL,
+    definition: 'A circular argument in which the conclusion is included in the premise.',
+    example: 'The word of Zorbo the Great is flawless and perfect. We know this because it says so in The Great and Infallible Book of Zorbo\'s Best and Most Truest Things that are Definitely True and Should Not Ever Be Questioned.',
+    counterStrategy: 'Show that the premise assumes the truth of the conclusion.',
+    difficulty: Difficulty.INTERMEDIATE
+  }
+];
