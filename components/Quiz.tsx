@@ -1,13 +1,15 @@
-
 import React, { useState } from 'react';
 import { Check, ArrowRight, Loader2, Award, ClipboardCheck, Zap, ShieldAlert, Heart, XCircle } from 'lucide-react';
 import { Bias, QuizQuestion, AppState } from '../types';
 import { generateQuizQuestion } from '../services/apiService';
+import { BIASES, FALLACIES } from '../constants';
 
 interface QuizProps {
   state: AppState;
   updateProgress: (id: string, quality: number) => void;
 }
+
+const SESSION_LENGTH = 10;
 
 const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
   const [active, setActive] = useState(false);
@@ -19,8 +21,6 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
   const [count, setCount] = useState(0);
   const [error, setError] = useState<string | null>(null);
 
-  const biases = state.mode === 'psychology' ? Object.values(state.progress).map(p => ({ id: p.biasId, name: p.biasId, definition: '' })) : [];
-
   const fetchNextQuestion = async () => {
     setLoading(true);
     setAnswered(false);
@@ -31,23 +31,23 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
       const allBiases = state.mode === 'psychology' ? BIASES : FALLACIES;
       const progressMap = state.mode === 'psychology' ? state.progress : state.fallacyProgress;
       
-      // Filter for biases the user hasn't mastered yet (<70%)
       let weakBiases = allBiases.filter(b => {
         const p = progressMap[b.id];
         return !p || p.masteryLevel < 70;
       });
 
-      // If everything is mastered, pull from everything but sort by lowest
       if (weakBiases.length === 0) {
         weakBiases = [...allBiases].sort((a, b) => 
           (progressMap[a.id]?.masteryLevel || 0) - (progressMap[b.id]?.masteryLevel || 0)
         ).slice(0, 10);
       }
 
-      // Adaptive Intensity: Use fewer options if the user is struggling, but here we increase subtlty
-      const targetBias = weakBiases[Math.floor(Math.random() * weakBiases.length)];
+      // 🧠 ARCHITECTURAL SEQUENCING:
+      const isScenario = count === 2 || count === 6; // Positions 3 and 7
+      const isMetacognition = count === 4; // Position 5
       
-      const q = await generateQuizQuestion([targetBias]);
+      const targetBias = weakBiases[Math.floor(Math.random() * weakBiases.length)];
+      const q = await generateQuizQuestion([targetBias] as any[], isScenario, isMetacognition);
       
       if (!q || !q.options || q.options.length === 0) {
         throw new Error("AI generated malformed logic trap.");
@@ -79,7 +79,7 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
     if (isCorrect) {
       updateProgress(question!.biasId, 5);
     } else {
-      setIntegrity(prev => Math.max(0, prev - 25));
+      setIntegrity(prev => Math.max(0, prev - 20)); 
       updateProgress(question!.biasId, 1);
     }
     setCount(c => c + 1);
@@ -100,21 +100,21 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
           <div className="space-y-3">
             <h2 className="serif text-4xl text-white italic">Shadow Quiz</h2>
             <p className="text-slate-500 text-sm max-w-sm mx-auto uppercase tracking-widest leading-relaxed">
-              Adversarial assessment protocol. <br/> Identify the trap or lose integrity.
+              10-Item Adversarial Sequence. <br/> Identify the trap or lose integrity.
             </p>
           </div>
           <button 
             onClick={handleStart}
             className="btn-primary w-full py-5 rounded-2xl text-[10px] font-black uppercase tracking-[0.3em] shadow-xl shadow-rose-900/20 active:scale-95 transition-all"
           >
-            INITIALIZE_TRAP_SEQUENCE
+            INITIALIZE_10_TRAP_SEQUENCE
           </button>
         </div>
       </div>
     );
   }
 
-  if (integrity <= 0 || (count >= 5 && answered)) {
+  if (integrity <= 0 || (count >= SESSION_LENGTH && answered)) {
     const isDefeated = integrity <= 0;
     return (
       <div className="max-w-md mx-auto py-12 text-center animate-fade-in">
@@ -123,7 +123,7 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
             {isDefeated ? <XCircle size={48} /> : <Award size={48} />}
           </div>
           <div>
-            <h2 className="serif text-5xl text-white italic mb-2">{isDefeated ? 'Overwhelmed' : 'Shields Up'}</h2>
+            <h2 className="serif text-5xl text-white italic mb-2">{isDefeated ? 'Overwhelmed' : 'Protocol Clear'}</h2>
             <p className="text-slate-500 text-[10px] font-bold uppercase tracking-[0.4em] mt-2">
               Final Integrity: {integrity}%
             </p>
@@ -148,7 +148,7 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
         <div className="flex items-center gap-6">
            <div>
              <div className="text-[8px] font-mono text-slate-500 uppercase tracking-[0.4em] mb-1">Assessing_Logic</div>
-             <div className="text-white font-bold text-lg tracking-tight italic serif">Trap 0{count + 1}</div>
+             <div className="text-white font-bold text-lg tracking-tight italic serif">Trap {count + 1} / {SESSION_LENGTH}</div>
            </div>
            <div className="h-10 w-px bg-white/5"></div>
            <div className="w-48 md:w-64">
@@ -164,7 +164,10 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
               </div>
            </div>
         </div>
-        <Heart size={20} className={integrity < 40 ? 'text-rose-500 animate-pulse' : 'text-slate-800'} />
+        <div className="flex flex-col items-center">
+           <Heart size={20} className={integrity < 40 ? 'text-rose-500 animate-pulse' : 'text-slate-800'} />
+           {question?.isScenario && <div className="text-[8px] font-black text-indigo-400 uppercase mt-1 tracking-tighter">SCENARIO_ACTIVE</div>}
+        </div>
       </div>
 
       <div className="min-h-[400px] flex flex-col">
@@ -245,7 +248,5 @@ const Quiz: React.FC<QuizProps> = ({ state, updateProgress }) => {
     </div>
   );
 };
-
-export default Quiz;
 
 export default Quiz;

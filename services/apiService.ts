@@ -46,21 +46,35 @@ export const generateAIPoweredScenario = async (bias: Bias): Promise<string> => 
   }
 };
 
-export const generateQuizQuestion = async (biases: Bias[]): Promise<QuizQuestion> => {
+export const generateQuizQuestion = async (biases: Bias[], isScenario: boolean = false, isMetacognition: boolean = false): Promise<QuizQuestion> => {
   const targetBias = biases[Math.floor(Math.random() * biases.length)];
   try {
     const prompt = `
-      Create a Multiple-Choice Question for understanding "${targetBias.name}".
-      Output JSON: { "scenario": string, "question": string, "options": [string, string, string, string], "correctAnswer": string, "explanation": string }
+      GOAL: Generate a high-stakes "Shadow Trap" for ${isMetacognition ? 'Metacognition (thinking about thinking)' : targetBias.name}.
+      
+      REQUIREMENTS:
+      1. TYPE: ${isScenario ? 'SCENARIO-BASED (A 3-4 sentence professional narrative)' : 'DIRECT (A concise but subtle logic claim)'}.
+      2. OPTIONS: Provide 4 options. 1 is perfectly rational. 3 are "Adversarial Distractors" (sound plausible but succumb to the bias/fallacy).
+      3. METACOGNITION: ${isMetacognition ? 'Focus the question on the user\'s confidence or the "Blind Spot Bias" - how we see others\' biases but not our own.' : 'Focus on identifying the distortion.'}
+      4. INTEGRITY: Ensure exactly ONE answer is factually/logically defensible.
+      
+      Output JSON: 
+      { 
+        "scenario": "string (The situation)", 
+        "question": "string (The prompt)", 
+        "options": ["string", "string", "string", "string"], 
+        "correctAnswer": "string (Must match one option exactly)", 
+        "explanation": "string (Why the others were traps)" 
+      }
     `;
     const content = await callOpenRouter([
-      { role: "system", content: "You are a rigorous assessment developer. JSON only." },
+      { role: "system", content: "You are a master of adversarial pedagogy and cognitive science. JSON only." },
       { role: "user", content: prompt }
-    ], { response_format: { type: "json_object" } });
+    ], { response_format: { type: "json_object" }, temperature: 0.7 });
     const data = JSON.parse(content);
     return {
       biasId: targetBias.id,
-      isScenario: true,
+      isScenario: isScenario,
       content: `${data.scenario}\n\n${data.question}`,
       correctAnswer: data.correctAnswer,
       options: data.options.sort(() => 0.5 - Math.random()), 
