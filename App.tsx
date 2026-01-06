@@ -19,7 +19,8 @@ import {
   Binary,
   Shuffle,
   MessageSquare,
-  HelpCircle
+  HelpCircle,
+  Swords
 } from 'lucide-react';
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
@@ -39,8 +40,6 @@ import { ContextLab } from './components/ContextLab/ContextLab';
 import { ChatInterface } from './components/SocraticChat/ChatInterface';
 import { LandingPage } from './components/LandingPage';
 import { ShadowBoxing } from './components/ShadowBoxing';
-
-import { Swords } from 'lucide-react';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -156,7 +155,7 @@ const App: React.FC = () => {
           </div>
           
           <nav className="flex-1 p-4 space-y-1 overflow-y-auto no-scrollbar">
-            <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
+            <NavLink to="/dashboard" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
             <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" />
@@ -166,13 +165,13 @@ const App: React.FC = () => {
             <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
             <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" />
             <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" />
-            <NavLink to="/flashcards" icon={<Zap size={18} />} label="Practice" />
+            <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
             <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
             <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" />
           </nav>
 
           <div className="p-4 border-t border-white/5 space-y-1">
-            <NavLink to="/welcome" icon={<HelpCircle size={18} />} label="About" />
+            <NavLink to="/" icon={<HelpCircle size={18} />} label="About" />
             <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" />
           </div>
         </aside>
@@ -209,7 +208,7 @@ const App: React.FC = () => {
                   <button 
                     onClick={() => setState(prev => ({ ...prev, mode: 'logic' }))}
                     className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-lg text-[10px] uppercase tracking-widest font-bold transition-all ${
-                      state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-xl border border-white/10' : 'text-slate-500 hover:text-slate-300'
+                      state.mode === 'logic' ? 'bg-white/10 text-rose-400 shadow-lg border border-white/10' : 'text-slate-500 hover:text-slate-300'
                     }`}
                   >
                     <ShieldAlert size={12} />
@@ -219,7 +218,7 @@ const App: React.FC = () => {
               </div>
 
               <nav className="flex-1 p-6 space-y-4 overflow-y-auto no-scrollbar">
-                <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/dashboard" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" onClick={() => setIsMobileMenuOpen(false)} />
@@ -229,10 +228,10 @@ const App: React.FC = () => {
                 <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/flashcards" icon={<Zap size={18} />} label="Practice" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/plan" icon={<CalendarDays size={18} />} label="Schedule" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/welcome" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" onClick={() => setIsMobileMenuOpen(false)} />
               </nav>
             </div>
@@ -243,7 +242,8 @@ const App: React.FC = () => {
         <main className="flex-1 h-full overflow-y-auto pt-16 lg:pt-0 no-scrollbar bg-transparent">
           <div className="max-w-6xl mx-auto p-6 md:p-10 lg:p-12">
             <Routes>
-              <Route path="/" element={<Dashboard state={state} />} />
+              <Route path="/" element={<LandingPage />} />
+              <Route path="/dashboard" element={<Dashboard state={state} />} />
               <Route path="/catalog" element={<Catalog state={state} toggleFavorite={(id) => {
                  setState(prev => {
                    const isFav = prev.favorites.includes(id);
@@ -267,7 +267,6 @@ const App: React.FC = () => {
               <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
               <Route path="/plan" element={<StudyPlan state={state} />} />
               <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
-              <Route path="/welcome" element={<LandingPage />} />
             </Routes>
           </div>
         </main>

@@ -83,7 +83,7 @@ export const LandingPage: React.FC = () => {
         
         <div className="pt-12">
           <button 
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/dashboard')}
             className="group btn-primary bg-white text-black hover:bg-zinc-200 px-12 py-5 rounded-full font-bold tracking-[0.2em] text-[10px] flex items-center gap-4 mx-auto transition-all shadow-2xl shadow-white/10"
           >
             INITIALIZE SYSTEM <ArrowRight size={16} className="group-hover:translate-x-1 transition-transform" />
