@@ -26,6 +26,27 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
   const [logContext, setLogContext] = useState<TransferLog['context']>('work');
   const [logImpact, setLogImpact] = useState(3);
 
+  const [cardMode, setCardMode] = useState<'term' | 'scenario'>('term');
+  const [dynamicScenario, setDynamicScenario] = useState<string | null>(null);
+  const [loadingScenario, setLoadingScenario] = useState(false);
+
+  useEffect(() => {
+    let queue = BIASES.map(b => b.id);
+    if (state.preferences.flashcardsOnlyFavorites) {
+      queue = queue.filter(id => state.favorites.includes(id));
+    }
+    
+    // Sort by nextReviewDate
+    queue.sort((a, b) => (state.progress[a]?.nextReviewDate || 0) - (state.progress[b]?.nextReviewDate || 0));
+    
+    // ⚡️ ARCHITECT FIX: If queue is still empty (e.g. no favorites), fall back to all biases
+    if (queue.length === 0) {
+      queue = BIASES.map(b => b.id).sort((a, b) => (state.progress[a]?.masteryLevel || 0) - (state.progress[b]?.masteryLevel || 0));
+    }
+
+    setSessionQueue(queue.slice(0, 10));
+  }, [state.progress, state.favorites, state.preferences.flashcardsOnlyFavorites]);
+
   const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
 
   const handleGrade = (quality: number) => {
