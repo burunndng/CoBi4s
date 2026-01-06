@@ -18,52 +18,52 @@ export const LandingPage: React.FC = () => {
 
   const features = [
     {
-      title: "Registry",
-      description: "The Codex. Reference the 50 laws of human irrationality.",
-      icon: <Library size={24} />,
-      link: '/catalog'
-    },
-    {
-      title: "Flashcards",
-      description: "The Drill. Spaced repetition for pattern recognition.",
-      icon: <BookOpen size={24} />,
-      link: '/flashcards'
-    },
-    {
-      title: "Simulator",
-      description: "The Sandbox. Face high-stakes choices and consequences.",
-      icon: <BrainCircuit size={24} />,
-      link: '/instructor'
-    },
-    {
-      title: "Detector",
-      description: "The Lens. Highlight hidden biases/fallacies in text.",
-      icon: <ShieldAlert size={24} />,
-      link: '/detector'
-    },
-    {
-      title: "Logic Lab",
-      description: "The Workshop. Fix broken arguments with steel-manning.",
-      icon: <FlaskConical size={24} />,
-      link: '/lab'
-    },
-    {
-      title: "Switcher",
-      description: "The Prism. Calibrate heuristics for different contexts.",
-      icon: <Shuffle size={24} />,
-      link: '/context'
-    },
-    {
-      title: "Mirror",
-      description: "The Coach. Debug your own thoughts in real-time.",
+      title: "Socratic Mirror",
+      description: "The Hub. Real-time cognitive debugging and pattern harvesting.",
       icon: <MessageSquare size={24} />,
       link: '/chat'
     },
     {
-      title: "Trainer",
-      description: "The Compiler. Program logic to test your understanding.",
+      title: "Shadow Boxing",
+      description: "The Arena. Face 'The Sophist' in adversarial logic combat.",
+      icon: <Swords size={24} />,
+      link: '/debate'
+    },
+    {
+      title: "The Gauntlet",
+      description: "The Assessment. 10-item high-stakes adaptive integrity testing.",
+      icon: <ShieldAlert size={24} />,
+      link: '/quiz'
+    },
+    {
+      title: "Transfer Bridge",
+      description: "The Reality-Log. Sync abstract theory with real-world observations.",
+      icon: <Target size={24} />,
+      link: '/flashcards'
+    },
+    {
+      title: "Logic Lab",
+      description: "The Workshop. Isolate and repair broken logical structures.",
+      icon: <FlaskConical size={24} />,
+      link: '/lab'
+    },
+    {
+      title: "Simulation",
+      description: "The Sandbox. Narratively complex 'Choose Your Own Adventure' drills.",
+      icon: <BrainCircuit size={24} />,
+      link: '/instructor'
+    },
+    {
+      title: "Algorithm Trainer",
+      description: "The Circuit. Map natural language logic to visual AST structures.",
       icon: <Binary size={24} />,
       link: '/trainer'
+    },
+    {
+      title: "Registry",
+      description: "The Library. A high-fidelity database of 50+ cognitive laws.",
+      icon: <Library size={24} />,
+      link: '/catalog'
     }
   ];
 
