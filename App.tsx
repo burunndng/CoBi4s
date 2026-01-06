@@ -175,10 +175,22 @@ const App: React.FC = () => {
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
             <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" />
-            <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
-            <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
-            <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
-            <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
+            
+            {/* 🛡️ LOGIC MODE TOOLS */}
+            {state.mode === 'logic' && (
+              <>
+                <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
+                <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
+              </>
+            )}
+
+            {/* 🧠 PSYCHOLOGY MODE TOOLS */}
+            {state.mode === 'psychology' && (
+              <>
+                <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
+                <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
+              </>
+            )}
           </nav>
 
           <div className="p-4 border-t border-white/5 space-y-1">
@@ -258,10 +270,21 @@ const App: React.FC = () => {
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
+                
+                {state.mode === 'logic' && (
+                  <>
+                    <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
+                    <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
+                  </>
+                )}
+
+                {state.mode === 'psychology' && (
+                  <>
+                    <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
+                    <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
+                  </>
+                )}
+
                 <NavLink to="/" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/settings" icon={<Sliders size={18} />} label="Configuration" onClick={() => setIsMobileMenuOpen(false)} />
                 

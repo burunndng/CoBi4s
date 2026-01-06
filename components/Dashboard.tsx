@@ -190,23 +190,43 @@ const Dashboard: React.FC<DashboardProps> = ({ state, setState }) => {
               onClick={() => navigate('/catalog')} 
             />
             <NavCard 
-              title="Shadow Quiz" 
-              desc="Integrity Test" 
-              icon={<ShieldAlert size={20} className="text-amber-500" />}
-              onClick={() => navigate('/quiz')} 
-            />
-            <NavCard 
               title="Mirror" 
               desc="Cognitive Coach" 
               icon={<Shuffle size={18} />}
               onClick={() => navigate('/chat')} 
             />
-            <NavCard 
-              title="Debate" 
-              desc="Shadow Boxing" 
-              icon={<Swords size={20} className="text-rose-500" />}
-              onClick={() => navigate('/debate')} 
-            />
+            
+            {state.mode === 'psychology' ? (
+              <>
+                <NavCard 
+                  title="Shadow Quiz" 
+                  desc="Integrity Test" 
+                  icon={<ShieldAlert size={20} className="text-amber-500" />}
+                  onClick={() => navigate('/quiz')} 
+                />
+                <NavCard 
+                  title="Flashcards" 
+                  desc="Retention" 
+                  icon={<Zap size={20} className="text-emerald-500" />}
+                  onClick={() => navigate('/flashcards')} 
+                />
+              </>
+            ) : (
+              <>
+                <NavCard 
+                  title="Trainer" 
+                  desc="Pattern Deconstructor" 
+                  icon={<Binary size={20} className="text-indigo-500" />}
+                  onClick={() => navigate('/trainer')} 
+                />
+                <NavCard 
+                  title="Architect" 
+                  desc="Decision Auditor" 
+                  icon={<Target size={20} className="text-rose-500" />}
+                  onClick={() => navigate('/decision')} 
+                />
+              </>
+            )}
           </div>
 
           <div className="pt-2">
