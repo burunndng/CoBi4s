@@ -5,6 +5,7 @@ import { BiasedSnippet, Bias, Fallacy, AppState } from '../../types';
 import { TextCanvas, Highlight } from '../shared/TextCanvas';
 import { TransferTips } from '../shared/TransferTips';
 import { Loader2, AlertCircle, CheckCircle, BrainCircuit, RefreshCw, Eye, ShieldAlert } from 'lucide-react';
+import { BiasHUD } from './BiasHUD';
 
 interface BiasDetectorProps {
   state: AppState;
@@ -203,12 +204,6 @@ export const BiasDetector: React.FC<BiasDetectorProps> = ({ state, updateProgres
           </div>
         </div>
       ) : null}
-
-import { BiasHUD } from './BiasHUD';
-
-// ... (rest of imports)
-
-// ... (inside BiasDetector component)
 
       {selection && !loading && !showAnswer && (
         <BiasHUD 
