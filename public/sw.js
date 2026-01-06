@@ -1,9 +1,8 @@
-const CACHE_NAME = 'cognibias-v4';
+const CACHE_NAME = 'cognibias-v5'; // Bumped for CDN purge
 const STATIC_ASSETS = [
   './',
   './index.html',
   './manifest.json',
-  'https://cdn.tailwindcss.com',
   'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400;1,600&family=JetBrains+Mono:wght@400;500&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap'
 ];
 
@@ -13,6 +12,8 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     caches.open(CACHE_NAME).then((cache) => {
       console.log('[SW] Pre-caching static assets');
+      // Use addAll with map to catch individual failures if needed, 
+      // but here we trust fonts + local assets
       return cache.addAll(STATIC_ASSETS);
     })
   );
@@ -34,11 +35,11 @@ self.addEventListener('activate', (event) => {
 
 // 🌊 Stale-While-Revalidate Strategy
 self.addEventListener('fetch', (event) => {
-  // Skip cross-origin (except fonts/tailwind) and API calls
+  // Skip cross-origin (except fonts) and API calls
   const isInternal = event.request.url.startsWith(self.location.origin);
-  const isCdn = event.request.url.includes('tailwindcss.com') || event.request.url.includes('fonts.googleapis.com');
+  const isFont = event.request.url.includes('fonts.googleapis.com') || event.request.url.includes('fonts.gstatic.com');
   
-  if (!isInternal && !isCdn) return;
+  if (!isInternal && !isFont) return;
   if (event.request.method !== 'GET') return;
 
   event.respondWith(
@@ -50,8 +51,8 @@ self.addEventListener('fetch', (event) => {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
-        }).catch(() => {
-          // Return cached response if offline and fetch fails
+        }).catch((err) => {
+          console.error('[SW] Fetch failed:', err);
           return cachedResponse;
         });
 
