@@ -17,19 +17,30 @@ export const TextCanvas: React.FC<TextCanvasProps> = ({ text, highlights, onSele
   const containerRef = useRef<HTMLDivElement>(null);
 
   const handleMouseUp = () => {
-    const selection = window.getSelection();
-    if (!selection || selection.isCollapsed) {
-      onSelection('', null);
-      return;
-    }
+    // Wrap in a microtask to ensure React has finished any immediate updates
+    setTimeout(() => {
+      const selection = window.getSelection();
+      if (!selection || selection.isCollapsed || selection.rangeCount === 0) {
+        onSelection('', null);
+        return;
+      }
 
-    const range = selection.getRangeAt(0);
-    const rect = range.getBoundingClientRect();
-    
-    // Ensure selection is inside our container
-    if (containerRef.current && containerRef.current.contains(range.commonAncestorContainer)) {
-      onSelection(selection.toString().trim(), rect);
-    }
+      try {
+        const range = selection.getRangeAt(0);
+        const rect = range.getBoundingClientRect();
+        
+        // Defensive check for the commonAncestorContainer still being in the DOM
+        if (containerRef.current && 
+            range.commonAncestorContainer && 
+            containerRef.current.contains(range.commonAncestorContainer)) {
+          onSelection(selection.toString().trim(), rect);
+        }
+      } catch (err) {
+        // Silently catch selection errors if nodes were removed during re-render
+        console.warn('Selection capture interrupted by DOM update');
+        onSelection('', null);
+      }
+    }, 0);
   };
 
   const renderContent = () => {
