@@ -41,6 +41,7 @@
 │   ├── shared/          # Unified Interaction Components (TextCanvas, TransferTips)
 │   └── ...
 ├── services/            # AI Integration (SSE Streaming / Grok)
+├── lib/                 # System Utilities (Storage Management)
 ├── types.ts             # Strict Schema (AppState, SimulationScenario, BiasedSnippet)
 ├── constants.ts         # Logic Core (BIASES, FALLACIES, INITIAL_STATE)
 └── App.tsx              # Main State Container, Routing & Migration
@@ -48,7 +49,7 @@
 
 ### Data Flow
 1. **State Source**: `App.tsx` holds the single source of truth (`AppState`).
-2. **Persistence**: `useEffect` in `App.tsx` syncs state to `localStorage`.
+2. **Persistence**: `useEffect` in `App.tsx` syncs state to `localStorage` via **`lib/storageManager.ts`** pruning logic.
 3. **Architecture**: **Dual-Core**. Global `mode` state switches the entire app's registry, icons, and accents (Indigo for Psych, Rose for Logic).
 4. **Interactive Primitives**: Shared components like `TextCanvas` (highlighting) and `TransferTips` (cues) ensure cross-module consistency.
 

@@ -8,7 +8,13 @@
     - **Streaming Core**: Migrated to a raw UTF-8 `ReadableStream` architecture for zero-latency token ingestion.
     - **"The Razor" Persona**: Overhauled the system prompt to be surgical, analytical, and direct.
     - **Pattern Harvester HUD**: Added a real-time diagnostic side-panel that "hooks" mentioned biases/fallacies during chat.
-    - **Secret Mode (The Void)**: Implemented a hidden "Easter Egg" mode accessible via a subtle Octagon trigger with custom cryptic prompting.
+    - **Secret Mode (The Void)**: Implemented a hidden "Easter Egg" mode accessible via a subtle Octagon trigger.
+    - **Mobile Optimization**: Converted HUD to a responsive slide-out drawer with notification badges.
+- **System Stability & Build Quality**:
+    - **Import Sanitization**: Resolved critical `ReferenceError` crashes (`Target`, `Shuffle`, `BrainCircuit`) by auditing and fixing missing icon imports across all components.
+    - **App.tsx Refactor**: Repaired codebase corruption and duplicate imports introduced during rapid feature iterations.
+    - **Bundler Optimization**: Removed redundant `importmap` from `index.html` to give Vite exclusive control over dependency resolution, ensuring production stability.
+    - **Storage Management**: Implemented `lib/storageManager.ts` to calculate real-time `localStorage` usage and automatically prune old history to prevent `QuotaExceededError`.
 - **Cognitive Brutalism Aesthetic**:
     - **Blueprint Style**: Injected a global geometric grid and SVG fractal noise texture for a tactile, industrial feel.
     - **Glassmorphism**: Overhauled all surfaces to use `backdrop-blur-xl` and translucent borders.
