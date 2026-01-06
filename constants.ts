@@ -241,6 +241,10 @@ export const INITIAL_STATE: AppState = {
   transferLogs: [],
   dailyFocus: null,
   roadmap: [],
+  userProfile: {
+    longTermMemory: [],
+    archivedSessions: 0
+  },
   preferences: {
     flashcardsOnlyFavorites: false,
     learnTab: 'all'

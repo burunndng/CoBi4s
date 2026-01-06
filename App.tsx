@@ -59,7 +59,8 @@ const App: React.FC = () => {
         chatHistory: parsed.chatHistory || [],
         transferLogs: parsed.transferLogs || [],
         dailyFocus: parsed.dailyFocus || null,
-        roadmap: parsed.roadmap || []
+        roadmap: parsed.roadmap || [],
+        userProfile: parsed.userProfile || { longTermMemory: [], archivedSessions: 0 }
       };
     }
     return INITIAL_STATE;

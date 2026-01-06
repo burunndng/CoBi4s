@@ -1,9 +1,9 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { AppState, ChatMessage, ProgressState } from '../../types';
 import { BIASES, FALLACIES } from '../../constants';
-import { streamChatMessage } from '../../services/apiService';
+import { streamChatMessage, summarizeChatHistory } from '../../services/apiService';
 import { MessageBubble } from './MessageBubble';
-import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles, Target, Zap, X } from 'lucide-react';
+import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles, Target, Zap, X, Brain } from 'lucide-react';
 
 interface ChatInterfaceProps {
   state: AppState;
@@ -16,7 +16,34 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
   const [secretMode, setSecretMode] = useState(false);
   const [detectedPatterns, setDetectedPatterns] = useState<string[]>([]);
   const [isHudOpen, setIsHudOpen] = useState(false);
+  const [protocol, setProtocol] = useState<'standard' | 'auditor' | 'conflict'>('standard');
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // 👻 GHOSTING PROTOCOL: Auto-Compress History
+  useEffect(() => {
+    if (state.chatHistory.length > 20 && !loading) {
+      const ghostMessages = async () => {
+        const oldest = state.chatHistory.slice(0, 10);
+        const kept = state.chatHistory.slice(10);
+        
+        try {
+          const newFacts = await summarizeChatHistory(oldest);
+          setState(prev => ({
+            ...prev,
+            chatHistory: kept,
+            userProfile: {
+              ...prev.userProfile,
+              longTermMemory: [...new Set([...prev.userProfile.longTermMemory, ...newFacts])],
+              archivedSessions: prev.userProfile.archivedSessions + 1
+            }
+          }));
+        } catch (e) {
+          console.error("Ghosting failed", e);
+        }
+      };
+      ghostMessages();
+    }
+  }, [state.chatHistory.length, loading, setState]);
 
   // ⚡️ HACKODER: Live Pattern Scanner
   useEffect(() => {
@@ -92,9 +119,19 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
         content: m.content
       }));
 
+      // 🧠 MEMORY INJECTION
+      let systemContext = "";
+      if (state.userProfile?.longTermMemory?.length > 0) {
+        systemContext += `\nUSER CONTEXT (MEMORY):\n${state.userProfile.longTermMemory.map(f => `- ${f}`).join('\n')}\n`;
+      }
+
       // Inject Protocol Instruction if not standard
       if (protocol !== 'standard') {
-        historyPayload.unshift({ role: 'system', content: getProtocolPrompt() });
+        systemContext += "\n" + getProtocolPrompt();
+      }
+
+      if (systemContext) {
+        historyPayload.unshift({ role: 'system', content: systemContext.trim() });
       }
 
       // 🌊 COMMENCE STREAM
@@ -147,7 +184,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
               {secretMode ? 'The Void' : 'Socratic Mirror'}
             </h1>
             
-            <div className="flex gap-2 mt-3">
+            <div className="flex gap-2 mt-3 items-center">
                {(['standard', 'auditor', 'conflict'] as const).map(p => (
                  <button 
                    key={p}
@@ -159,6 +196,14 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
                    {p}
                  </button>
                ))}
+               
+               {/* 👻 GHOST MEMORY INDICATOR */}
+               {state.userProfile?.longTermMemory?.length > 0 && (
+                 <div className="ml-4 flex items-center gap-2 bg-indigo-500/10 border border-indigo-500/20 px-3 py-1.5 rounded-full animate-in fade-in" title="Active Long-Term Memory">
+                    <Brain size={12} className="text-indigo-400" />
+                    <span className="text-[9px] font-mono text-indigo-300 font-bold">{state.userProfile.longTermMemory.length}_FACTS</span>
+                 </div>
+               )}
             </div>
           </div>
           

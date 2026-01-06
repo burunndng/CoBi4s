@@ -207,9 +207,17 @@ export interface AppState {
 
   } | null;
 
-  roadmap: CustomMilestone[]; // ⚡️ Strategic Journey
+    roadmap: CustomMilestone[];
 
-  preferences: {
+    userProfile: {
+
+      longTermMemory: string[];
+
+      archivedSessions: number;
+
+    };
+
+    preferences: {
     flashcardsOnlyFavorites: boolean;
     learnTab: string;
   };

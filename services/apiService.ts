@@ -171,6 +171,33 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
   return JSON.parse(content);
 };
 
+export const summarizeChatHistory = async (messages: { role: string, content: string }[]): Promise<string[]> => {
+  const conversation = messages.map(m => `${m.role.toUpperCase()}: ${m.content}`).join('\n');
+  const prompt = `
+    TASK: MEMORY COMPRESSION
+    Summarize the following conversation into 3-5 concise "User Facts" that should be remembered for future context.
+    Focus on: user goals, recurring anxieties, specific decision contexts, or revealed biases.
+    Ignore: casual greetings, system glitches, or generic chitchat.
+    
+    CONVERSATION:
+    ${conversation}
+    
+    Output JSON: { "facts": ["User is worried about...", "User tends to..."] }
+  `;
+
+  try {
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a memory archivist. Extract psychological context. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    const parsed = JSON.parse(content);
+    return parsed.facts || [];
+  } catch (e) {
+    console.error("Memory compression failed", e);
+    return [];
+  }
+};
+
 export const generateDeconstructionCase = async (biasName: string, definition: string): Promise<any> => {
   const prompt = `
     FORENSIC DECONSTRUCTOR:
