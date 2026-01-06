@@ -25,4 +25,12 @@ if ('serviceWorker' in navigator) {
       .then(reg => console.log('SW Registered', reg.scope))
       .catch(err => console.log('SW Failed', err));
   });
+
+  // ⚡️ ARCHITECT RECOVERY: Listen for forced reloads from SW (Hash Mismatches)
+  navigator.serviceWorker.addEventListener('message', (event) => {
+    if (event.data && event.data.type === 'RELOAD_REQUIRED') {
+      console.warn('System update detected. Refreshing for stability...');
+      window.location.reload();
+    }
+  });
 }

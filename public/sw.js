@@ -1,4 +1,4 @@
-const CACHE_NAME = 'cognibias-v11'; // ⚡️ FORCED_SYNC
+const CACHE_NAME = 'cognibias-v12'; // ⚡️ AUTONOMOUS_RECOVERY
 const STATIC_ASSETS = [
   './',
   './index.html',
@@ -45,7 +45,7 @@ self.addEventListener('fetch', (event) => {
   
   if (!isInternal && !isFont) return;
 
-  // ⚡️ STRATEGY A: Entry Point (index.html) -> NETWORK-ONLY with NO-CACHE headers
+  // ⚡️ STRATEGY A: Entry Point (index.html) -> NETWORK-ONLY with NO-CACHE
   const isHtml = url.pathname.endsWith('/') || url.pathname.endsWith('index.html');
   if (isHtml) {
     event.respondWith(
@@ -60,16 +60,23 @@ self.addEventListener('fetch', (event) => {
     return;
   }
 
-  // ⚡️ STRATEGY B: Hashed Assets -> CACHE-FIRST with 404 RECOVERY
+  // ⚡️ STRATEGY B: Hashed Assets -> CACHE-FIRST with FORCED RELOAD RECOVERY
   if (url.pathname.includes('/assets/')) {
     event.respondWith(
       caches.match(event.request).then((cachedResponse) => {
         if (cachedResponse) return cachedResponse;
 
         return fetch(event.request).then((networkResponse) => {
+          // 🛑 404 RECOVERY: If an asset is missing, the build is stale.
           if (networkResponse.status === 404) {
-            console.warn('[SW] Fatal Hash Mismatch! Clearing cache...');
+            console.warn('[SW] Fatal Hash Mismatch! Clearing cache and forcing reload...');
             caches.delete(CACHE_NAME);
+            
+            // Signal all clients to reload
+            self.clients.matchAll().then(clients => {
+              clients.forEach(client => client.postMessage({ type: 'RELOAD_REQUIRED' }));
+            });
+
             return networkResponse;
           }
 
@@ -89,7 +96,7 @@ self.addEventListener('fetch', (event) => {
     caches.open(CACHE_NAME).then((cache) => {
       return cache.match(event.request).then((cachedResponse) => {
         const fetchPromise = fetch(event.request).then((networkResponse) => {
-          if (networkResponse.status === 200) {
+          if (networkResponse && networkResponse.status === 200) {
             cache.put(event.request, networkResponse.clone());
           }
           return networkResponse;
