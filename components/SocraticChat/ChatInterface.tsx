@@ -3,7 +3,7 @@ import { AppState, ChatMessage, ProgressState } from '../../types';
 import { BIASES, FALLACIES } from '../../constants';
 import { streamChatMessage } from '../../services/apiService';
 import { MessageBubble } from './MessageBubble';
-import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles, Target, Zap } from 'lucide-react';
+import { Send, MessageSquare, Trash2, Loader2, Octagon, Sparkles, Target, Zap, X } from 'lucide-react';
 
 interface ChatInterfaceProps {
   state: AppState;
@@ -136,23 +136,24 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
             </p>
           </div>
           
-                    <div className="flex items-center gap-3">
-                       {/* Mobile HUD Toggle */}
-                       <button 
-                         onClick={() => setIsHudOpen(!isHudOpen)}
-                         className="xl:hidden p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all relative"
-                         title="Toggle Diagnostics"
-                       >
-                         <Target size={18} />
-                         {detectedPatterns.length > 0 && (
-                           <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-black text-[8px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                             {detectedPatterns.length}
-                           </span>
-                         )}
-                       </button>
-          
-                       <button 
-                         onClick={() => setSecretMode(!secretMode)}               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30"
+          <div className="flex items-center gap-3">
+             {/* Mobile HUD Toggle */}
+             <button 
+               onClick={() => setIsHudOpen(!isHudOpen)}
+               className="xl:hidden p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all relative"
+               title="Toggle Diagnostics"
+             >
+               <Target size={18} />
+               {detectedPatterns.length > 0 && (
+                 <span className="absolute -top-1 -right-1 w-4 h-4 bg-amber-500 text-black text-[8px] font-bold rounded-full flex items-center justify-center animate-pulse">
+                   {detectedPatterns.length}
+                 </span>
+               )}
+             </button>
+
+             <button 
+               onClick={() => setSecretMode(!secretMode)}
+               className="p-2.5 rounded-xl bg-white/[0.02] border border-white/5 text-zinc-800 hover:text-violet-500 transition-all hover:border-violet-500/30"
                title="Initialize Secret Protocol"
              >
                <Octagon size={14} />
