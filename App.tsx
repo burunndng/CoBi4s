@@ -35,10 +35,7 @@ const Flashcards = React.lazy(() => import('./components/Flashcards'));
 const Quiz = React.lazy(() => import('./components/Quiz'));
 const StudyPlan = React.lazy(() => import('./components/StudyPlan'));
 const AppSettings = React.lazy(() => import('./components/AppSettings'));
-const AIInstructor = React.lazy(() => import('./components/AIInstructor').then(m => ({ default: m.default })));
-const BiasDetector = React.lazy(() => import('./components/BiasDetector/BiasDetector').then(m => ({ default: m.BiasDetector })));
 const DecisionArchitect = React.lazy(() => import('./components/DecisionArchitect/DecisionArchitect').then(m => ({ default: m.DecisionArchitect })));
-const LogicLab = React.lazy(() => import('./components/LogicLab/LogicLab').then(m => ({ default: m.LogicLab })));
 const AlgorithmTrainer = React.lazy(() => import('./components/AlgorithmTrainer/AlgorithmTrainer').then(m => ({ default: m.AlgorithmTrainer })));
 const ContextLab = React.lazy(() => import('./components/ContextLab/ContextLab').then(m => ({ default: m.ContextLab })));
 const ChatInterface = React.lazy(() => import('./components/SocraticChat/ChatInterface').then(m => ({ default: m.ChatInterface })));
@@ -179,10 +176,7 @@ const App: React.FC = () => {
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
             <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" />
             <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
-            <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
             <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" />
-            <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" />
-            <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" />
             <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" />
             <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" />
           </nav>
@@ -265,10 +259,7 @@ const App: React.FC = () => {
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/decision" icon={<Scale size={18} />} label="Architect" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/lab" icon={<FlaskConical size={18} />} label="Lab" onClick={() => setIsMobileMenuOpen(false)} />
-                <NavLink to="/detector" icon={<Eye size={18} />} label="Detector" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/flashcards" icon={<Zap size={18} />} label="Flashcards" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/quiz" icon={<GraduationCap size={18} />} label="Assessment" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/" icon={<HelpCircle size={18} />} label="About" onClick={() => setIsMobileMenuOpen(false)} />
@@ -311,10 +302,7 @@ const App: React.FC = () => {
                 <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
                 <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
                 <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
-                <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />
                 <Route path="/decision" element={<DecisionArchitect state={state} setState={setState} />} />
-                <Route path="/lab" element={<LogicLab state={state} updateProgress={updateProgress} />} />
-                <Route path="/detector" element={<BiasDetector state={state} updateProgress={updateProgress} />} />
                 <Route path="/flashcards" element={<Flashcards state={state} updateProgress={updateProgress} toggleFavorite={toggleFavorite} setState={setState} />} />
                 <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
                 <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
