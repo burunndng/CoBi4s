@@ -171,6 +171,29 @@ export const evaluateRepair = async (original: string, fallacy: string, repair: 
   return JSON.parse(content);
 };
 
+export const generateLogicPieces = async (biasName: string, definition: string): Promise<any> => {
+  const prompt = `
+    LOGIC PIECE GENERATOR:
+    Concept: "${biasName}"
+    Definition: "${definition}"
+    
+    TASK: Generate 3 variants for each stage of this bias's logical structure. 
+    Some should be "correct" representations, others should be subtle "red herrings" (logical errors that aren't quite this bias).
+    
+    Output JSON:
+    {
+      "triggers": ["string", "string", "string"],
+      "leaps": ["string", "string", "string"],
+      "alternatives": ["string", "string", "string"]
+    }
+  `;
+  const content = await callOpenRouter([
+    { role: "system", content: "You are a cognitive logic puzzle designer. JSON only." },
+    { role: "user", content: prompt }
+  ], { response_format: { type: "json_object" }, temperature: 0.8 });
+  return JSON.parse(content);
+};
+
 export const runAlgorithmTest = async (
   biasName: string, 
   definition: string, 
