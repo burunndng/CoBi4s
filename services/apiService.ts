@@ -49,51 +49,56 @@ export const generateAIPoweredScenario = async (bias: Bias): Promise<string> => 
   }
 };
 
-export const generateQuizQuestion = async (biases: Bias[], isScenario: boolean = false, isMetacognition: boolean = false): Promise<QuizQuestion> => {
-  const targetBias = biases[Math.floor(Math.random() * biases.length)];
-  const cacheKey = `${targetBias.id}-${isScenario}-${isMetacognition}`;
+import { QUIZ_VAULT } from '../constants/quizVault';
 
-  // Serve from cache if available for instant load
-  if (trapCache.has(cacheKey)) {
-    const cached = trapCache.get(cacheKey)!;
-    // Clear used item to allow rotation
-    trapCache.delete(cacheKey);
-    return cached;
-  }
+export const generateQuizQuestion = async (
+  targetBiases: Bias[], 
+  scenarioMode: boolean = false, 
+  metaCognition: boolean = false
+): Promise<QuizQuestion> => {
+  const target = targetBiases[0]; // Primary target
 
-  try {
-    const prompt = `
-      GOAL: High-stakes logic trap for ${isMetacognition ? 'Metacognition' : targetBias.name}.
-      RULES:
-      1. STYLE: ${isScenario ? 'Scenario (<25 words)' : 'Direct logic claim (1 sentence)'}. Use simple, clinical language. 
-      2. OPTIONS: 4 options. 1 is rational. 3 are traps. 
-      3. METACOGNITION: ${isMetacognition ? 'Focus on Blind Spot Bias.' : 'Focus on the distortion.'}
-      4. INTEGRITY: Exactly ONE correct answer.
-      Output JSON: { "scenario": "...", "question": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..." }
-    `;
-    
-    const content = await callOpenRouter([
-      { role: "system", content: "You are a logic parser. JSON only. Maximum conciseness." },
-      { role: "user", content: prompt }
-    ], { response_format: { type: "json_object" }, temperature: 0.4 });
-    
-    const data = JSON.parse(content);
-    const result = {
-      biasId: targetBias.id,
-      isScenario: isScenario,
-      content: `${data.scenario}\n\n${data.question}`,
-      correctAnswer: data.correctAnswer,
-      options: data.options.sort(() => 0.5 - Math.random()), 
-      explanation: data.explanation
+  // ⚡️ VAULT CHECK: Instant Retrieval
+  const vaultMatch = QUIZ_VAULT.find(q => q.biasId === target.id);
+  if (vaultMatch && Math.random() > 0.3) { // 70% chance to use vault for speed
+    // Add randomness to options if needed or just return
+    return {
+      ...vaultMatch,
+      id: crypto.randomUUID(), // New ID for tracking
+      options: [...vaultMatch.options].sort(() => 0.5 - Math.random()) // Shuffle options
     };
-
-    // Pre-cache next variation in the background (Optional: could implement)
-    return result;
-  } catch (error) {
-    throw error;
   }
-};
 
+  // Fallback to LLM
+  const prompt = `
+    TASK: Generate a multiple-choice question about: "${target.name}".
+    DEFINITION: ${target.definition}
+    TYPE: ${scenarioMode ? "Real-world Scenario (Story)" : "Conceptual Definition"}
+    
+    REQUIREMENTS:
+    - 4 Options.
+    - 1 Correct Answer (Must be "${target.name}" or a description of it).
+    - 3 Plausible Distractors (Related concepts, not obvious jokes).
+    
+    Output JSON: { "text": "...", "options": ["...", "...", "...", "..."], "correctAnswer": "...", "explanation": "..." }
+  `;
+  
+  const content = await callOpenRouter([
+    { role: "system", content: "You are a cognitive psychology professor. JSON only." },
+    { role: "user", content: prompt }
+  ], { response_format: { type: "json_object" }, temperature: 0.9 });
+  
+  const parsed = JSON.parse(content);
+  return {
+    id: crypto.randomUUID(),
+    biasId: target.id,
+    text: parsed.text,
+    options: parsed.options,
+    correctAnswer: parsed.correctAnswer,
+    explanation: parsed.explanation,
+    scenario: scenarioMode
+  };
+};
 export const generateSimulatorStep = async (bias: Bias, phase: 'pre' | 'teach' | 'post'): Promise<any> => {
   const prompt = `Create a diagnostic scenario for "${bias.name}" (${bias.definition}). Output JSON: { "scenario": string, "question": string, "options": [string, string], "correctIndex": number, "explanation": string }.`;
   const content = await callOpenRouter([
