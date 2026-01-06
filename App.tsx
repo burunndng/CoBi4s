@@ -26,15 +26,15 @@ import {
 import { BIASES, INITIAL_STATE, FALLACIES } from './constants';
 import { AppState, LearningMode } from './types';
 import { pruneState } from './lib/storageManager';
-import Dashboard from './components/Dashboard';
-import Catalog from './components/Catalog';
-import Flashcards from './components/Flashcards';
-import Quiz from './components/Quiz';
-import StudyPlan from './components/StudyPlan';
-import AppSettings from './components/AppSettings';
 import { Logo } from './components/Logo';
 
 // ⚡️ SENTINEL: Lazy-Loaded Heavy Modules
+const Dashboard = React.lazy(() => import('./components/Dashboard'));
+const Catalog = React.lazy(() => import('./components/Catalog'));
+const Flashcards = React.lazy(() => import('./components/Flashcards'));
+const Quiz = React.lazy(() => import('./components/Quiz'));
+const StudyPlan = React.lazy(() => import('./components/StudyPlan'));
+const AppSettings = React.lazy(() => import('./components/AppSettings'));
 const AIInstructor = React.lazy(() => import('./components/AIInstructor').then(m => ({ default: m.default })));
 const BiasDetector = React.lazy(() => import('./components/BiasDetector/BiasDetector').then(m => ({ default: m.BiasDetector })));
 const DecisionArchitect = React.lazy(() => import('./components/DecisionArchitect/DecisionArchitect').then(m => ({ default: m.DecisionArchitect })));
