@@ -320,6 +320,10 @@ const App: React.FC = () => {
                      return { ...prev, favorites: isFav ? prev.favorites.filter(f => f !== id) : [...prev.favorites, id] };
                    });
                 }} />} />
+                <Route path="/quiz" element={<Quiz state={state} updateProgress={updateProgress} />} />
+                <Route path="/plan" element={<StudyPlan state={state} />} />
+                <Route path="/settings" element={<AppSettings state={state} setState={setState} />} />
+              </Routes>
             </React.Suspense>
           </div>
         </main>

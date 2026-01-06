@@ -69,7 +69,6 @@ const Flashcards: React.FC<FlashcardProps> = ({ state, updateProgress, toggleFav
     advanceCard();
   };
 
-  const bias = sessionQueue[currentIndex] ? BIASES.find(b => b.id === sessionQueue[currentIndex]) : null;
   const currentProgress = bias ? state.progress[bias.id] : null;
   const masteryLevel = currentProgress?.masteryLevel || 0;
 
