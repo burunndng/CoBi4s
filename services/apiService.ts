@@ -274,8 +274,71 @@ export const generateBranchingScenario = async (bias: Bias): Promise<any> => {
       { role: "user", content: prompt }
     ], { response_format: { type: "json_object" } });
     return JSON.parse(content);
-  } catch (error) {
-    console.error("Simulation generation failed:", error);
-    throw error;
-  }
-};
+      } catch (error) {
+      console.error("Simulation generation failed:", error);
+      throw error;
+    }
+  };
+  
+  export const generateAdversarialStatement = async (
+    topic: string, 
+    history: { role: string, content: string }[], 
+    fallacyList: Fallacy[]
+  ): Promise<{ content: string, fallacyId: string }> => {
+    const fallacies = fallacyList.map(f => `${f.name} (ID: ${f.id})`).join(', ');
+    const prompt = `
+      TOPIC: "${topic}"
+      YOUR GOAL: You are a hostile debater. You must defend your position aggressively.
+      ADVERSARIAL RULE: You MUST inject exactly ONE logical fallacy into your next response.
+      FALLACY OPTIONS: ${fallacies}
+      
+      INSTRUCTIONS:
+      1. Look at the history.
+      2. Counter the user's points (if any).
+      3. Inject the chosen fallacy in a way that sounds plausible or emotional.
+      4. Return ONLY JSON.
+      
+      Output JSON:
+      {
+        "content": "Your debate response here...",
+        "fallacyId": "The ID of the fallacy you injected"
+      }
+    `;
+  
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a master debater and logic trap setter. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" }, temperature: 0.8 });
+    
+    return JSON.parse(content);
+  };
+  
+  export const evaluateCallout = async (
+    statement: string, 
+    userFallacyId: string, 
+    actualFallacyId: string,
+    fallacyName: string
+  ): Promise<{ isCorrect: boolean, explanation: string }> => {
+    const prompt = `
+      The AI said: "${statement}"
+      The AI intended to use: "${actualFallacyId}"
+      The user called out: "${userFallacyId}"
+      
+      Judge if the user's callout is valid. Sometimes a statement contains multiple fallacies even if only one was intended. 
+      If the user's choice is correct or a valid alternative, mark isCorrect as true.
+      Provide a 2-sentence explanation.
+      
+      Output JSON:
+      {
+        "isCorrect": boolean,
+        "explanation": "string"
+      }
+    `;
+  
+    const content = await callOpenRouter([
+      { role: "system", content: "You are a logic professor. JSON only." },
+      { role: "user", content: prompt }
+    ], { response_format: { type: "json_object" } });
+    
+    return JSON.parse(content);
+  };

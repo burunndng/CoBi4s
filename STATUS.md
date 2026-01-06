@@ -10,6 +10,11 @@
     - **Pattern Harvester HUD**: Added a real-time diagnostic side-panel that "hooks" mentioned biases/fallacies during chat.
     - **Secret Mode (The Void)**: Implemented a hidden "Easter Egg" mode accessible via a subtle Octagon trigger.
     - **Mobile Optimization**: Converted HUD to a responsive slide-out drawer with notification badges.
+- **Shadow Boxing (Adversarial Logic Arena)**:
+    - **Combat Core**: Implemented a "Debate Arena" where users face a hostile AI ("The Sophist") that intentionally uses logical fallacies.
+    - **Integrity Mechanics**: Users have an "Integrity Meter" (100 HP). Correct fallacy callouts heal/protect integrity; missing them or misidentifying causes damage.
+    - **Real-time Evaluation**: AI logic professor judges user callouts in real-time, providing immediate feedback on logical strikes.
+    - **Combat HUD**: Created a high-contrast debate interface with health bars, adversarial logs, and a "Fallacy Arsenal" command palette.
 - **Android PWA & Mobile Polish**:
     - **Service Worker 2.0**: Implemented a robust `sw.js` with stale-while-revalidate caching and versioning to enable offline use.
     - **Native Feel**: Disabled Android's "pull-to-refresh" gesture to maintain immersion; implemented `active:scale-95` haptic-visuals for all buttons.

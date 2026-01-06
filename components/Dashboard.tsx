@@ -1,7 +1,7 @@
 
 import React, { useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle } from 'lucide-react';
+import { ArrowRight, Activity, Zap, Layers, Trophy, BrainCircuit, Shuffle, Swords } from 'lucide-react';
 import { AppState, ProgressState } from '../types';
 import { BIASES } from '../constants';
 
@@ -83,10 +83,10 @@ const Dashboard: React.FC<DashboardProps> = ({ state }) => {
             onClick={() => navigate('/catalog')} 
           />
           <NavCard 
-            title="Simulator" 
-            desc="Decision Sandbox" 
-            icon={<BrainCircuit size={20} />}
-            onClick={() => navigate('/instructor')} 
+            title="Debate" 
+            desc="Shadow Boxing" 
+            icon={<Swords size={20} className="text-rose-500" />}
+            onClick={() => navigate('/debate')} 
           />
           <NavCard 
             title="Mirror" 

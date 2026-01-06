@@ -38,6 +38,9 @@ import { AlgorithmTrainer } from './components/AlgorithmTrainer/AlgorithmTrainer
 import { ContextLab } from './components/ContextLab/ContextLab';
 import { ChatInterface } from './components/SocraticChat/ChatInterface';
 import { LandingPage } from './components/LandingPage';
+import { ShadowBoxing } from './components/ShadowBoxing';
+
+import { Swords } from 'lucide-react';
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(() => {
@@ -52,6 +55,7 @@ const App: React.FC = () => {
         fallacyProgress: parsed.fallacyProgress || {},
         decisionLogs: parsed.decisionLogs || [],
         algorithmTests: parsed.algorithmTests || [],
+        shadowBoxingHistory: parsed.shadowBoxingHistory || [],
         chatHistory: parsed.chatHistory || []
       };
     }
@@ -155,6 +159,7 @@ const App: React.FC = () => {
             <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" />
             <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" />
             <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" />
+            <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" />
             <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" />
             <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" />
             <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" />
@@ -217,6 +222,7 @@ const App: React.FC = () => {
                 <NavLink to="/" icon={<LayoutGrid size={18} />} label="Overview" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/catalog" icon={<Library size={18} />} label="Registry" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/chat" icon={<MessageSquare size={18} />} label="Mirror" onClick={() => setIsMobileMenuOpen(false)} />
+                <NavLink to="/debate" icon={<Swords size={18} />} label="Shadow Boxing" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/trainer" icon={<Binary size={18} />} label="Trainer" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/context" icon={<Shuffle size={18} />} label="Switcher" onClick={() => setIsMobileMenuOpen(false)} />
                 <NavLink to="/instructor" icon={<BrainCircuit size={18} />} label="Simulator" onClick={() => setIsMobileMenuOpen(false)} />
@@ -245,6 +251,7 @@ const App: React.FC = () => {
                  });
               }} />} />
               <Route path="/chat" element={<ChatInterface state={state} setState={setState} />} />
+              <Route path="/debate" element={<ShadowBoxing state={state} setState={setState} />} />
               <Route path="/trainer" element={<AlgorithmTrainer state={state} setState={setState} />} />
               <Route path="/context" element={<ContextLab />} />
               <Route path="/instructor" element={<AIInstructor state={state} updateProgress={updateProgress} />} />

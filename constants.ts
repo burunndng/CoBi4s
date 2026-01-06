@@ -26,6 +26,16 @@ export const BIASES: Bias[] = [
     { id: 'parkinsons-law', name: "Parkinson's Law", category: Category.DECISION_MAKING, definition: 'Work expands so as to fill the time available for its completion.', example: 'Taking two weeks to finish a project that could be done in two days, just because the deadline is two weeks away.', counterStrategy: 'Set artificial, aggressive deadlines for yourself.', relatedBiases: ['planning-fallacy'], difficulty: Difficulty.BEGINNER }
 ];
 
+export const DEBATE_TOPICS = [
+  "Artificial Intelligence will eventually replace all creative human endeavors.",
+  "Social media is fundamentally incompatible with a healthy democracy.",
+  "Remote work is a net negative for professional development and corporate culture.",
+  "Universal Basic Income is the only solution to automation-driven unemployment.",
+  "Space exploration is a waste of resources that should be spent on Earth.",
+  "A meat-heavy diet is the most optimal for human evolution and performance.",
+  "Nuclear energy is the only viable path to zero-carbon emissions by 2050."
+];
+
 export const INITIAL_STATE: AppState = {
   mode: 'psychology',
   progress: {},
@@ -36,6 +46,7 @@ export const INITIAL_STATE: AppState = {
   favorites: [],
   decisionLogs: [],
   algorithmTests: [],
+  shadowBoxingHistory: [],
   chatHistory: [],
   preferences: {
     flashcardsOnlyFavorites: false,

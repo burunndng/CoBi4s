@@ -7,6 +7,7 @@
 - **The Library (Registry)**: Polymorphic database supporting both **Biases** (Psychology) and **Fallacies** (Logic).
 - **The Drill (Flashcards 2.0)**: Contextual spaced repetition featuring **Scenario Mode** for pattern recognition.
 - **The Sandbox (Simulator)**: Branching "Choose Your Own Adventure" scenarios with real-time consequences.
+- **The Arena (Shadow Boxing)**: Adversarial debate training with health bars and real-time fallacy callouts.
 - **The Lens (Detector)**: Interactive pattern-recognition tool with a categorized **HUD Command Palette**.
 - **The Workshop (Logic Lab)**: Advanced "Argument Repair" module with steel-manning, repair chips, and granular AI metrics.
 - **The Prism (Switcher)**: Nuance calibration tool using a **Range-Vibe Hybrid** slider to distinguish biases from heuristics.

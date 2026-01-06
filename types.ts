@@ -115,6 +115,28 @@ export interface ChatMessage {
   relatedBiasId?: string; // If the AI detects a specific bias
 }
 
+export interface ShadowBoxingTurn {
+  id: string;
+  role: 'adversary' | 'user';
+  content: string;
+  timestamp: number;
+  fallacyInjected?: string; // Fallacy ID if role === 'adversary'
+  calloutDetected?: {
+    fallacyId: string;
+    isCorrect: boolean;
+    explanation: string;
+  };
+}
+
+export interface ShadowBoxingSession {
+  id: string;
+  topic: string;
+  integrityPoints: number; // Start at 100
+  history: ShadowBoxingTurn[];
+  status: 'active' | 'defeated' | 'victory';
+  startTime: number;
+}
+
 export interface SimulationScenario {
   id: string;
   biasId: string;
@@ -139,6 +161,7 @@ export interface AppState {
   favorites: string[];
   decisionLogs: DecisionLog[];
   algorithmTests: AlgorithmTest[];
+  shadowBoxingHistory: ShadowBoxingSession[];
   chatHistory: ChatMessage[];
   preferences: {
     flashcardsOnlyFavorites: boolean;
