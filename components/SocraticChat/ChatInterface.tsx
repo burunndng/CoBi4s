@@ -211,14 +211,25 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
              {/* Mobile HUD Toggle */}
              <button 
                onClick={() => setIsHudOpen(!isHudOpen)}
-               className="xl:hidden p-3.5 rounded-xl bg-white/[0.02] border border-white/5 text-amber-500 hover:text-amber-400 transition-all active:scale-90 relative"
+               className={`xl:hidden p-3.5 rounded-xl bg-white/[0.02] border border-white/5 transition-all active:scale-90 relative group ${
+                 detectedPatterns.length > 0 ? 'text-amber-400 border-amber-500/30' : 'text-slate-500 hover:text-white'
+               }`}
                title="Toggle Diagnostics"
              >
                <Target size={20} />
                {detectedPatterns.length > 0 && (
-                 <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center animate-pulse">
-                   {detectedPatterns.length}
-                 </span>
+                 <>
+                   <span className="absolute -top-1 -right-1 w-5 h-5 bg-amber-500 text-black text-[10px] font-bold rounded-full flex items-center justify-center animate-bounce">
+                     {detectedPatterns.length}
+                   </span>
+                   {!isHudOpen && (
+                     <div className="absolute top-12 right-0 w-40 bg-zinc-900 border border-amber-500/30 p-3 rounded-xl shadow-xl z-50 animate-in slide-in-from-top-2 pointer-events-none">
+                        <div className="text-xs text-amber-100 font-bold mb-1">Patterns Detected</div>
+                        <div className="text-[10px] text-amber-500/80">Tap to view analysis</div>
+                        <div className="absolute -top-1.5 right-4 w-3 h-3 bg-zinc-900 border-t border-l border-amber-500/30 transform rotate-45"></div>
+                     </div>
+                   )}
+                 </>
                )}
              </button>
 
@@ -245,11 +256,50 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({ state, setState })
           className="flex-1 overflow-y-auto space-y-8 py-8 pr-4 scrollbar-thin scrollbar-thumb-white/5 scrollbar-track-transparent no-scrollbar"
         >
           {state.chatHistory.length === 0 ? (
-            <div className="h-full flex flex-col items-center justify-center text-slate-800 space-y-6 opacity-40">
-               {secretMode ? <Octagon size={64} className="animate-pulse text-violet-900" /> : <MessageSquare size={64} />}
-               <div className="text-center space-y-2">
-                  <p className="text-[10px] uppercase tracking-[0.5em] font-black">System Ready</p>
-                  <p className="text-xs font-mono italic">Awaiting cognitive input...</p>
+            <div className="h-full flex flex-col items-center justify-center space-y-10 animate-fade-in">
+               <div className="text-center space-y-4 max-w-lg">
+                  <div className="w-20 h-20 bg-indigo-500/10 rounded-full flex items-center justify-center mx-auto border border-indigo-500/20 shadow-[0_0_30px_rgba(99,102,241,0.15)]">
+                     {secretMode ? <Octagon size={40} className="text-violet-400" /> : <MessageSquare size={40} className="text-indigo-400" />}
+                  </div>
+                  <h2 className="serif text-3xl text-white italic">The Socratic Mirror</h2>
+                  <p className="text-slate-400 text-sm leading-relaxed">
+                    This is not a chatbot. It is a cognitive debugging tool. Select a protocol to begin analyzing your thought patterns.
+                  </p>
+               </div>
+
+               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 w-full max-w-3xl px-4">
+                  <button 
+                    onClick={() => { setProtocol('standard'); setInput("I'm feeling stuck on..."); }}
+                    className="group p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-indigo-500/30 hover:bg-indigo-500/5 transition-all text-left flex flex-col gap-3 active:scale-95"
+                  >
+                     <Sparkles size={20} className="text-indigo-400 group-hover:scale-110 transition-transform" />
+                     <div>
+                        <div className="text-white text-sm font-bold uppercase tracking-wide">Vent & Analyze</div>
+                        <div className="text-slate-500 text-xs mt-1">Detect hidden biases in your stream of consciousness.</div>
+                     </div>
+                  </button>
+
+                  <button 
+                    onClick={() => { setProtocol('auditor'); setInput("I need to make a decision about..."); }}
+                    className="group p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-rose-500/30 hover:bg-rose-500/5 transition-all text-left flex flex-col gap-3 active:scale-95"
+                  >
+                     <Target size={20} className="text-rose-400 group-hover:scale-110 transition-transform" />
+                     <div>
+                        <div className="text-white text-sm font-bold uppercase tracking-wide">Debug Decision</div>
+                        <div className="text-slate-500 text-xs mt-1">Run a ruthless Pre-Mortem risk assessment.</div>
+                     </div>
+                  </button>
+
+                  <button 
+                    onClick={() => { setProtocol('conflict'); setInput("I'm having a conflict with..."); }}
+                    className="group p-6 rounded-2xl bg-zinc-900/50 border border-white/5 hover:border-emerald-500/30 hover:bg-emerald-500/5 transition-all text-left flex flex-col gap-3 active:scale-95"
+                  >
+                     <Zap size={20} className="text-emerald-400 group-hover:scale-110 transition-transform" />
+                     <div>
+                        <div className="text-white text-sm font-bold uppercase tracking-wide">Resolve Conflict</div>
+                        <div className="text-slate-500 text-xs mt-1">De-escalate and find the underlying interest.</div>
+                     </div>
+                  </button>
                </div>
             </div>
           ) : (
