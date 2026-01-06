@@ -4,68 +4,49 @@
 
 ## 🚀 Recent Changes
 
+- **Socratic Mirror (Real-time Neural Hub)**:
+    - **Streaming Core**: Migrated to a raw UTF-8 `ReadableStream` architecture for zero-latency token ingestion.
+    - **"The Razor" Persona**: Overhauled the system prompt to be surgical, analytical, and direct.
+    - **Pattern Harvester HUD**: Added a real-time diagnostic side-panel that "hooks" mentioned biases/fallacies during chat.
+    - **Secret Mode (The Void)**: Implemented a hidden "Easter Egg" mode accessible via a subtle Octagon trigger with custom cryptic prompting.
+- **Cognitive Brutalism Aesthetic**:
+    - **Blueprint Style**: Injected a global geometric grid and SVG fractal noise texture for a tactile, industrial feel.
+    - **Glassmorphism**: Overhauled all surfaces to use `backdrop-blur-xl` and translucent borders.
+    - **Editorial Typography**: Implemented a high-contrast typographic system using Cormorant Garamond (Serif) and JetBrains Mono.
+- **Contextual Flashcards (Scenario Mode)**:
+    - **Dual-Mode Drill**: Added a toggle between "Term Mode" (Name ↔ Def) and "Scenario Mode" (Context ↔ Name).
+    - **AI Refresh**: Integrated real-time AI scenario generation to provide fresh practice examples for every card.
+- **AI Simulator (Simulation Sandbox)**:
+    - **Branching Logic**: Revamped the legacy quiz-style simulator into a "Choose Your Own Adventure" engine with narrative consequences.
+- **Decision Audit (Red Team Report)**:
+    - **Risk Matrix**: Users now rate the severity (1-10) of detected biases before finalizing audits.
+    - **Visual Triage**: Color-coded risk indicators based on severity.
+- **Bias Detector (Command Palette)**:
+    - **HUD Interaction**: Replaced standard dropdowns with a categorized "Heads-Up Display" for faster, mental-model-based tagging.
 - **Algorithm Trainer (`AlgorithmTrainer`)**:
-    - **New Feature**: A "Logic Compiler" where users program biases using pseudo-code.
     - **Adversarial Testing**: The AI runs 3 unit tests (Happy Path, Edge Case, Counter-Example) against the user's logic.
     - **Integrated IDE**: Includes a code editor, terminal output, and test history.
 - **Context Switcher (`ContextLab`)**:
-    - **New Feature**: A "Range-Vibe Hybrid" tool for calibrating heuristics.
-    - **Workflow**: User inputs an action -> AI generates 3 contexts -> User sets utility sliders -> AI reveals target zones.
-    - **Visual Feedback**: Uses a gradient slider (Rose -> Emerald) with a yellow "Target Zone" overlay.
+    - **Range-Vibe Hybrid**: Calibration tool using a gradient slider to reveal AI-determined utility target zones.
 
 ### Logic Domain Expansion (Dual-Core Architecture)
-- **Codex (Poly-Registry)**:
-    - Updated `Catalog.tsx` to be polymorphic, supporting both **Biases** (Psychology) and **Fallacies** (Logic).
-    - Visual theming adapts to the active mode (Indigo for Psych, Rose for Logic).
-    - Added comprehensive dataset of top 25 Logical Fallacies (`constants/fallacies.ts`).
-- **Fallacy Finder (`BiasDetector` Upgrade)**:
-    - Enhanced the detector to generate **Dialogues** when in Logic mode.
-    - AI creates realistic debates where users must identify specific fallacious lines.
-    - Added new contexts like "Courtroom" and "Political Talk Show".
-- **Logic Lab (`LogicLab`)**:
-    - **New Feature**: A dedicated module for "Argument Repair".
-    - **Workflow**: Identify -> Repair (Steel Man) -> Evaluate.
-    - **AI Professor**: Grades user repairs on logical soundness and preservation of intent.
-    - Provides constructive feedback and a "Master Repair" example.
-
-### Pattern Recognition & Metacognition Features
-- **Bias Detector (`BiasDetector`)**:
-    - Implemented an interactive pattern-recognition tool.
-    - AI generates realistic text (emails, tweets, ads) with hidden biases.
-    - Users identify biases by highlighting text and tagging them correctly.
-    - Features "fuzzy matching" to validate selections against AI-generated ground truth.
-- **Decision Architect (`DecisionArchitect`)**:
-    - Implemented a "Decision Hygiene" wizard for real-world application.
-    - Uses a "Red Team" AI approach to analyze user-submitted decisions.
-    - Identifies blind spots and generates "Killer Questions" to challenge the user's reasoning.
-    - Supports saving, answering reflections, and finalizing decision logs.
-
-### AI Architecture Migration
-- **Service Transition**: Migrated all AI logic from Google Gemini (`geminiService.ts`) to OpenRouter (`apiService.ts`).
-- **Model Selection**: Standardized on `x-ai/grok-4.1-fast` for all dynamic content.
-- **Configurability**: Added an **Intelligence** section in the Configuration tab to allow users to securely input their own OpenRouter API key.
-- **Parameters**: Set default temperature to `0.6` for balanced reasoning and creative scenario generation.
-
-### Project Restructuring
-- **Component Organization**: Moved all UI views into a dedicated `components/` directory.
-- **Service Organization**: Moved AI integration logic into a `services/` directory.
-- **Cleanup**: Removed the obsolete `geminiService.ts` and non-existent `index.css` references.
+- **Codex (Poly-Registry)**: Polymorphic support for both **Biases** and **Fallacies** with mode-specific theming.
+- **Logic Lab (`LogicLab`)**: Advanced "Argument Repair" module with fuzzy identification and repair strategy chips.
 
 ### Deployment & CI/CD
 - **GitHub Pages**: Configured the project for hosting on GitHub Pages with `base: '/CoBi4s/'`.
-- **GitHub Actions**: Created a `.github/workflows/deploy.yml` workflow for automated builds and deployments.
-- **Dependency Management**: Added \`package-lock.json\` to fix CI/CD build issues.
+- **GitHub Actions**: Automated deployment workflow.
 
 ### Agent Customization
-- **CogniBias Expert**: Created a specialized system agent (\`cognibias-expert\`) for repository-specific engineering and feature ideation.
+- **Subagent Roster**: Formalized a library of 6 specialized agents in `.gemini/` (Cognitive Architect, Theme Architect, Module Builder, Schema Guardian, Prompt Engineer, UI Polisher).
 
 ## 📋 Current State
-- **Status**: Functional & Deployed.
+- **Status**: Production-ready, High-Fidelity.
 - **Deployment URL**: [https://burunndng.github.io/CoBi4s/](https://burunndng.github.io/CoBi4s/)
 - **Primary Model**: Grok 4.1 Fast (via OpenRouter).
-- **Storage**: LocalStorage-centric (Key: `cognibias-storage`, `cognibias-openrouter-key`).
+- **Storage**: LocalStorage-centric (No DB/Auth).
 
 ## 🛠 Next Steps
-- [ ] Monitor deployment success on GitHub Actions.
-- [ ] Implement robust error handling for API quota limits.
-- [ ] Enhance simulator scenarios with multi-turn feedback loops.
+- [ ] Implement Session-Ghosting (Compression for chat history).
+- [ ] Visual AST (Abstract Syntax Tree) visualization for the Algorithm Trainer.
+- [ ] Mobile-specific touch optimization for the HUD and Sliders.
