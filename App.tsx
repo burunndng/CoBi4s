@@ -349,7 +349,7 @@ const NavLink: React.FC<{ to: string; icon: React.ReactNode; label: string; onCl
     <Link 
       to={to} 
       onClick={onClick}
-      className={`flex items-center gap-4 px-5 py-4 rounded-xl transition-all group active:scale-[0.98] ${
+      className={`flex items-center gap-4 px-5 py-4 rounded-xl transition-all group active:scale-[0.98] will-change-transform ${
         isActive 
           ? 'bg-white/10 text-white' 
           : 'text-slate-400 hover:text-white hover:bg-white/5'

@@ -58,9 +58,10 @@
     }
 
     /* ⚡️ Haptic Feedback Primitive */
-    button:active, .clickable:active {
+    button:active, .clickable:active, a:active {
       transform: scale(0.96);
       transition: transform 0.1s cubic-bezier(0, 0, 0.2, 1);
+      will-change: transform; /* ⚡️ Sentinel: Promote to compositor layer */
     }
 
     /* Noise Overlay */
@@ -71,10 +72,11 @@
       left: 0;
       width: 100%;
       height: 100%;
-      opacity: 0.025;
+      opacity: 0.015; /* Reduced for better paint performance */
       pointer-events: none;
       z-index: 9999;
-      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3True%3Cfilter id='noiseFilter'%3True%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3True%3C/filter%3True%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3True%3C/svg%3True");
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+      transform: translateZ(0); /* Force GPU acceleration for the noise layer */
     }
 
     .prose { user-select: text; }
