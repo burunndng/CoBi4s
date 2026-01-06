@@ -2,7 +2,7 @@ import React, { useState, useEffect, useRef } from 'react';
 import { AppState, ShadowBoxingSession, ShadowBoxingTurn, Fallacy } from '../types';
 import { FALLACIES, DEBATE_TOPICS } from '../constants';
 import { generateAdversarialStatement, evaluateCallout } from '../services/apiService';
-import { Swords, Shield, AlertTriangle, Send, Zap, Brain, Target, RefreshCw, Loader2, ArrowRight } from 'lucide-react';
+import { Swords, Shield, AlertTriangle, Send, Zap, Brain, Target, RefreshCw, Loader2, ArrowRight, X } from 'lucide-react';
 
 interface ShadowBoxingProps {
   state: AppState;
