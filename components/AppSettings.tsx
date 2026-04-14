@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Download, Upload, Trash2, Key } from 'lucide-react';
+import { Download, Upload, Trash2 } from 'lucide-react';
 import { AppState } from '../types';
 import { INITIAL_STATE } from '../constants';
 
@@ -10,13 +10,6 @@ interface SettingsProps {
 }
 
 const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
-  const [apiKey, setApiKey] = useState(() => localStorage.getItem('cognibias-openrouter-key') || '');
-
-  const saveApiKey = (key: string) => {
-    setApiKey(key);
-    localStorage.setItem('cognibias-openrouter-key', key);
-  };
-
   const exportData = () => {
     const blob = new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -71,33 +64,6 @@ const AppSettings: React.FC<SettingsProps> = ({ state, setState }) => {
              <span>BUILD_MANIFEST</span>
              <span className="text-indigo-400">v4.1.10-METICULOUS</span>
           </div>
-        </div>
-      </section>
-
-      <section className="space-y-4">
-        <h2 className="text-xs font-semibold text-slate-500 uppercase tracking-wider">Intelligence</h2>
-        <div className="surface rounded-xl p-5 space-y-4">
-          <div className="flex items-center gap-3">
-             <div className="p-2 bg-blue-500/10 rounded-lg">
-                <Key size={18} className="text-blue-500" />
-             </div>
-             <div>
-               <div className="text-white font-medium text-sm">OpenRouter API Key</div>
-               <div className="text-xs text-slate-500">Stored locally in your browser.</div>
-             </div>
-          </div>
-          <form onSubmit={(e) => e.preventDefault()} className="space-y-4">
-            {/* Hidden username field for accessibility/password managers */}
-            <input type="text" name="username" autoComplete="username" className="hidden" aria-hidden="true" value="cognibias-user" readOnly />
-            <input 
-              type="password"
-              value={apiKey}
-              onChange={(e) => saveApiKey(e.target.value)}
-              placeholder="sk-or-v1-..."
-              autoComplete="current-password"
-              className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-3 text-sm text-white focus:outline-none focus:border-blue-500 transition-colors font-mono"
-            />
-          </form>
         </div>
       </section>
 
